@@ -18,6 +18,7 @@ namespace MusicPlayer
         private bool playMusic = false, repeatMusic = false, shuffleMusic = false;
         string[]? musicFilesArr;
         string[]? shuffleMusicFilesArr;
+        List<MyMusic> musicList = new List<MyMusic> ();
 
         public FormMain()
         {
@@ -25,7 +26,10 @@ namespace MusicPlayer
             MyModule.SetRoundedCorners(this, 8, 8, 8, 8);
             LoadMusicFiles();
             MyModule.MakeCircular(PicBoxPlayAndPause);
-            CbSortMusic.SelectedIndex = 0;       
+            //CbSortMusic.SelectedIndex = 0;
+            
+           
+            
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -154,7 +158,29 @@ namespace MusicPlayer
                                            .Where(file => file.EndsWith(".mp3") || file.EndsWith(".wav"))
                                            .ToArray();
 
-            CreateMusicListControls();
+            foreach (string file in musicFilesArr)
+            {
+                var tagFile = TagLib.File.Create(file);
+
+                string title = tagFile.Tag.Title ?? Path.GetFileNameWithoutExtension(file); // Fallback to file name if no title
+                string artist = tagFile.Tag.FirstPerformer ?? "Unknown Artist";
+                string album = tagFile.Tag.Album ?? "Unknown Album";
+                TimeSpan duration = tagFile.Properties.Duration;
+                string albumCoverPath = "C:/Users/Mark Daniel/Downloads";
+                Image albumCoverImage = Image.FromFile(Path.Combine(albumCoverPath, "music2.png"));
+
+                
+
+                MyMusic myMusic = new MyMusic(albumCoverImage, title, artist, album, duration, file);
+                musicList.Add(myMusic);
+            }
+
+            
+            dataGridView1.DataSource = musicList;
+            dataGridView1.Columns["File"].Visible = false;
+            dataGridView1.Columns[0].HeaderText = "";
+
+            //CreateMusicListControls();
         }
 
         private void CreateMusicListControls()

@@ -28,3 +28,4 @@ C:\Users\Mark Daniel\source\repos\MusicPlayer\MusicPlayer\bin\Debug\net8.0-windo
 C:\Users\Mark Daniel\source\repos\MusicPlayer\MusicPlayer\bin\Debug\net8.0-windows\NAudio.WinMM.dll
 C:\Users\Mark Daniel\source\repos\MusicPlayer\MusicPlayer\obj\Debug\net8.0-windows\MusicPlayer.Properties.Resources.resources
 C:\Users\Mark Daniel\source\repos\MusicPlayer\MusicPlayer\bin\Debug\net8.0-windows\Modernial.dll
+C:\Users\Mark Daniel\source\repos\MusicPlayer\MusicPlayer\obj\Debug\net8.0-windows\MusicPlayer.sourcelink.json
