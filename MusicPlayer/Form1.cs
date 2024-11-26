@@ -1,11 +1,14 @@
 using Modernial.Controls;
+using MusicPlayer.CustomControls;
 using NAudio.Wave;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.Formats.Tar;
+using System.Globalization;
 using System.Linq;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
@@ -40,6 +43,8 @@ namespace MusicPlayer
         private List<string> importMusic = new List<string>();
         public List<MyMusic> playMusicQueue = new List<MyMusic>();
         public List<MyMusic> shuffleMusicList = new List<MyMusic>();
+
+        private List<MyMusic> artists = new List<MyMusic>();
 
         private Size formSize; //Keep form size when it is minimized and restored.Since the form is resized because it takes into account the size of the title bar and borders.
         private int borderSize = 2;
@@ -144,7 +149,7 @@ namespace MusicPlayer
                 }
 
                 DgvMusicList.DataSource = null;
-
+                musicList = musicList.OrderBy(x => x.Title).ToList();
                 tempMusicList = new List<MyMusic>(musicList);   // Copy the music list from musicList to tempMusicList
                 DgvMusicList.DataSource = musicList;            // Set musicList as the datasource to display in data grid view           
                 ModifyDvgMusicList(DgvMusicList);               // Function call for customizing the data grid 
@@ -422,6 +427,7 @@ namespace MusicPlayer
         {
             ModifyDvgMusicList(DgvMusicList);   // Update the DataGridView display of the music list
             UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists, btnSongs, btnArtists, btnAlbums);
+            UpdateSideBarButtonUI(btnSongs, pnlSubSelectSign, btnArtists, btnAlbums);
             DisplayOrHideSubButtons();
 
             // Display the filter controls for the music list and hide play list queue controls
@@ -429,8 +435,10 @@ namespace MusicPlayer
             PnlPlayMusicQueue.Visible = false;
 
             // Display the music list and hide the play list queue data grid view
-            PnlMusicList.Visible = true;
+            pnlMusicLibrary.Visible = true;
             PnlPlayMusicQueue.Visible = false;
+
+            pnlArtists.Visible = false;
         }
 
         private void DisplayOrHideSubButtons()
@@ -455,7 +463,7 @@ namespace MusicPlayer
             foreach (var btn in buttons)
             {
                 btn.Visible = isVisible;
-            } 
+            }
         }
 
         private void AdjustButtonPosition(System.Windows.Forms.Button referenceBtn, params System.Windows.Forms.Button[] buttons)
@@ -481,7 +489,11 @@ namespace MusicPlayer
 
             // Display the play list queue and hide the music list queue data grid view
             PnlPlayMusicQueue.Visible = true;
-            PnlMusicList.Visible = false;
+            pnlMusicLibrary.Visible = false;
+
+            pnlArtists.Visible = false;
+
+            lblShowLibraryTitle.Text = "Songs";
         }
 
         private void BtnPlayLists_Click(object sender, EventArgs e)
@@ -494,31 +506,210 @@ namespace MusicPlayer
 
         private void BtnSongs_Click(object sender, EventArgs e)
         {
-            UpdateSideBarButtonUI(btnSongs, pnlSubSelectSign ,btnArtists, btnAlbums);
-            UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists, btnArtists, btnAlbums);
+            UpdateSideBarButtonUI(btnSongs, pnlSubSelectSign, btnArtists, btnAlbums);
+            UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
+
+            lblShowLibraryTitle.Text = "Songs";
         }
 
         private void BtnArtists_Click(object sender, EventArgs e)
         {
             UpdateSideBarButtonUI(btnArtists, pnlSubSelectSign, btnSongs, btnAlbums);
-            UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists, btnSongs, btnAlbums);
+            UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
+
+            lblShowLibraryTitle.Text = "Artists";
+
+            DisplayAlbums();
+            MyModule.MakeCircular(pictureBox3);
+
+            pnlArtists.Visible = true;
+        }
+
+        private void DisplayAlbums()
+        {
+            foreach (var artist in getArtistInfo())
+            {
+                // Create a new Label for each iteration
+                System.Windows.Forms.Panel pnlArtistCover = new System.Windows.Forms.Panel
+                {
+                    //BackColor = Color.Red,
+                    //Name = "pnlArtistCover",
+                    //Size = new Size(150, 200),
+                    //Margin = new Padding(5)
+
+                    BackColor = Color.FromArgb(8, 18, 38),
+                    BorderStyle = BorderStyle.FixedSingle,
+                    //Location = new Point(18, 3),
+                    Name = "pnlArtistCover",
+                    Size = new Size(150, 200),
+                    Margin = new Padding(5),
+                    //TabIndex = 1,
+                };
+
+                PictureBox picBoxArtistImage = new PictureBox
+                {
+                    //BackColor = Color.Silver,
+                    Image = artist.ArtistImage,
+                    Location = new Point(10, 10),
+                    Name = "picBoxArtistImage",
+                    Size = new Size(130, 130),
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    //TabIndex = 0,
+                    //TabStop = false
+                };
+
+                PictureBox picBoxPlayIcon = new PictureBox
+                {
+                    Anchor = AnchorStyles.None,
+                    BackColor = Color.FromArgb(36, 176, 191),
+                    BackgroundImageLayout = ImageLayout.Stretch,
+                    Image = Properties.Resources.play,
+                    Location = new Point(99, 99),
+                    Name = "picBoxPlayIcon",
+                    Padding = new Padding(3, 0, 0, 0),
+                    Size = new Size(35, 35),
+                    SizeMode = PictureBoxSizeMode.CenterImage,
+                    //TabIndex = 7,
+                    //TabStop = false
+                    //SetToolTip(pictureBox3, "Pause")
+                };
+
+                Label lblArtistName = new Label
+                {
+                    AutoSize = true,
+                    Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
+                    ForeColor = Color.White,
+                    Location = new Point(10, 155),
+                    Name = "LblArtistName",
+                    Size = new Size(44, 17),
+                    MaximumSize = new Size(0, 130),
+                    //TabIndex = 6,
+                    Text = artist.ArtistName,
+                };
+                
+                // Add the controls to te form
+                flowLayoutPanel1.Controls.Add(pnlArtistCover);
+                pnlArtistCover.Controls.Add(picBoxArtistImage);
+                pnlArtistCover.Controls.Add(picBoxPlayIcon);
+                pnlArtistCover.Controls.Add(lblArtistName);
+
+                // Create rounded corners and circular controls
+                MyModule.MakeCircular(picBoxPlayIcon);
+                MyModule.SetRoundedCorners(pnlArtistCover, 10, 10, 10, 10);
+                MyModule.SetRoundedCorners(picBoxArtistImage, 10, 10, 10, 10);
+                picBoxPlayIcon.BringToFront();
+
+                // Attach event handlers for mouse enter and leave
+                AttachMouseEvents(pnlArtistCover, picBoxPlayIcon ,lblArtistName.Text);
+            }
+        }
+
+        private void AttachMouseEvents(System.Windows.Forms.Panel pnlArtistCover, PictureBox playButton, string artistName)
+        {
+            pnlArtistCover.MouseEnter += (sender, e) => pnlArtistCover.BackColor = Color.Silver;
+            pnlArtistCover.MouseLeave += (sender, e) => pnlArtistCover.BackColor = Color.FromArgb(8, 18, 38);
+
+            // Apply the same events to all child controls
+            foreach (Control child in pnlArtistCover.Controls)
+            {
+                child.MouseEnter += (sender, e) => pnlArtistCover.BackColor = Color.Silver;
+                child.MouseLeave += (sender, e) =>
+                {
+                    // Check if the mouse is still within the panel
+                    Point mousePosition = pnlArtistCover.PointToClient(Control.MousePosition);
+                    if (!pnlArtistCover.ClientRectangle.Contains(mousePosition))
+                    {
+                        pnlArtistCover.BackColor = Color.FromArgb(8, 18, 38);
+                    }
+                };
+            }
+
+            playButton.MouseClick += (sender, e) => { playMusicByArtists(artistName); };
+        }
+
+        private void playMusicByArtists(string artistName)
+        {
+            currentMusicIndex = -1;
+            currentMusicIndex++;
+
+            // Filter the music based on the selected artist name in the artist combo box
+            playMusicQueue = musicList
+                    .Where(s => s.Artist.ToLower().Equals(artistName.ToLower()))  // Match by the selected artist
+                    .ToList();  // Convert the filtered results to a list
+                                // Retrieve every cells data from the selected row
+            
+            // Retrieve music information
+            string title = playMusicQueue[currentMusicIndex].Title;
+            string artist = playMusicQueue[currentMusicIndex].Artist;
+            string filePath = playMusicQueue[currentMusicIndex].File;
+            Image musicPicture = playMusicQueue[currentMusicIndex].MusicPictureMedium;  // Get the mp3 image
+
+            PlayMusic(musicPicture, filePath, title, artist);
+
+            if (shuffleMusic)
+            {
+                FisherYatesShuffle(filePath);                       // Shuffle the music list
+                DgvPlayMusicQueue.DataSource = shuffleMusicList;    // Set the shuffleMusicList music as the data source 
+            }
+            else
+            {
+                DgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
+            }
+
+            //DgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
+
+            // Display the play back controls
+            TimerShowPnlPlayerControls.Start();
+        }
+
+        private List<ArtistInfo> getArtistInfo()
+        {
+            List<ArtistInfo> getArtist = new List<ArtistInfo>();
+
+            getArtist = musicList
+                            .Select(a => new ArtistInfo(CapitalizeWords(a.Artist), a.MusicPictureMedium))
+                            .Distinct()
+                            .ToList();
+
+            label2.Text = $"{getArtist.Count}";
+            return getArtist;
+        }
+
+        // Helper method to capitalize the first letter of each word
+        private static string CapitalizeWords(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+            return textInfo.ToTitleCase(input.ToLower());
         }
 
         private void BtnAlbums_Click(object sender, EventArgs e)
         {
             UpdateSideBarButtonUI(btnAlbums, pnlSubSelectSign, btnSongs, btnArtists);
-            UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists, btnSongs, btnArtists);
+            UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
+
+            lblShowLibraryTitle.Text = "Albums";
         }
+
+        private System.Windows.Forms.Button lastClickedButton; // Track the last clicked button
 
         private void UpdateSideBarButtonUI(System.Windows.Forms.Button targetButton, System.Windows.Forms.Panel pnl, params System.Windows.Forms.Button[] Buttons)
         {
             int paddingTop = 8;
             pnl.Top = targetButton.Top + paddingTop;  // Set the position base on the selected button
 
-            //targetButton.ForeColor = Color.White;
+            targetButton.BackColor = Color.FromArgb(47, 53, 64); // Selected background color
+            targetButton.ForeColor = Color.White;   // Change the font color of the selected button
+
+            // Update the isClicked state of the new target button
+            if (targetButton is NielarkButton nielarkButton)
+            {
+                nielarkButton.SetClickedState(true);
+            }
 
             // Loop to set the default appearance of the side bar buttons
             foreach (var btn in Buttons)
@@ -528,7 +719,15 @@ namespace MusicPlayer
 
                 // Reset the side bar font's color if not selected
                 btn.ForeColor = Color.FromName("ScrollBar");
+
+                if (btn is NielarkButton otherNielarkButton)
+                {
+                    otherNielarkButton.SetClickedState(false);
+                }
             }
+
+            // Update the last clicked button reference
+            lastClickedButton = targetButton;
         }
 
         private void ModifyDvgMusicList(DataGridView dataGridViewMusic)
@@ -697,8 +896,9 @@ namespace MusicPlayer
                 else
                 {
                     currentFilePath = shuffleMusicList[currentMusicIndex].File;     // Get the file path of the current playing mp3 from shuffleMusicList
-                    DgvPlayMusicQueue.DataSource = musicList;                       // Revert to the original (unshuffled) music list in the DataGridView
-
+                    //DgvPlayMusicQueue.DataSource = musicList;                     // Revert to the original (unshuffled) music list in the DataGridView
+                    shuffleMusicList = shuffleMusicList.OrderBy(x => x.Title).ToList();
+                    DgvPlayMusicQueue.DataSource = shuffleMusicList;
                     currentMusicIndex = playMusicQueue.FindIndex(index => index.File == currentFilePath);   // Find the index of the current song in the unshuffled playMusicQueue
 
                     // If the song is not found in the unshuffled list, select the first song
@@ -1470,7 +1670,7 @@ namespace MusicPlayer
                 PnlPlayerControls.Top -= decrementValue;    // Move the panel upwards
 
                 // Adjust the heights of the associated panels accordingly
-                PnlMusicList.Height -= decrementValue - heightAdjustmentOffset;
+                pnlMusicLibrary.Height -= decrementValue - heightAdjustmentOffset;
                 PnlPlayMusicQueue.Height -= decrementValue - heightAdjustmentOffset;
             }
             else
@@ -1637,11 +1837,11 @@ namespace MusicPlayer
             PnlSideBar.Left = sideBarLeftPosition;
 
             PnlHeaderControl.Left = sideBarWidth;
-            PnlMusicList.Left = sideBarWidth;
+            pnlMusicLibrary.Left = sideBarWidth;
             PnlPlayMusicQueue.Left = sideBarWidth;
 
             PnlHeaderControl.Width = pnlMain.Width - sideBarWidth;
-            PnlMusicList.Width = pnlMain.Width - sideBarWidth;
+            pnlMusicLibrary.Width = pnlMain.Width - sideBarWidth;
             PnlPlayMusicQueue.Width = pnlMain.Width - sideBarWidth;
         }
 

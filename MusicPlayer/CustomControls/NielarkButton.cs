@@ -224,11 +224,26 @@ namespace MusicPlayer.CustomControls
         // Click event handler to change background color permanently
         private void OnClick(object sender, EventArgs e)
         {
-            isClicked = true;
-            this.BackColor = clickedBackgroundColor;
-            this.ForeColor = hoverTextColor; // Optionally, change text color permanently when clicked
+            //isClicked = true;
+            //this.BackColor = clickedBackgroundColor;
+            //this.ForeColor = hoverTextColor; // Optionally, change text color permanently when clicked
+        }
+
+        // Set the clicked state explicitly
+        public void SetClickedState(bool clicked)
+        {
+            isClicked = clicked;
+
+            if (isClicked)
+            {
+                this.BackColor = Color.FromArgb(47, 53, 64); // Clicked background color
+                this.ForeColor = Color.White;                 // Clicked text color
+            }
+            else
+            {
+                this.BackColor = Color.FromArgb(12, 23, 45);  // Default background color
+                this.ForeColor = Color.FromName("ScrollBar"); // Default text color
+            }
         }
     }
-
-
 }

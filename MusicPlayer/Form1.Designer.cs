@@ -81,17 +81,25 @@
             btnAlbums = new CustomControls.NielarkButton();
             PnlHeaderControl = new Panel();
             PnlSortControls = new Panel();
+            lblShowLibraryTitle = new Label();
             BtnImportMusic = new CustomControls.NielarkButton();
             BtnShuffleAndPlay = new CustomControls.NielarkButton();
             CbFilterArtist = new Modernial.Controls.PoisonComboBox();
             label1 = new Label();
             label2 = new Label();
             CbFilterAlbum = new Modernial.Controls.PoisonComboBox();
-            pictureBox4 = new PictureBox();
+            picBoxSearchIcon = new PictureBox();
             TxtSearch = new TextBox();
             CbSortMusic = new Modernial.Controls.PoisonComboBox();
             PnlPlayQueueControl = new Panel();
             BtnClearQueue = new CustomControls.NielarkButton();
+            pnlMusicLibrary = new Panel();
+            pnlArtists = new Panel();
+            flowLayoutPanel1 = new FlowLayoutPanel();
+            panel3 = new Panel();
+            pictureBox3 = new PictureBox();
+            label4 = new Label();
+            pictureBox5 = new PictureBox();
             PnlMusicList = new Panel();
             DgvMusicList = new DataGridView();
             PnlPlayMusicQueue = new Panel();
@@ -125,8 +133,14 @@
             PnlSideBar.SuspendLayout();
             PnlHeaderControl.SuspendLayout();
             PnlSortControls.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)picBoxSearchIcon).BeginInit();
             PnlPlayQueueControl.SuspendLayout();
+            pnlMusicLibrary.SuspendLayout();
+            pnlArtists.SuspendLayout();
+            flowLayoutPanel1.SuspendLayout();
+            panel3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
             PnlMusicList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)DgvMusicList).BeginInit();
             PnlPlayMusicQueue.SuspendLayout();
@@ -140,7 +154,7 @@
             pnlMain.Controls.Add(PnlHeader);
             pnlMain.Controls.Add(PnlSideBar);
             pnlMain.Controls.Add(PnlHeaderControl);
-            pnlMain.Controls.Add(PnlMusicList);
+            pnlMain.Controls.Add(pnlMusicLibrary);
             pnlMain.Controls.Add(PnlPlayMusicQueue);
             pnlMain.Dock = DockStyle.Fill;
             pnlMain.Location = new Point(2, 2);
@@ -949,19 +963,31 @@
             // PnlSortControls
             // 
             PnlSortControls.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PnlSortControls.Controls.Add(lblShowLibraryTitle);
             PnlSortControls.Controls.Add(BtnImportMusic);
             PnlSortControls.Controls.Add(BtnShuffleAndPlay);
             PnlSortControls.Controls.Add(CbFilterArtist);
             PnlSortControls.Controls.Add(label1);
             PnlSortControls.Controls.Add(label2);
             PnlSortControls.Controls.Add(CbFilterAlbum);
-            PnlSortControls.Controls.Add(pictureBox4);
+            PnlSortControls.Controls.Add(picBoxSearchIcon);
             PnlSortControls.Controls.Add(TxtSearch);
             PnlSortControls.Controls.Add(CbSortMusic);
             PnlSortControls.Location = new Point(19, 0);
             PnlSortControls.Name = "PnlSortControls";
             PnlSortControls.Size = new Size(757, 80);
             PnlSortControls.TabIndex = 13;
+            // 
+            // lblShowLibraryTitle
+            // 
+            lblShowLibraryTitle.AutoSize = true;
+            lblShowLibraryTitle.Font = new Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblShowLibraryTitle.ForeColor = Color.White;
+            lblShowLibraryTitle.Location = new Point(0, 0);
+            lblShowLibraryTitle.Name = "lblShowLibraryTitle";
+            lblShowLibraryTitle.Size = new Size(83, 32);
+            lblShowLibraryTitle.TabIndex = 17;
+            lblShowLibraryTitle.Text = "Songs";
             // 
             // BtnImportMusic
             // 
@@ -1052,12 +1078,11 @@
             // 
             label2.AutoSize = true;
             label2.BackColor = Color.White;
-            label2.Location = new Point(360, 0);
+            label2.Location = new Point(163, 6);
             label2.Name = "label2";
             label2.Size = new Size(38, 15);
             label2.TabIndex = 15;
             label2.Text = "label2";
-            label2.Visible = false;
             // 
             // CbFilterAlbum
             // 
@@ -1080,27 +1105,29 @@
             CbFilterAlbum.UseSelectable = true;
             CbFilterAlbum.SelectedIndexChanged += CbFilterAlbum_SelectedIndexChanged;
             // 
-            // pictureBox4
+            // picBoxSearchIcon
             // 
-            pictureBox4.BackColor = Color.FromArgb(36, 176, 191);
-            pictureBox4.BackgroundImageLayout = ImageLayout.None;
-            pictureBox4.BorderStyle = BorderStyle.FixedSingle;
-            pictureBox4.Image = (Image)resources.GetObject("pictureBox4.Image");
-            pictureBox4.Location = new Point(0, 6);
-            pictureBox4.Name = "pictureBox4";
-            pictureBox4.Padding = new Padding(4);
-            pictureBox4.Size = new Size(29, 29);
-            pictureBox4.SizeMode = PictureBoxSizeMode.StretchImage;
-            pictureBox4.TabIndex = 5;
-            pictureBox4.TabStop = false;
+            picBoxSearchIcon.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            picBoxSearchIcon.BackColor = Color.FromArgb(36, 176, 191);
+            picBoxSearchIcon.BackgroundImageLayout = ImageLayout.None;
+            picBoxSearchIcon.BorderStyle = BorderStyle.FixedSingle;
+            picBoxSearchIcon.Image = (Image)resources.GetObject("picBoxSearchIcon.Image");
+            picBoxSearchIcon.Location = new Point(294, 6);
+            picBoxSearchIcon.Name = "picBoxSearchIcon";
+            picBoxSearchIcon.Padding = new Padding(4);
+            picBoxSearchIcon.Size = new Size(29, 29);
+            picBoxSearchIcon.SizeMode = PictureBoxSizeMode.StretchImage;
+            picBoxSearchIcon.TabIndex = 5;
+            picBoxSearchIcon.TabStop = false;
             // 
             // TxtSearch
             // 
+            TxtSearch.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             TxtSearch.BackColor = Color.FromArgb(12, 23, 45);
             TxtSearch.BorderStyle = BorderStyle.FixedSingle;
             TxtSearch.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             TxtSearch.ForeColor = Color.FromArgb(252, 255, 245);
-            TxtSearch.Location = new Point(29, 6);
+            TxtSearch.Location = new Point(323, 6);
             TxtSearch.Name = "TxtSearch";
             TxtSearch.PlaceholderText = "Search";
             TxtSearch.Size = new Size(220, 29);
@@ -1165,13 +1192,95 @@
             BtnClearQueue.UseVisualStyleBackColor = false;
             BtnClearQueue.Click += BtnClearQueue_Click;
             // 
+            // pnlMusicLibrary
+            // 
+            pnlMusicLibrary.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlMusicLibrary.Controls.Add(pnlArtists);
+            pnlMusicLibrary.Controls.Add(PnlMusicList);
+            pnlMusicLibrary.Location = new Point(200, 110);
+            pnlMusicLibrary.Name = "pnlMusicLibrary";
+            pnlMusicLibrary.Size = new Size(795, 485);
+            pnlMusicLibrary.TabIndex = 4;
+            // 
+            // pnlArtists
+            // 
+            pnlArtists.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlArtists.Controls.Add(flowLayoutPanel1);
+            pnlArtists.Location = new Point(0, 0);
+            pnlArtists.Name = "pnlArtists";
+            pnlArtists.Size = new Size(795, 485);
+            pnlArtists.TabIndex = 4;
+            pnlArtists.Visible = false;
+            // 
+            // flowLayoutPanel1
+            // 
+            flowLayoutPanel1.AutoScroll = true;
+            flowLayoutPanel1.Controls.Add(panel3);
+            flowLayoutPanel1.Dock = DockStyle.Fill;
+            flowLayoutPanel1.Location = new Point(0, 0);
+            flowLayoutPanel1.Name = "flowLayoutPanel1";
+            flowLayoutPanel1.Padding = new Padding(15, 0, 15, 15);
+            flowLayoutPanel1.Size = new Size(795, 485);
+            flowLayoutPanel1.TabIndex = 0;
+            // 
+            // panel3
+            // 
+            panel3.BackColor = Color.FromArgb(8, 18, 38);
+            panel3.BorderStyle = BorderStyle.FixedSingle;
+            panel3.Controls.Add(pictureBox3);
+            panel3.Controls.Add(label4);
+            panel3.Controls.Add(pictureBox5);
+            panel3.Location = new Point(18, 3);
+            panel3.Name = "panel3";
+            panel3.Size = new Size(150, 200);
+            panel3.TabIndex = 1;
+            panel3.Visible = false;
+            // 
+            // pictureBox3
+            // 
+            pictureBox3.Anchor = AnchorStyles.None;
+            pictureBox3.BackColor = Color.FromArgb(36, 176, 191);
+            pictureBox3.BackgroundImageLayout = ImageLayout.Stretch;
+            pictureBox3.Image = Properties.Resources.play;
+            pictureBox3.Location = new Point(99, 99);
+            pictureBox3.Name = "pictureBox3";
+            pictureBox3.Padding = new Padding(3, 0, 0, 0);
+            pictureBox3.Size = new Size(35, 35);
+            pictureBox3.SizeMode = PictureBoxSizeMode.CenterImage;
+            pictureBox3.TabIndex = 7;
+            pictureBox3.TabStop = false;
+            toolTipPlayerControl.SetToolTip(pictureBox3, "Pause");
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label4.ForeColor = Color.White;
+            label4.Location = new Point(10, 155);
+            label4.MaximumSize = new Size(130, 0);
+            label4.Name = "label4";
+            label4.Size = new Size(44, 17);
+            label4.TabIndex = 6;
+            label4.Text = "Artists";
+            // 
+            // pictureBox5
+            // 
+            pictureBox5.Image = Properties.Resources.artist;
+            pictureBox5.Location = new Point(10, 10);
+            pictureBox5.Name = "pictureBox5";
+            pictureBox5.Padding = new Padding(20);
+            pictureBox5.Size = new Size(130, 130);
+            pictureBox5.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox5.TabIndex = 0;
+            pictureBox5.TabStop = false;
+            // 
             // PnlMusicList
             // 
             PnlMusicList.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             PnlMusicList.AutoScroll = true;
             PnlMusicList.BackColor = Color.FromArgb(8, 18, 38);
             PnlMusicList.Controls.Add(DgvMusicList);
-            PnlMusicList.Location = new Point(200, 110);
+            PnlMusicList.Location = new Point(0, 0);
             PnlMusicList.Name = "PnlMusicList";
             PnlMusicList.Size = new Size(795, 485);
             PnlMusicList.TabIndex = 3;
@@ -1233,7 +1342,7 @@
             DgvMusicList.RowTemplate.Height = 40;
             DgvMusicList.ScrollBars = ScrollBars.None;
             DgvMusicList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            DgvMusicList.Size = new Size(757, 390);
+            DgvMusicList.Size = new Size(756, 390);
             DgvMusicList.TabIndex = 3;
             DgvMusicList.CellContentClick += DgvMusicList_CellContentClick;
             DgvMusicList.CellMouseClick += DgvMusicList_CellMouseClick;
@@ -1384,8 +1493,15 @@
             PnlHeaderControl.ResumeLayout(false);
             PnlSortControls.ResumeLayout(false);
             PnlSortControls.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
+            ((System.ComponentModel.ISupportInitialize)picBoxSearchIcon).EndInit();
             PnlPlayQueueControl.ResumeLayout(false);
+            pnlMusicLibrary.ResumeLayout(false);
+            pnlArtists.ResumeLayout(false);
+            flowLayoutPanel1.ResumeLayout(false);
+            panel3.ResumeLayout(false);
+            panel3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             PnlMusicList.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)DgvMusicList).EndInit();
             PnlPlayMusicQueue.ResumeLayout(false);
@@ -1412,7 +1528,7 @@
         private Label label1;
         private Modernial.Controls.PoisonComboBox CbSortMusic;
         private Panel PnlSortControls;
-        private PictureBox pictureBox4;
+        private PictureBox picBoxSearchIcon;
         private TextBox TxtSearch;
         private DataGridView DgvMusicList;
         private Modernial.Controls.PoisonComboBox CbFilterArtist;
@@ -1462,5 +1578,13 @@
         private CustomControls.NielarkButton btnSongs;
         private Panel pnlSubSelectSign;
         private CustomControls.NielarkButton btnPlayLists;
+        private Panel pnlMusicLibrary;
+        private Label lblShowLibraryTitle;
+        private Panel pnlArtists;
+        private FlowLayoutPanel flowLayoutPanel1;
+        private Panel panel3;
+        private PictureBox pictureBox3;
+        private Label label4;
+        private PictureBox pictureBox5;
     }
 }
