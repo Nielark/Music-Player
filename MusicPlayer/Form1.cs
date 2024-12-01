@@ -19,6 +19,7 @@ using static MusicPlayer.MyModule;
 using static System.Formats.Asn1.AsnWriter;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Panel = System.Windows.Forms.Panel;
 
 namespace MusicPlayer
 {
@@ -43,8 +44,6 @@ namespace MusicPlayer
         private List<string> importMusic = new List<string>();
         public List<MyMusic> playMusicQueue = new List<MyMusic>();
         public List<MyMusic> shuffleMusicList = new List<MyMusic>();
-
-        private List<MyMusic> artists = new List<MyMusic>();
 
         private Size formSize; //Keep form size when it is minimized and restored.Since the form is resized because it takes into account the size of the title bar and borders.
         private int borderSize = 2;
@@ -114,11 +113,18 @@ namespace MusicPlayer
             UpdateMuteStateChanged += OnUpdateMuteStateChanged;
             UpdateVolumeValueChanged += OnUpdateVolumeValueChanged;
             //UpdateVolumeIconChanged += OnUpdateVolumeIconChanged;
+
+            // Assuming `musicList` is a List<MyMusic> with Title and Artist properties
+            AutoCompleteStringCollection autoCompleteCollection = new AutoCompleteStringCollection();
+
+            // Add Titles or Artists to the AutoCompleteStringCollection
+            autoCompleteCollection.AddRange(musicList.Select(x => x.Title).ToArray());
+            autoCompleteCollection.AddRange(musicList.Select(x => x.Artist).ToArray());
+
+            // Configure the TextBox for auto-completion
+            TxtSearch.AutoCompleteCustomSource = autoCompleteCollection;
+            TxtSearch.AutoCompleteSource = AutoCompleteSource.CustomSource;
         }
-
-
-
-
 
         private void PnlHeader_MouseDown(object sender, MouseEventArgs e)
         {
@@ -153,6 +159,12 @@ namespace MusicPlayer
                 tempMusicList = new List<MyMusic>(musicList);   // Copy the music list from musicList to tempMusicList
                 DgvMusicList.DataSource = musicList;            // Set musicList as the datasource to display in data grid view           
                 ModifyDvgMusicList(DgvMusicList);               // Function call for customizing the data grid 
+
+                var artistInfo = GetMusicInfo(a => new ArtistInfo(CapitalizeWords(a.Artist), a.MusicPictureMedium));
+                DisplayInfo(flowLayoutPanel1, true, artistInfo);
+
+                var albumInfo = GetMusicInfo(a => new AlbumInfo(CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium));
+                DisplayInfo(flowLayoutPanel2, false, albumInfo);
             }
             else
             {
@@ -376,9 +388,6 @@ namespace MusicPlayer
 
             PlayMusic(musicPicture, filePath, Title, Artist);   // Function call to play the music
 
-            // Adjust and display the player controls panel
-            // PnlPlayerControls.Location = new Point(0, 470);
-            //PnlPlayerControls.Dock = DockStyle.Bottom;
             TimerShowPnlPlayerControls.Start();
         }
 
@@ -406,7 +415,6 @@ namespace MusicPlayer
 
                 // Reset the marquee labels
                 MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
-                ResetAndStopMarqueeSettings(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
             }
 
             // Clear the data grid view of the play queue
@@ -430,15 +438,9 @@ namespace MusicPlayer
             UpdateSideBarButtonUI(btnSongs, pnlSubSelectSign, btnArtists, btnAlbums);
             DisplayOrHideSubButtons();
 
-            // Display the filter controls for the music list and hide play list queue controls
-            PnlSortControls.Visible = true;
-            PnlPlayMusicQueue.Visible = false;
-
-            // Display the music list and hide the play list queue data grid view
-            pnlMusicLibrary.Visible = true;
-            PnlPlayMusicQueue.Visible = false;
-
-            pnlArtists.Visible = false;
+            Panel[] showPanels = { PnlSortControls, pnlMusicLibrary, PnlMusicList };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum };
+            PanelVisibilityHandler(showPanels, hidePanels);
         }
 
         private void DisplayOrHideSubButtons()
@@ -483,15 +485,9 @@ namespace MusicPlayer
             UpdateSideBarButtonUI(btnPlayQueue, pnlSelectSign, btnHome, btnMusicLibrary, btnPlayLists, btnSongs, btnArtists, btnAlbums);
             pnlSubSelectSign.Visible = false;
 
-            // Display the filter controls for the play list queue and hide music list controls
-            PnlPlayQueueControl.Visible = true;
-            PnlSortControls.Visible = false;
-
-            // Display the play list queue and hide the music list queue data grid view
-            PnlPlayMusicQueue.Visible = true;
-            pnlMusicLibrary.Visible = false;
-
-            pnlArtists.Visible = false;
+            Panel[] showPanels = { PnlPlayQueueControl, PnlPlayMusicQueue };
+            Panel[] hidePanels = { PnlSortControls, pnlMusicLibrary, pnlArtists, pnlAlbum };
+            PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Songs";
         }
@@ -510,6 +506,10 @@ namespace MusicPlayer
             UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
 
+            Panel[] showPanels = { PnlSortControls, pnlMusicLibrary, PnlMusicList };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum };
+            PanelVisibilityHandler(showPanels, hidePanels);
+
             lblShowLibraryTitle.Text = "Songs";
         }
 
@@ -519,20 +519,34 @@ namespace MusicPlayer
             UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
 
+            Panel[] showPanels = { PnlSortControls, pnlMusicLibrary, pnlArtists };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlAlbum };
+            PanelVisibilityHandler(showPanels, hidePanels);
+
             lblShowLibraryTitle.Text = "Artists";
 
-            DisplayAlbums();
             MyModule.MakeCircular(pictureBox3);
-
-            pnlArtists.Visible = true;
         }
 
-        private void DisplayAlbums()
+        private void PanelVisibilityHandler(Panel[] showPanels, Panel[] hidePanels)
         {
-            foreach (var artist in getArtistInfo())
+            foreach (var showPanel in showPanels)
+            {
+                showPanel.Visible = true;
+            }
+
+            foreach (var hidePanel in hidePanels)
+            {
+                hidePanel.Visible = false;
+            }
+        }
+
+        private void DisplayInfo<T>(FlowLayoutPanel targetFlowLayoutPanel, bool isArtist, List<T> musicInfo) where T : MusicInfo
+        {
+            foreach (var info in musicInfo)
             {
                 // Create a new Label for each iteration
-                System.Windows.Forms.Panel pnlArtistCover = new System.Windows.Forms.Panel
+                System.Windows.Forms.Panel pnlCover = new System.Windows.Forms.Panel
                 {
                     //BackColor = Color.Red,
                     //Name = "pnlArtistCover",
@@ -548,10 +562,10 @@ namespace MusicPlayer
                     //TabIndex = 1,
                 };
 
-                PictureBox picBoxArtistImage = new PictureBox
+                PictureBox picBoxImage = new PictureBox
                 {
                     //BackColor = Color.Silver,
-                    Image = artist.ArtistImage,
+                    Image = info.DisplayImage,
                     Location = new Point(10, 10),
                     Name = "picBoxArtistImage",
                     Size = new Size(130, 130),
@@ -586,59 +600,58 @@ namespace MusicPlayer
                     Size = new Size(44, 17),
                     MaximumSize = new Size(0, 130),
                     //TabIndex = 6,
-                    Text = artist.ArtistName,
+                    Text = info.Name,
                 };
-                
+
                 // Add the controls to te form
-                flowLayoutPanel1.Controls.Add(pnlArtistCover);
-                pnlArtistCover.Controls.Add(picBoxArtistImage);
-                pnlArtistCover.Controls.Add(picBoxPlayIcon);
-                pnlArtistCover.Controls.Add(lblArtistName);
+                targetFlowLayoutPanel.Controls.Add(pnlCover);
+                pnlCover.Controls.Add(picBoxImage);
+                pnlCover.Controls.Add(picBoxPlayIcon);
+                pnlCover.Controls.Add(lblArtistName);
 
                 // Create rounded corners and circular controls
                 MyModule.MakeCircular(picBoxPlayIcon);
-                MyModule.SetRoundedCorners(pnlArtistCover, 10, 10, 10, 10);
-                MyModule.SetRoundedCorners(picBoxArtistImage, 10, 10, 10, 10);
+                MyModule.SetRoundedCorners(pnlCover, 10, 10, 10, 10);
+                MyModule.SetRoundedCorners(picBoxImage, 10, 10, 10, 10);
                 picBoxPlayIcon.BringToFront();
 
                 // Attach event handlers for mouse enter and leave
-                AttachMouseEvents(pnlArtistCover, picBoxPlayIcon ,lblArtistName.Text);
+                AttachMouseEvents(pnlCover, picBoxPlayIcon ,lblArtistName.Text, isArtist);
             }
         }
 
-        private void AttachMouseEvents(System.Windows.Forms.Panel pnlArtistCover, PictureBox playButton, string artistName)
+        private void AttachMouseEvents(System.Windows.Forms.Panel pnlCover, PictureBox playButton, string nameIdentifier, bool isArtist)
         {
-            pnlArtistCover.MouseEnter += (sender, e) => pnlArtistCover.BackColor = Color.Silver;
-            pnlArtistCover.MouseLeave += (sender, e) => pnlArtistCover.BackColor = Color.FromArgb(8, 18, 38);
+            pnlCover.MouseEnter += (sender, e) => pnlCover.BackColor = Color.Silver;
+            pnlCover.MouseLeave += (sender, e) => pnlCover.BackColor = Color.FromArgb(8, 18, 38);
 
             // Apply the same events to all child controls
-            foreach (Control child in pnlArtistCover.Controls)
+            foreach (Control child in pnlCover.Controls)
             {
-                child.MouseEnter += (sender, e) => pnlArtistCover.BackColor = Color.Silver;
+                child.MouseEnter += (sender, e) => pnlCover.BackColor = Color.Silver;
                 child.MouseLeave += (sender, e) =>
                 {
                     // Check if the mouse is still within the panel
-                    Point mousePosition = pnlArtistCover.PointToClient(Control.MousePosition);
-                    if (!pnlArtistCover.ClientRectangle.Contains(mousePosition))
+                    Point mousePosition = pnlCover.PointToClient(Control.MousePosition);
+                    if (!pnlCover.ClientRectangle.Contains(mousePosition))
                     {
-                        pnlArtistCover.BackColor = Color.FromArgb(8, 18, 38);
+                        pnlCover.BackColor = Color.FromArgb(8, 18, 38);
                     }
                 };
             }
 
-            playButton.MouseClick += (sender, e) => { playMusicByArtists(artistName); };
+            playButton.MouseClick += (sender, e) => { playMusicByArtists(nameIdentifier, isArtist); };
         }
 
-        private void playMusicByArtists(string artistName)
+        private void playMusicByArtists(string nameIdentifier, bool isArtist)
         {
-            currentMusicIndex = -1;
-            currentMusicIndex++;
+            currentMusicIndex = -1; // Set to empty
+            currentMusicIndex++; 
 
             // Filter the music based on the selected artist name in the artist combo box
             playMusicQueue = musicList
-                    .Where(s => s.Artist.ToLower().Equals(artistName.ToLower()))  // Match by the selected artist
+                    .Where(s => isArtist ? s.Artist.ToLower().Equals(nameIdentifier.ToLower()) : s.Album.ToLower().Equals(nameIdentifier.ToLower()))  // Match by the selected artist
                     .ToList();  // Convert the filtered results to a list
-                                // Retrieve every cells data from the selected row
             
             // Retrieve music information
             string title = playMusicQueue[currentMusicIndex].Title;
@@ -658,23 +671,19 @@ namespace MusicPlayer
                 DgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
             }
 
-            //DgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
-
             // Display the play back controls
             TimerShowPnlPlayerControls.Start();
         }
 
-        private List<ArtistInfo> getArtistInfo()
+        private List<T> GetMusicInfo<T>(Func<MyMusic, T> selector) where T : MusicInfo
         {
-            List<ArtistInfo> getArtist = new List<ArtistInfo>();
-
-            getArtist = musicList
-                            .Select(a => new ArtistInfo(CapitalizeWords(a.Artist), a.MusicPictureMedium))
+            var musicInfo = musicList
+                            .Select(selector)
                             .Distinct()
                             .ToList();
 
-            label2.Text = $"{getArtist.Count}";
-            return getArtist;
+            label2.Text = $"{musicInfo.Count}";
+            return musicInfo;
         }
 
         // Helper method to capitalize the first letter of each word
@@ -691,6 +700,10 @@ namespace MusicPlayer
             UpdateSideBarButtonUI(btnAlbums, pnlSubSelectSign, btnSongs, btnArtists);
             UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
+
+            Panel[] showPanels = { PnlSortControls, pnlMusicLibrary, pnlAlbum };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlArtists };
+            PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Albums";
         }
@@ -1311,15 +1324,6 @@ namespace MusicPlayer
         {
             if (playMusicQueue != null)
             {
-                // Reset label settings and stop any running marquee timers
-                ResetAndStopMarqueeSettings(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
-                //LblShowPlayTitle.AutoSize = true;
-                //LblShowPlayArtist.AutoSize = true;
-                //TimerTitleMarquee.Stop(); // Stop the timer
-                //TimerArtistMarquee.Stop(); // Stop the timer
-                //LblShowPlayTitle.Left = 0;
-                //LblShowPlayArtist.Left = 0;
-
                 // Find the index of the song in the queue (shuffled or not) based on file path
                 if (!shuffleMusic)
                 {
@@ -1348,7 +1352,7 @@ namespace MusicPlayer
                 audioFileReader = new AudioFileReader(filePath);    // Read the audio file
                 waveOutDevice.Init(audioFileReader);                // Initialize playback with audio file
                 waveOutDevice.Play();                               // Start playing the music
-                UpdateVolumeValue(TbVolume.Value);                             // Update volume
+                UpdateVolumeValue(TbVolume.Value);                  // Update volume
 
                 // Display music image or a default one if no image is available
                 if (musicPicture != null)
@@ -1359,7 +1363,6 @@ namespace MusicPlayer
                 else
                 {
                     PicBoxShowPlayPicture.Image = Properties.Resources.default_music_picture_medium;
-                    //PicBoxShowPlayPicture.ImageLocation = "C:/Users/Mark Daniel/Downloads/music.png";
                     miniPlayerMusicPicture = Properties.Resources.default_music_picture_medium;
                 }
 
@@ -1381,17 +1384,6 @@ namespace MusicPlayer
                 TimerMusicDuration.Start();     // Start tracking the music duration in seek bar
                 playMusic = true;               // Update play status
             }
-        }
-
-        public void ResetAndStopMarqueeSettings(Label LblShowPlayTitle, Label LblShowPlayArtist, System.Windows.Forms.Panel PnlMarquee, System.Windows.Forms.Timer TimerTitleMarquee, System.Windows.Forms.Timer TimerArtistMarquee)
-        {
-            // Reset the marquee labels
-            //LblShowPlayTitle.AutoSize = true;
-            //LblShowPlayArtist.AutoSize = true;
-            //TimerTitleMarquee.Stop();   // Stop the title marquee timer
-            //TimerArtistMarquee.Stop();  // Stop the artist marquee timer
-            //LblShowPlayTitle.Left = 0;  // Reset the title label position
-            //LblShowPlayArtist.Left = 0; // Reset the artist label position
         }
 
         public void MarqueeEffectHandler(Label LblShowPlayTitle, Label LblShowPlayArtist, System.Windows.Forms.Panel PnlMarquee, System.Windows.Forms.Timer TimerTitleMarquee, System.Windows.Forms.Timer TimerArtistMarquee)
@@ -1584,19 +1576,6 @@ namespace MusicPlayer
 
         private void PicBoxMiniPlayerToggle_Click(object sender, EventArgs e)
         {
-            //miniPlayer = !miniPlayer;
-
-            //if (miniPlayer)
-            //{
-            //    PicBoxMiniPlayerToggle.Image = Properties.Resources.mini_player;
-            //    toolTipPlayerControl.SetToolTip(PicBoxMiniPlayerToggle, "Minimize player");
-            //}
-            //else
-            //{
-            //    PicBoxMiniPlayerToggle.Image = Properties.Resources.exit_mini_player;
-            //    toolTipPlayerControl.SetToolTip(PicBoxMiniPlayerToggle, "Exit mini player");
-            //}
-
             Form MiniPlayer = new MiniPlayer(this);
             this.Hide();
             MiniPlayer.Show();
@@ -1759,7 +1738,7 @@ namespace MusicPlayer
                 // Function call to display Controls
                 ShowOrHideDataGridViewColumn(true);
                 ShowOrHideShuffleAndRepeatButton(true);
-                ShowOrHideFilterControl(true, 161, 45);
+                ShowOrHideFilterControl(true, 161, 45, 272);
                 ShowOrHideSideBar(0, PnlSideBar.Width, -30);
                 ShowOrHideSkipButton(true, 45, 15);
 
@@ -1773,7 +1752,7 @@ namespace MusicPlayer
                 // Function call to display Controls
                 ShowOrHideDataGridViewColumn(true);
                 ShowOrHideShuffleAndRepeatButton(true);
-                ShowOrHideFilterControl(true, 161, 45);
+                ShowOrHideFilterControl(true, 161, 45, 272);
                 ShowOrHideSideBar(0, PnlSideBar.Width, -30);
 
                 picBoxHamburgerMenu.Visible = false;
@@ -1787,7 +1766,7 @@ namespace MusicPlayer
                 // Function call to display Controls
                 ShowOrHideDataGridViewColumn(true);
                 ShowOrHideShuffleAndRepeatButton(true);
-                ShowOrHideFilterControl(true, 161, 45);
+                ShowOrHideFilterControl(true, 161, 45, 272);
 
                 picBoxHamburgerMenu.Visible = true;
             }
@@ -1796,7 +1775,7 @@ namespace MusicPlayer
                 // Function call to hide controls
                 ShowOrHideSkipButton(false, 0, -30);
                 ShowOrHideSideBar(-PnlSideBar.Width, 0, 15);
-                ShowOrHideFilterControl(false, 0, 0);
+                ShowOrHideFilterControl(false, 0, 0, 111);
 
                 // Function call to display Controls
                 ShowOrHideDataGridViewColumn(true);
@@ -1809,7 +1788,7 @@ namespace MusicPlayer
                 // Function call to hide controls
                 ShowOrHideSkipButton(false, 0, -30);
                 ShowOrHideSideBar(-PnlSideBar.Width, 0, 15);
-                ShowOrHideFilterControl(false, 0, 0);
+                ShowOrHideFilterControl(false, 0, 0, 111);
                 ShowOrHideDataGridViewColumn(false);
                 ShowOrHideShuffleAndRepeatButton(false);
 
@@ -1845,13 +1824,17 @@ namespace MusicPlayer
             PnlPlayMusicQueue.Width = pnlMain.Width - sideBarWidth;
         }
 
-        private void ShowOrHideFilterControl(bool showControl, int filterArtistOffset, int volumeButtonOffset)
+        private void ShowOrHideFilterControl(bool showControl, int filterArtistOffset, int volumeButtonOffset, int searchBarWidth)
         {
             CbFilterAlbum.Visible = showControl;
             CbFilterArtist.Left = CbFilterAlbum.Left - filterArtistOffset;
 
             PicBoxFullScreenToggle.Visible = showControl;
             PicBoxShowVolumeBar.Left = PicBoxFullScreenToggle.Left - volumeButtonOffset;
+
+            picBoxSearchIcon.Left = CbFilterArtist.Left;
+            TxtSearch.Left = picBoxSearchIcon.Right;
+            TxtSearch.Width = searchBarWidth; // 172 maximum size
         }
 
         private void ShowOrHideDataGridViewColumn(bool showColumn)

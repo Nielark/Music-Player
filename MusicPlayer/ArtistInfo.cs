@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 
 namespace MusicPlayer
 {
-    public class ArtistInfo
+    public class ArtistInfo : MusicInfo
     {
         public string ArtistName {  get; set; }
         public Image ArtistImage { get; set; }
+
+        public string Name => ArtistName;
+        public Image DisplayImage => ArtistImage;
+
 
         public ArtistInfo(string artistName, Image artistImage) 
         {

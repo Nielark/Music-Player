@@ -94,6 +94,12 @@
             PnlPlayQueueControl = new Panel();
             BtnClearQueue = new CustomControls.NielarkButton();
             pnlMusicLibrary = new Panel();
+            pnlAlbum = new Panel();
+            flowLayoutPanel2 = new FlowLayoutPanel();
+            panel1 = new Panel();
+            pictureBox1 = new PictureBox();
+            label3 = new Label();
+            pictureBox2 = new PictureBox();
             pnlArtists = new Panel();
             flowLayoutPanel1 = new FlowLayoutPanel();
             panel3 = new Panel();
@@ -136,6 +142,11 @@
             ((System.ComponentModel.ISupportInitialize)picBoxSearchIcon).BeginInit();
             PnlPlayQueueControl.SuspendLayout();
             pnlMusicLibrary.SuspendLayout();
+            pnlAlbum.SuspendLayout();
+            flowLayoutPanel2.SuspendLayout();
+            panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             pnlArtists.SuspendLayout();
             flowLayoutPanel1.SuspendLayout();
             panel3.SuspendLayout();
@@ -1007,9 +1018,9 @@
             BtnImportMusic.HoverBackgroundColor = Color.Empty;
             BtnImportMusic.HoverBorderColor = Color.Empty;
             BtnImportMusic.HoverTextColor = Color.White;
-            BtnImportMusic.Location = new Point(625, 5);
+            BtnImportMusic.Location = new Point(616, 6);
             BtnImportMusic.Name = "BtnImportMusic";
-            BtnImportMusic.Size = new Size(130, 30);
+            BtnImportMusic.Size = new Size(140, 30);
             BtnImportMusic.TabIndex = 16;
             BtnImportMusic.Text = "Import Music";
             BtnImportMusic.TextColor = Color.FromArgb(8, 18, 38);
@@ -1123,6 +1134,7 @@
             // TxtSearch
             // 
             TxtSearch.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            TxtSearch.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             TxtSearch.BackColor = Color.FromArgb(12, 23, 45);
             TxtSearch.BorderStyle = BorderStyle.FixedSingle;
             TxtSearch.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -1130,7 +1142,7 @@
             TxtSearch.Location = new Point(323, 6);
             TxtSearch.Name = "TxtSearch";
             TxtSearch.PlaceholderText = "Search";
-            TxtSearch.Size = new Size(220, 29);
+            TxtSearch.Size = new Size(272, 29);
             TxtSearch.TabIndex = 4;
             TxtSearch.TextChanged += TxtSearch_TextChanged;
             // 
@@ -1195,12 +1207,85 @@
             // pnlMusicLibrary
             // 
             pnlMusicLibrary.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlMusicLibrary.Controls.Add(pnlAlbum);
             pnlMusicLibrary.Controls.Add(pnlArtists);
             pnlMusicLibrary.Controls.Add(PnlMusicList);
             pnlMusicLibrary.Location = new Point(200, 110);
             pnlMusicLibrary.Name = "pnlMusicLibrary";
             pnlMusicLibrary.Size = new Size(795, 485);
             pnlMusicLibrary.TabIndex = 4;
+            // 
+            // pnlAlbum
+            // 
+            pnlAlbum.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlAlbum.Controls.Add(flowLayoutPanel2);
+            pnlAlbum.Location = new Point(0, 0);
+            pnlAlbum.Name = "pnlAlbum";
+            pnlAlbum.Size = new Size(795, 485);
+            pnlAlbum.TabIndex = 2;
+            pnlAlbum.Visible = false;
+            // 
+            // flowLayoutPanel2
+            // 
+            flowLayoutPanel2.AutoScroll = true;
+            flowLayoutPanel2.Controls.Add(panel1);
+            flowLayoutPanel2.Dock = DockStyle.Fill;
+            flowLayoutPanel2.Location = new Point(0, 0);
+            flowLayoutPanel2.Name = "flowLayoutPanel2";
+            flowLayoutPanel2.Padding = new Padding(15, 0, 15, 15);
+            flowLayoutPanel2.Size = new Size(795, 485);
+            flowLayoutPanel2.TabIndex = 1;
+            // 
+            // panel1
+            // 
+            panel1.BackColor = Color.FromArgb(8, 18, 38);
+            panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Controls.Add(pictureBox1);
+            panel1.Controls.Add(label3);
+            panel1.Controls.Add(pictureBox2);
+            panel1.Location = new Point(18, 3);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(150, 200);
+            panel1.TabIndex = 1;
+            panel1.Visible = false;
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.Anchor = AnchorStyles.None;
+            pictureBox1.BackColor = Color.FromArgb(36, 176, 191);
+            pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
+            pictureBox1.Image = Properties.Resources.play;
+            pictureBox1.Location = new Point(73, 148);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Padding = new Padding(3, 0, 0, 0);
+            pictureBox1.Size = new Size(35, 35);
+            pictureBox1.SizeMode = PictureBoxSizeMode.CenterImage;
+            pictureBox1.TabIndex = 7;
+            pictureBox1.TabStop = false;
+            toolTipPlayerControl.SetToolTip(pictureBox1, "Pause");
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label3.ForeColor = Color.White;
+            label3.Location = new Point(10, 155);
+            label3.MaximumSize = new Size(130, 0);
+            label3.Name = "label3";
+            label3.Size = new Size(44, 17);
+            label3.TabIndex = 6;
+            label3.Text = "Artists";
+            // 
+            // pictureBox2
+            // 
+            pictureBox2.Image = Properties.Resources.artist;
+            pictureBox2.Location = new Point(10, 10);
+            pictureBox2.Name = "pictureBox2";
+            pictureBox2.Padding = new Padding(20);
+            pictureBox2.Size = new Size(130, 130);
+            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox2.TabIndex = 0;
+            pictureBox2.TabStop = false;
             // 
             // pnlArtists
             // 
@@ -1284,6 +1369,7 @@
             PnlMusicList.Name = "PnlMusicList";
             PnlMusicList.Size = new Size(795, 485);
             PnlMusicList.TabIndex = 3;
+            PnlMusicList.Visible = false;
             // 
             // DgvMusicList
             // 
@@ -1496,6 +1582,12 @@
             ((System.ComponentModel.ISupportInitialize)picBoxSearchIcon).EndInit();
             PnlPlayQueueControl.ResumeLayout(false);
             pnlMusicLibrary.ResumeLayout(false);
+            pnlAlbum.ResumeLayout(false);
+            flowLayoutPanel2.ResumeLayout(false);
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             pnlArtists.ResumeLayout(false);
             flowLayoutPanel1.ResumeLayout(false);
             panel3.ResumeLayout(false);
@@ -1586,5 +1678,11 @@
         private PictureBox pictureBox3;
         private Label label4;
         private PictureBox pictureBox5;
+        private Panel pnlAlbum;
+        private FlowLayoutPanel flowLayoutPanel2;
+        private Panel panel1;
+        private PictureBox pictureBox1;
+        private Label label3;
+        private PictureBox pictureBox2;
     }
 }
