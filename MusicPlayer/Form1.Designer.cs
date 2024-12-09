@@ -79,6 +79,15 @@
             btnSongs = new CustomControls.NielarkButton();
             btnArtists = new CustomControls.NielarkButton();
             btnAlbums = new CustomControls.NielarkButton();
+            pnlContent = new Panel();
+            pnlInfo = new Panel();
+            BtnAlbumPlay = new CustomControls.NielarkButton();
+            BtnAlbumShuffleAndPlay = new CustomControls.NielarkButton();
+            lblAlbumNumbers = new Label();
+            lblAlbumArtist = new Label();
+            lblAlbumName = new Label();
+            picBoxAlbumImage = new PictureBox();
+            pnlAlbumList = new Panel();
             PnlHeaderControl = new Panel();
             PnlSortControls = new Panel();
             lblShowLibraryTitle = new Label();
@@ -97,6 +106,7 @@
             pnlAlbum = new Panel();
             flowLayoutPanel2 = new FlowLayoutPanel();
             panel1 = new Panel();
+            label5 = new Label();
             pictureBox1 = new PictureBox();
             label3 = new Label();
             pictureBox2 = new PictureBox();
@@ -137,6 +147,9 @@
             PnlHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picBoxHamburgerMenu).BeginInit();
             PnlSideBar.SuspendLayout();
+            pnlContent.SuspendLayout();
+            pnlInfo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)picBoxAlbumImage).BeginInit();
             PnlHeaderControl.SuspendLayout();
             PnlSortControls.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picBoxSearchIcon).BeginInit();
@@ -164,9 +177,7 @@
             pnlMain.Controls.Add(PnlPlayerControls);
             pnlMain.Controls.Add(PnlHeader);
             pnlMain.Controls.Add(PnlSideBar);
-            pnlMain.Controls.Add(PnlHeaderControl);
-            pnlMain.Controls.Add(pnlMusicLibrary);
-            pnlMain.Controls.Add(PnlPlayMusicQueue);
+            pnlMain.Controls.Add(pnlContent);
             pnlMain.Dock = DockStyle.Fill;
             pnlMain.Location = new Point(2, 2);
             pnlMain.Name = "pnlMain";
@@ -960,13 +971,149 @@
             btnAlbums.Visible = false;
             btnAlbums.Click += BtnAlbums_Click;
             // 
+            // pnlContent
+            // 
+            pnlContent.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlContent.Controls.Add(pnlInfo);
+            pnlContent.Controls.Add(pnlAlbumList);
+            pnlContent.Controls.Add(PnlHeaderControl);
+            pnlContent.Controls.Add(pnlMusicLibrary);
+            pnlContent.Controls.Add(PnlPlayMusicQueue);
+            pnlContent.Location = new Point(200, 30);
+            pnlContent.Name = "pnlContent";
+            pnlContent.Size = new Size(795, 565);
+            pnlContent.TabIndex = 2;
+            // 
+            // pnlInfo
+            // 
+            pnlInfo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            pnlInfo.Controls.Add(BtnAlbumPlay);
+            pnlInfo.Controls.Add(BtnAlbumShuffleAndPlay);
+            pnlInfo.Controls.Add(lblAlbumNumbers);
+            pnlInfo.Controls.Add(lblAlbumArtist);
+            pnlInfo.Controls.Add(lblAlbumName);
+            pnlInfo.Controls.Add(picBoxAlbumImage);
+            pnlInfo.Location = new Point(10, 10);
+            pnlInfo.Name = "pnlInfo";
+            pnlInfo.Size = new Size(775, 200);
+            pnlInfo.TabIndex = 0;
+            pnlInfo.Visible = false;
+            // 
+            // BtnAlbumPlay
+            // 
+            BtnAlbumPlay.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            BtnAlbumPlay.BackColor = Color.FromArgb(36, 176, 191);
+            BtnAlbumPlay.BackgroundColor = Color.FromArgb(36, 176, 191);
+            BtnAlbumPlay.BorderColor = Color.Empty;
+            BtnAlbumPlay.BorderRadius = 6;
+            BtnAlbumPlay.BorderSize = 0;
+            BtnAlbumPlay.ClickedBackgroundColor = Color.FromArgb(36, 176, 191);
+            BtnAlbumPlay.FlatAppearance.BorderSize = 0;
+            BtnAlbumPlay.FlatAppearance.MouseDownBackColor = Color.FromArgb(36, 176, 191);
+            BtnAlbumPlay.FlatAppearance.MouseOverBackColor = Color.FromArgb(36, 176, 191);
+            BtnAlbumPlay.FlatStyle = FlatStyle.Flat;
+            BtnAlbumPlay.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            BtnAlbumPlay.ForeColor = Color.FromArgb(8, 18, 38);
+            BtnAlbumPlay.HoverBackgroundColor = Color.Empty;
+            BtnAlbumPlay.HoverBorderColor = Color.Empty;
+            BtnAlbumPlay.HoverTextColor = Color.White;
+            BtnAlbumPlay.Location = new Point(220, 150);
+            BtnAlbumPlay.Name = "BtnAlbumPlay";
+            BtnAlbumPlay.Size = new Size(130, 35);
+            BtnAlbumPlay.TabIndex = 17;
+            BtnAlbumPlay.Text = "Play All";
+            BtnAlbumPlay.TextColor = Color.FromArgb(8, 18, 38);
+            BtnAlbumPlay.UseVisualStyleBackColor = false;
+            // 
+            // BtnAlbumShuffleAndPlay
+            // 
+            BtnAlbumShuffleAndPlay.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            BtnAlbumShuffleAndPlay.BackColor = Color.FromArgb(36, 176, 191);
+            BtnAlbumShuffleAndPlay.BackgroundColor = Color.FromArgb(36, 176, 191);
+            BtnAlbumShuffleAndPlay.BorderColor = Color.Empty;
+            BtnAlbumShuffleAndPlay.BorderRadius = 6;
+            BtnAlbumShuffleAndPlay.BorderSize = 0;
+            BtnAlbumShuffleAndPlay.ClickedBackgroundColor = Color.FromArgb(36, 176, 191);
+            BtnAlbumShuffleAndPlay.FlatAppearance.BorderSize = 0;
+            BtnAlbumShuffleAndPlay.FlatAppearance.MouseDownBackColor = Color.FromArgb(36, 176, 191);
+            BtnAlbumShuffleAndPlay.FlatAppearance.MouseOverBackColor = Color.FromArgb(36, 176, 191);
+            BtnAlbumShuffleAndPlay.FlatStyle = FlatStyle.Flat;
+            BtnAlbumShuffleAndPlay.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            BtnAlbumShuffleAndPlay.ForeColor = Color.FromArgb(8, 18, 38);
+            BtnAlbumShuffleAndPlay.HoverBackgroundColor = Color.Empty;
+            BtnAlbumShuffleAndPlay.HoverBorderColor = Color.Empty;
+            BtnAlbumShuffleAndPlay.HoverTextColor = Color.White;
+            BtnAlbumShuffleAndPlay.Location = new Point(360, 150);
+            BtnAlbumShuffleAndPlay.Name = "BtnAlbumShuffleAndPlay";
+            BtnAlbumShuffleAndPlay.Size = new Size(130, 35);
+            BtnAlbumShuffleAndPlay.TabIndex = 16;
+            BtnAlbumShuffleAndPlay.Text = "Shuffle && Play";
+            BtnAlbumShuffleAndPlay.TextColor = Color.FromArgb(8, 18, 38);
+            BtnAlbumShuffleAndPlay.UseVisualStyleBackColor = false;
+            // 
+            // lblAlbumNumbers
+            // 
+            lblAlbumNumbers.Anchor = AnchorStyles.Left;
+            lblAlbumNumbers.AutoSize = true;
+            lblAlbumNumbers.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblAlbumNumbers.ForeColor = Color.White;
+            lblAlbumNumbers.Location = new Point(220, 98);
+            lblAlbumNumbers.Name = "lblAlbumNumbers";
+            lblAlbumNumbers.Size = new Size(201, 21);
+            lblAlbumNumbers.TabIndex = 7;
+            lblAlbumNumbers.Text = "Song Count | Total Duration";
+            // 
+            // lblAlbumArtist
+            // 
+            lblAlbumArtist.Anchor = AnchorStyles.Left;
+            lblAlbumArtist.AutoSize = true;
+            lblAlbumArtist.Font = new Font("Segoe UI Semibold", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblAlbumArtist.ForeColor = Color.White;
+            lblAlbumArtist.Location = new Point(220, 60);
+            lblAlbumArtist.Name = "lblAlbumArtist";
+            lblAlbumArtist.Size = new Size(66, 30);
+            lblAlbumArtist.TabIndex = 6;
+            lblAlbumArtist.Text = "Artist";
+            // 
+            // lblAlbumName
+            // 
+            lblAlbumName.AutoSize = true;
+            lblAlbumName.Font = new Font("Segoe UI", 20.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblAlbumName.ForeColor = Color.White;
+            lblAlbumName.Location = new Point(220, 15);
+            lblAlbumName.Name = "lblAlbumName";
+            lblAlbumName.Size = new Size(185, 37);
+            lblAlbumName.TabIndex = 5;
+            lblAlbumName.Text = "Album Name";
+            // 
+            // picBoxAlbumImage
+            // 
+            picBoxAlbumImage.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            picBoxAlbumImage.BackgroundImageLayout = ImageLayout.Stretch;
+            picBoxAlbumImage.Image = (Image)resources.GetObject("picBoxAlbumImage.Image");
+            picBoxAlbumImage.Location = new Point(10, 10);
+            picBoxAlbumImage.Name = "picBoxAlbumImage";
+            picBoxAlbumImage.Size = new Size(180, 180);
+            picBoxAlbumImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            picBoxAlbumImage.TabIndex = 1;
+            picBoxAlbumImage.TabStop = false;
+            // 
+            // pnlAlbumList
+            // 
+            pnlAlbumList.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlAlbumList.Location = new Point(0, 220);
+            pnlAlbumList.Name = "pnlAlbumList";
+            pnlAlbumList.Size = new Size(795, 355);
+            pnlAlbumList.TabIndex = 3;
+            pnlAlbumList.Visible = false;
+            // 
             // PnlHeaderControl
             // 
             PnlHeaderControl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             PnlHeaderControl.BackColor = Color.FromArgb(8, 18, 38);
             PnlHeaderControl.Controls.Add(PnlSortControls);
             PnlHeaderControl.Controls.Add(PnlPlayQueueControl);
-            PnlHeaderControl.Location = new Point(200, 30);
+            PnlHeaderControl.Location = new Point(0, 0);
             PnlHeaderControl.Name = "PnlHeaderControl";
             PnlHeaderControl.Size = new Size(795, 80);
             PnlHeaderControl.TabIndex = 15;
@@ -1094,6 +1241,7 @@
             label2.Size = new Size(38, 15);
             label2.TabIndex = 15;
             label2.Text = "label2";
+            label2.Visible = false;
             // 
             // CbFilterAlbum
             // 
@@ -1210,7 +1358,7 @@
             pnlMusicLibrary.Controls.Add(pnlAlbum);
             pnlMusicLibrary.Controls.Add(pnlArtists);
             pnlMusicLibrary.Controls.Add(PnlMusicList);
-            pnlMusicLibrary.Location = new Point(200, 110);
+            pnlMusicLibrary.Location = new Point(0, 80);
             pnlMusicLibrary.Name = "pnlMusicLibrary";
             pnlMusicLibrary.Size = new Size(795, 485);
             pnlMusicLibrary.TabIndex = 4;
@@ -1240,14 +1388,27 @@
             // 
             panel1.BackColor = Color.FromArgb(8, 18, 38);
             panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Controls.Add(label5);
             panel1.Controls.Add(pictureBox1);
             panel1.Controls.Add(label3);
             panel1.Controls.Add(pictureBox2);
             panel1.Location = new Point(18, 3);
             panel1.Name = "panel1";
             panel1.Size = new Size(150, 200);
-            panel1.TabIndex = 1;
+            panel1.TabIndex = 2;
             panel1.Visible = false;
+            // 
+            // label5
+            // 
+            label5.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label5.ForeColor = Color.White;
+            label5.Location = new Point(10, 170);
+            label5.MaximumSize = new Size(130, 0);
+            label5.Name = "label5";
+            label5.Size = new Size(130, 20);
+            label5.TabIndex = 8;
+            label5.Text = "Album";
+            label5.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // pictureBox1
             // 
@@ -1255,7 +1416,7 @@
             pictureBox1.BackColor = Color.FromArgb(36, 176, 191);
             pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
             pictureBox1.Image = Properties.Resources.play;
-            pictureBox1.Location = new Point(73, 148);
+            pictureBox1.Location = new Point(99, 99);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Padding = new Padding(3, 0, 0, 0);
             pictureBox1.Size = new Size(35, 35);
@@ -1266,15 +1427,15 @@
             // 
             // label3
             // 
-            label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label3.ForeColor = Color.White;
-            label3.Location = new Point(10, 155);
+            label3.Location = new Point(10, 150);
             label3.MaximumSize = new Size(130, 0);
             label3.Name = "label3";
-            label3.Size = new Size(44, 17);
+            label3.Size = new Size(130, 20);
             label3.TabIndex = 6;
-            label3.Text = "Artists";
+            label3.Text = "Album";
+            label3.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // pictureBox2
             // 
@@ -1338,15 +1499,15 @@
             // 
             // label4
             // 
-            label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label4.ForeColor = Color.White;
             label4.Location = new Point(10, 155);
             label4.MaximumSize = new Size(130, 0);
             label4.Name = "label4";
-            label4.Size = new Size(44, 17);
+            label4.Size = new Size(130, 20);
             label4.TabIndex = 6;
             label4.Text = "Artists";
+            label4.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // pictureBox5
             // 
@@ -1439,7 +1600,7 @@
             PnlPlayMusicQueue.AutoScroll = true;
             PnlPlayMusicQueue.BackColor = Color.FromArgb(8, 18, 38);
             PnlPlayMusicQueue.Controls.Add(DgvPlayMusicQueue);
-            PnlPlayMusicQueue.Location = new Point(200, 110);
+            PnlPlayMusicQueue.Location = new Point(0, 80);
             PnlPlayMusicQueue.Name = "PnlPlayMusicQueue";
             PnlPlayMusicQueue.Size = new Size(795, 485);
             PnlPlayMusicQueue.TabIndex = 4;
@@ -1576,6 +1737,10 @@
             PnlHeader.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)picBoxHamburgerMenu).EndInit();
             PnlSideBar.ResumeLayout(false);
+            pnlContent.ResumeLayout(false);
+            pnlInfo.ResumeLayout(false);
+            pnlInfo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)picBoxAlbumImage).EndInit();
             PnlHeaderControl.ResumeLayout(false);
             PnlSortControls.ResumeLayout(false);
             PnlSortControls.PerformLayout();
@@ -1585,13 +1750,11 @@
             pnlAlbum.ResumeLayout(false);
             flowLayoutPanel2.ResumeLayout(false);
             panel1.ResumeLayout(false);
-            panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             pnlArtists.ResumeLayout(false);
             flowLayoutPanel1.ResumeLayout(false);
             panel3.ResumeLayout(false);
-            panel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
             PnlMusicList.ResumeLayout(false);
@@ -1680,9 +1843,19 @@
         private PictureBox pictureBox5;
         private Panel pnlAlbum;
         private FlowLayoutPanel flowLayoutPanel2;
+        private Panel pnlContent;
         private Panel panel1;
         private PictureBox pictureBox1;
         private Label label3;
         private PictureBox pictureBox2;
+        private Label label5;
+        private Panel pnlAlbumList;
+        private Panel pnlInfo;
+        private Label lblAlbumName;
+        private PictureBox picBoxAlbumImage;
+        private Label lblAlbumNumbers;
+        private Label lblAlbumArtist;
+        private CustomControls.NielarkButton BtnAlbumPlay;
+        private CustomControls.NielarkButton BtnAlbumShuffleAndPlay;
     }
 }

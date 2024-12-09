@@ -14,8 +14,10 @@ using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Timers;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using TagLib;
 using static MusicPlayer.MyModule;
+using static System.ComponentModel.Design.ObjectSelectorEditor;
 using static System.Formats.Asn1.AsnWriter;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -163,7 +165,7 @@ namespace MusicPlayer
                 var artistInfo = GetMusicInfo(a => new ArtistInfo(CapitalizeWords(a.Artist), a.MusicPictureMedium));
                 DisplayInfo(flowLayoutPanel1, true, artistInfo);
 
-                var albumInfo = GetMusicInfo(a => new AlbumInfo(CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium));
+                var albumInfo = GetMusicInfo(a => new AlbumInfo(CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
                 DisplayInfo(flowLayoutPanel2, false, albumInfo);
             }
             else
@@ -438,8 +440,8 @@ namespace MusicPlayer
             UpdateSideBarButtonUI(btnSongs, pnlSubSelectSign, btnArtists, btnAlbums);
             DisplayOrHideSubButtons();
 
-            Panel[] showPanels = { PnlSortControls, pnlMusicLibrary, PnlMusicList };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum };
+            Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, PnlMusicList };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum, pnlInfo };
             PanelVisibilityHandler(showPanels, hidePanels);
         }
 
@@ -485,8 +487,8 @@ namespace MusicPlayer
             UpdateSideBarButtonUI(btnPlayQueue, pnlSelectSign, btnHome, btnMusicLibrary, btnPlayLists, btnSongs, btnArtists, btnAlbums);
             pnlSubSelectSign.Visible = false;
 
-            Panel[] showPanels = { PnlPlayQueueControl, PnlPlayMusicQueue };
-            Panel[] hidePanels = { PnlSortControls, pnlMusicLibrary, pnlArtists, pnlAlbum };
+            Panel[] showPanels = { PnlHeaderControl, PnlPlayQueueControl, PnlPlayMusicQueue };
+            Panel[] hidePanels = { PnlSortControls, pnlMusicLibrary, pnlArtists, pnlAlbum, pnlInfo };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Songs";
@@ -506,8 +508,8 @@ namespace MusicPlayer
             UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
 
-            Panel[] showPanels = { PnlSortControls, pnlMusicLibrary, PnlMusicList };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum };
+            Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, PnlMusicList };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum ,pnlInfo };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Songs";
@@ -519,8 +521,8 @@ namespace MusicPlayer
             UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
 
-            Panel[] showPanels = { PnlSortControls, pnlMusicLibrary, pnlArtists };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlAlbum };
+            Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, pnlArtists };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlAlbum, pnlInfo };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Artists";
@@ -546,7 +548,7 @@ namespace MusicPlayer
             foreach (var info in musicInfo)
             {
                 // Create a new Label for each iteration
-                System.Windows.Forms.Panel pnlCover = new System.Windows.Forms.Panel
+                Panel pnlCover = new Panel
                 {
                     //BackColor = Color.Red,
                     //Name = "pnlArtistCover",
@@ -554,9 +556,10 @@ namespace MusicPlayer
                     //Margin = new Padding(5)
 
                     BackColor = Color.FromArgb(8, 18, 38),
-                    BorderStyle = BorderStyle.FixedSingle,
+                    //BorderStyle = BorderStyle.FixedSingle,
+                    BorderStyle = BorderStyle.None,
                     //Location = new Point(18, 3),
-                    Name = "pnlArtistCover",
+                    Name = "pnlCover",
                     Size = new Size(150, 200),
                     Margin = new Padding(5),
                     //TabIndex = 1,
@@ -567,21 +570,21 @@ namespace MusicPlayer
                     //BackColor = Color.Silver,
                     Image = info.DisplayImage,
                     Location = new Point(10, 10),
-                    Name = "picBoxArtistImage",
+                    Name = "picBoxImage",
                     Size = new Size(130, 130),
                     SizeMode = PictureBoxSizeMode.StretchImage,
                     //TabIndex = 0,
                     //TabStop = false
                 };
 
-                PictureBox picBoxPlayIcon = new PictureBox
+                PictureBox picBoxPlayButton = new PictureBox
                 {
                     Anchor = AnchorStyles.None,
                     BackColor = Color.FromArgb(36, 176, 191),
                     BackgroundImageLayout = ImageLayout.Stretch,
                     Image = Properties.Resources.play,
                     Location = new Point(99, 99),
-                    Name = "picBoxPlayIcon",
+                    Name = "picBoxPlayButton",
                     Padding = new Padding(3, 0, 0, 0),
                     Size = new Size(35, 35),
                     SizeMode = PictureBoxSizeMode.CenterImage,
@@ -590,60 +593,124 @@ namespace MusicPlayer
                     //SetToolTip(pictureBox3, "Pause")
                 };
 
-                Label lblArtistName = new Label
+                Label lblName = new Label
                 {
-                    AutoSize = true,
+                    AutoSize = false,
+                    TextAlign = ContentAlignment.MiddleLeft,
                     Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
                     ForeColor = Color.White,
-                    Location = new Point(10, 155),
-                    Name = "LblArtistName",
-                    Size = new Size(44, 17),
-                    MaximumSize = new Size(0, 130),
+                    Location = new Point(10, 150),
+                    Name = "lblName",
+                    Size = new Size(130, 20),
+                    MaximumSize = new Size(130, 20),
                     //TabIndex = 6,
-                    Text = info.Name,
+                    Text = isArtist ? info.Name : ((AlbumInfo)(object)info).AlbumName,
+                    AutoEllipsis = true,
                 };
+
+
+                Label? lblArtistName = null;
+                if (!isArtist && info is AlbumInfo albumInfo)
+                {
+                    lblArtistName = new Label
+                    {
+                        AutoSize = false,
+                        TextAlign = ContentAlignment.MiddleLeft,
+                        Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
+                        ForeColor = Color.White,
+                        Location = new Point(10, 170),
+                        Name = "LblArtistName",
+                        Size = new Size(130, 20),
+                        MaximumSize = new Size(130, 20),
+                        //TabIndex = 6,
+                        //Text = ((AlbumInfo)(object)info).ArtistName,
+                        Text = albumInfo.ArtistName,
+                        AutoEllipsis = true,
+                    };
+                }
 
                 // Add the controls to te form
                 targetFlowLayoutPanel.Controls.Add(pnlCover);
                 pnlCover.Controls.Add(picBoxImage);
-                pnlCover.Controls.Add(picBoxPlayIcon);
-                pnlCover.Controls.Add(lblArtistName);
+                pnlCover.Controls.Add(picBoxPlayButton);
+                pnlCover.Controls.Add(lblName);
+
+                // Add the artist name label if album button was clicked
+                if (!isArtist && lblArtistName != null)
+                {
+                    pnlCover.Controls.Add(lblArtistName);
+                    ShowToolTip(lblArtistName, pnlCover, picBoxImage, picBoxPlayButton, lblName, lblArtistName);
+                }
+
+                ShowToolTip(lblName, pnlCover, picBoxImage, picBoxPlayButton, lblName); // Display the tool tip
 
                 // Create rounded corners and circular controls
-                MyModule.MakeCircular(picBoxPlayIcon);
+                MyModule.MakeCircular(picBoxPlayButton);
                 MyModule.SetRoundedCorners(pnlCover, 10, 10, 10, 10);
                 MyModule.SetRoundedCorners(picBoxImage, 10, 10, 10, 10);
-                picBoxPlayIcon.BringToFront();
+                picBoxPlayButton.BringToFront();
 
                 // Attach event handlers for mouse enter and leave
-                AttachMouseEvents(pnlCover, picBoxPlayIcon ,lblArtistName.Text, isArtist);
+                AttachMouseEvents(pnlCover, picBoxPlayButton ,lblName.Text, isArtist);
             }
         }
 
-        private void AttachMouseEvents(System.Windows.Forms.Panel pnlCover, PictureBox playButton, string nameIdentifier, bool isArtist)
+        private void ShowToolTip(Label name, params Control[] targetControls)
         {
-            pnlCover.MouseEnter += (sender, e) => pnlCover.BackColor = Color.Silver;
-            pnlCover.MouseLeave += (sender, e) => pnlCover.BackColor = Color.FromArgb(8, 18, 38);
+            // Check if the text needs a tooltip
+            using (Graphics g = name.CreateGraphics())
+            {
+                SizeF textSize = g.MeasureString(name.Text, name.Font);
+
+                // Set a tooltip if the text size exceeds the label's width
+                if (textSize.Width > name.Width)
+                {
+                    foreach (Control control in targetControls)
+                    {
+                        toolTipPlayerControl.SetToolTip(control, name.Text);
+                    }
+                }
+            }
+        }
+
+        private void AttachMouseEvents(Panel pnlCover, PictureBox playButton, string nameIdentifier, bool isArtist)
+        {
+            HoverEffect(pnlCover, Color.Silver, Color.FromArgb(8, 18, 38));
+
+            playButton.MouseClick += (sender, e) => { PlayMusicByArtists(nameIdentifier, isArtist); };
+            pnlCover.MouseClick += (sender, e) => 
+            { 
+                DisplaySelectedAlbumOrMusicInfo(nameIdentifier, isArtist); 
+                //pnlInfo.Visible = true;
+
+                Panel[] showPanels = { pnlInfo };
+                Panel[] hidePanels = { PnlHeaderControl, pnlMusicLibrary, PnlPlayMusicQueue };
+                PanelVisibilityHandler(showPanels, hidePanels);
+            };
+        }
+
+        private void HoverEffect(Panel parentControl, Color mouseEnterColor, Color mouseLeaveColor)
+        {
+            parentControl.MouseEnter += (sender, e) => parentControl.BackColor = mouseEnterColor;
+            parentControl.MouseLeave += (sender, e) => parentControl.BackColor = mouseLeaveColor;
 
             // Apply the same events to all child controls
-            foreach (Control child in pnlCover.Controls)
+            foreach (Control child in parentControl.Controls)
             {
-                child.MouseEnter += (sender, e) => pnlCover.BackColor = Color.Silver;
+                child.MouseEnter += (sender, e) => parentControl.BackColor = mouseEnterColor;
                 child.MouseLeave += (sender, e) =>
                 {
                     // Check if the mouse is still within the panel
-                    Point mousePosition = pnlCover.PointToClient(Control.MousePosition);
-                    if (!pnlCover.ClientRectangle.Contains(mousePosition))
+                    Point mousePosition = parentControl.PointToClient(Control.MousePosition);
+                    if (!parentControl.ClientRectangle.Contains(mousePosition))
                     {
-                        pnlCover.BackColor = Color.FromArgb(8, 18, 38);
+                        parentControl.BackColor = mouseLeaveColor;
                     }
                 };
             }
-
-            playButton.MouseClick += (sender, e) => { playMusicByArtists(nameIdentifier, isArtist); };
         }
 
-        private void playMusicByArtists(string nameIdentifier, bool isArtist)
+        private void PlayMusicByArtists(string nameIdentifier, bool isArtist)
         {
             currentMusicIndex = -1; // Set to empty
             currentMusicIndex++; 
@@ -675,6 +742,53 @@ namespace MusicPlayer
             TimerShowPnlPlayerControls.Start();
         }
 
+        private void DisplaySelectedAlbumOrMusicInfo(string nameIdentifier, bool isArtist)
+        {
+            int totalAlbums = 0;
+
+            var select = musicList
+                            .Where(s => isArtist? s.Artist.Equals(nameIdentifier, StringComparison.OrdinalIgnoreCase) : s.Album.Equals(nameIdentifier, StringComparison.OrdinalIgnoreCase))
+                            .GroupBy(s => isArtist? s.Artist : s.Album)
+                            .Select(group => new
+                            {
+                                AlbumName = isArtist? null : group.Key,
+                                ArtistName = isArtist ? group.Key : group.First().Artist,  // Assuming all songs in the album have the same artist
+                                Duration = group.Aggregate(TimeSpan.Zero, (total, song) => total + TimeSpan.Parse(song.Duration)), // Parse and sum durations
+                                SongCount = group.Count(),  // Count the total number of songs in the album
+                                Image = group.First().MusicPictureMedium,   // Assuming all songs in the album have the same image
+                            })
+                            .ToList();
+
+            // Display the album information
+            if (select.Count > 0)
+            {
+                picBoxAlbumImage.Image = select[0].Image;
+
+                if (isArtist)
+                {
+                    lblAlbumNumbers.Visible = false;
+
+                    totalAlbums = musicList
+                                .Where(w => w.Artist.Equals(nameIdentifier, StringComparison.OrdinalIgnoreCase))
+                                .Select(s => s.Album)
+                                .Distinct()
+                                .Count();
+
+                    lblAlbumName.Text = select[0].ArtistName;
+                    lblAlbumArtist.Text = $"{totalAlbums} albums  |  {select[0].SongCount} songs  |  {select[0].Duration:hh\\:mm\\:ss} run time";
+                    lblAlbumNumbers.Text = select[0].AlbumName;
+                }
+                else
+                {
+                    lblAlbumNumbers.Visible = true;
+
+                    lblAlbumName.Text = select[0].AlbumName;
+                    lblAlbumArtist.Text = select[0].ArtistName;
+                    lblAlbumNumbers.Text = $"{select[0].SongCount} songs  |  {select[0].Duration:hh\\:mm\\:ss} run time";
+                }
+            }
+        }
+
         private List<T> GetMusicInfo<T>(Func<MyMusic, T> selector) where T : MusicInfo
         {
             var musicInfo = musicList
@@ -701,8 +815,8 @@ namespace MusicPlayer
             UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
 
-            Panel[] showPanels = { PnlSortControls, pnlMusicLibrary, pnlAlbum };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlArtists };
+            Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, pnlAlbum };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlArtists, pnlInfo };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Albums";
@@ -1598,7 +1712,8 @@ namespace MusicPlayer
 
         private void PlayBackInfoParentAndChild_MouseMove(object sender, MouseEventArgs e)
         {
-            MouseHoverPlayBackInfo();
+            //MouseHoverPlayBackInfo();
+            HoverEffect(PnlPlayBackInfo, Color.FromArgb(89, 89, 89), Color.Transparent);
         }
 
         private void PnlPlayBackInfo_MouseLeave(object sender, EventArgs e)
@@ -1729,6 +1844,7 @@ namespace MusicPlayer
             MyModule.SetRoundedCorners(PnlPlayMusicQueue, 0, 0, 10, 0);
             MyModule.SetRoundedCorners(PnlPlayerControls, 0, 0, 10, 0);
             MyModule.SetRoundedCorners(PnlPlayerControls, 0, 0, 10, 0);
+            MyModule.SetRoundedCorners(picBoxAlbumImage, 10, 10, 10, 10);
         }
 
         private void HandleResponsiveLayout()
@@ -1815,13 +1931,15 @@ namespace MusicPlayer
 
             PnlSideBar.Left = sideBarLeftPosition;
 
-            PnlHeaderControl.Left = sideBarWidth;
-            pnlMusicLibrary.Left = sideBarWidth;
-            PnlPlayMusicQueue.Left = sideBarWidth;
+            //PnlHeaderControl.Left = sideBarWidth;
+            //pnlMusicLibrary.Left = sideBarWidth;
+            //PnlPlayMusicQueue.Left = sideBarWidth;
+            pnlContent.Left = sideBarWidth;
 
-            PnlHeaderControl.Width = pnlMain.Width - sideBarWidth;
-            pnlMusicLibrary.Width = pnlMain.Width - sideBarWidth;
-            PnlPlayMusicQueue.Width = pnlMain.Width - sideBarWidth;
+            //PnlHeaderControl.Width = pnlMain.Width - sideBarWidth;
+            //pnlMusicLibrary.Width = pnlMain.Width - sideBarWidth;
+            //PnlPlayMusicQueue.Width = pnlMain.Width - sideBarWidth;
+            pnlContent.Width = pnlMain.Width - sideBarWidth;
         }
 
         private void ShowOrHideFilterControl(bool showControl, int filterArtistOffset, int volumeButtonOffset, int searchBarWidth)
