@@ -41,11 +41,18 @@ namespace MusicPlayer
         public int tempVolume = 100;  // Store previous volume value when muted
         private int targetTopPosition;
         public bool playMusic = false, repeatMusic = false, shuffleMusic = false, mute = false, fullScreen = false, miniPlayer = false;
-        public List<MyMusic> musicList = new List<MyMusic>();
-        private List<MyMusic> tempMusicList = new List<MyMusic>();
+        //public List<Music> musicList = new List<Music>();
+        //private List<Music> tempMusicList = new List<Music>();
         private List<string> importMusic = new List<string>();
-        public List<MyMusic> playMusicQueue = new List<MyMusic>();
-        public List<MyMusic> shuffleMusicList = new List<MyMusic>();
+        public List<Music> playMusicQueue = new List<Music>();
+        public List<Music> shuffleMusicList = new List<Music>();
+        MusicLibrary musicLibrary = new MusicLibrary();
+        public List<Music> musicList;
+        private List<Music> tempMusicList;
+
+        private PlayerControls playerControls;
+        private MusicListViewManager musicListViewManager;
+        private MusicSearchFilterSorter musicSearchFilterSorter;
 
         private Size formSize; //Keep form size when it is minimized and restored.Since the form is resized because it takes into account the size of the title bar and borders.
         private int borderSize = 2;
@@ -81,12 +88,51 @@ namespace MusicPlayer
             previousWidth = this.ClientSize.Width;
             TbVolume.Value = 100;   // Set 100 as the default value for volume
             //CbSortMusic.SelectedIndex = 0;
+
+            playerControls = new PlayerControls();
+
+            var uiControllers = new PlayerUIControllers
+            {
+                waveOutDevice = this.waveOutDevice,
+                audioFileReader = this.audioFileReader,
+                PicBoxShowPlayPicture = this.PicBoxShowPlayPicture,
+                LblShowPlayTitle = this.LblShowPlayTitle,
+                LblShowPlayArtist = this.LblShowPlayArtist,
+                LblMusicLength = this.LblMusicLength,
+                LblMusicDurationCtr = this.LblMusicDurationCtr,
+                TbSeekMusic = this.TbSeekMusic,
+                TbVolume = this.TbVolume,
+                TimerMusicDuration = this.TimerMusicDuration,
+                PnlMarquee = this.PnlMarquee,
+                TimerArtistMarquee = this.TimerArtistMarquee,
+                TimerTitleMarquee = this.TimerTitleMarquee
+            };
+            playerControls.SetPlayerUIControllers(uiControllers);
+            //musicListViewManager.SetUIControllers(uiControllers);
+            //musicSearchFilterSorter.SetUIControllers(uiControllers);
         }
 
         private void FormMain_Load(object sender, EventArgs e)
         {
             formSize = this.ClientSize;
-            LoadMusicFiles();   // Loads the music from the device storage
+            //LoadMusicFiles();   // Loads the music from the device storage
+            //MusicLibrary musicLibrary = new MusicLibrary();
+            musicLibrary.LoadMusicFiles(DgvMusicList);
+            musicList = new List<Music>(musicLibrary.musicList);
+            tempMusicList = new List<Music>(musicList);   // Copy the music list from musicList to tempMusicList
+            //label6.Text = $"{musicList[1].File}";
+            MusicPlayerBase musicPlayerBase = new MusicPlayerBase();
+            //musicPlayerBase.musicList = new List<Music>(musicLibrary.musicList);
+            musicListViewManager = new MusicListViewManager(playerControls, musicLibrary.musicList);
+            musicSearchFilterSorter = new MusicSearchFilterSorter(musicLibrary.musicList, playerControls);
+            musicSearchFilterSorter.temporaryMusicList = new List<Music>(musicLibrary.musicList);
+
+            var artistInfo = musicListViewManager.GetMusicInfo(a => new ArtistInfo(MusicListViewManager.CapitalizeWords(a.Artist), a.MusicPictureMedium));
+            musicListViewManager.DisplayInfo(flowLayoutPanel1, true, artistInfo);
+
+            var albumInfo = musicListViewManager.GetMusicInfo(a => new AlbumInfo(MusicListViewManager.CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
+            musicListViewManager.DisplayInfo(flowLayoutPanel2, false, albumInfo);
+
             // Set the ComboBox data source for filtering by artist
             CbFilterArtist.DataSource = musicList
                                         .Select(s => s.Artist)          // Select the Artist property from each item in the music list
@@ -108,13 +154,56 @@ namespace MusicPlayer
             CbFilterAlbum.Text = "Filter by Album";
 
             // Subscribe to the event to update the UI when play/pause state changes
-            PlayAndPauseStateChanged += OnPlayAndPauseStateChanged;
-            ShuffleMusicStateChanged += OnShuffleMusicStateChanged;
-            RepeatMusicStateChanged += OnRepeatMusicStateChanged;
-            MuteStateChanged += OnMuteStateChanged;
-            UpdateMuteStateChanged += OnUpdateMuteStateChanged;
-            UpdateVolumeValueChanged += OnUpdateVolumeValueChanged;
+            //PlayAndPauseStateChanged += OnPlayAndPauseStateChanged;
+            //ShuffleMusicStateChanged += OnShuffleMusicStateChanged;
+            //RepeatMusicStateChanged += OnRepeatMusicStateChanged;
+            //MuteStateChanged += OnMuteStateChanged;
+            //UpdateMuteStateChanged += OnUpdateMuteStateChanged;
+            //UpdateVolumeValueChanged += OnUpdateVolumeValueChanged;
             //UpdateVolumeIconChanged += OnUpdateVolumeIconChanged;
+
+            //playerControls = new PlayerControls();
+            playerControls.ShuffleMusicStateChanged += OnShuffleMusicStateChanged;
+            playerControls.PlayAndPauseStateChanged += OnPlayAndPauseStateChanged;
+            playerControls.RepeatMusicStateChanged += OnRepeatMusicStateChanged;
+            playerControls.MuteStateChanged += OnMuteStateChanged;
+            playerControls.UpdateMuteStateChanged += OnUpdateMuteStateChanged;
+            playerControls.UpdateVolumeValueChanged += OnUpdateVolumeValueChanged;
+
+            //var uiControllers = new PlayerUIControllers
+            //{
+            //    waveOutDevice = this.waveOutDevice,
+            //    audioFileReader = this.audioFileReader,
+            //    PicBoxShowPlayPicture = this.PicBoxShowPlayPicture,
+            //    LblShowPlayTitle = this.LblShowPlayTitle,
+            //    LblShowPlayArtist = this.LblShowPlayArtist,
+            //    LblMusicLength = this.LblMusicLength,
+            //    TbSeekMusic = this.TbSeekMusic,
+            //    TbVolume = this.TbVolume,
+            //    TimerMusicDuration = this.TimerMusicDuration,
+            //    PnlMarquee = this.PnlMarquee,
+            //    TimerArtistMarquee = this.TimerArtistMarquee,
+            //    TimerTitleMarquee = this.TimerTitleMarquee
+            //};
+            //playerControls.SetUIControllers(uiControllers);
+
+            var artistAndAlbumUIControllers = new ArtistAndAlbumUIControllers
+            {
+                PnlInfo = this.pnlInfo,
+                PnlHeaderControl = this.PnlHeaderControl,
+                PnlMusicLibrary = this.pnlMusicLibrary,
+                PnlPlayMusicQueue = this.PnlPlayMusicQueue,
+                DgvPlayMusicQueue = this.DgvPlayMusicQueue,
+                TimerShowPnlPlayerControls = this.TimerShowPnlPlayerControls,
+
+                PicBoxAlbumImage = this.picBoxAlbumImage,
+                LblAlbumName = this.lblAlbumName,
+                LblAlbumArtist = this.lblAlbumArtist,
+                LblAlbumNumbers = this.lblAlbumNumbers,
+
+                ToolTipPlayerControl = this.toolTipPlayerControl
+            };
+            musicListViewManager.SetArtistAndAlbumUIControllers(artistAndAlbumUIControllers);
 
             // Assuming `musicList` is a List<MyMusic> with Title and Artist properties
             AutoCompleteStringCollection autoCompleteCollection = new AutoCompleteStringCollection();
@@ -134,295 +223,352 @@ namespace MusicPlayer
             SendMessage(this.Handle, 0x112, 0xf012, 0);
         }
 
-        private void LoadMusicFiles()
-        {
-            // Define a list of music files to store the music
-            List<string> musicFiles = GetMusicFiles();
+        //private void LoadMusicFiles()
+        //{
+        //    // Define a list of music files to store the music
+        //    List<string> musicFiles = GetMusicFiles();
 
-            // Do something with the collected music files (e.g., populate a DataGridView or ListBox)
-            if (musicFiles.Count != 0)
-            {
-                foreach (string file in musicFiles)
-                {
-                    try
-                    {
-                        GetFileMetaData(file);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Handle or log the error, skip this file, and continue processing others
-                        //Console.WriteLine($"Error processing file {file}: {ex.Message}");
-                        label1.Text = $"Error processing file {file}: {ex.Message}";
-                    }
-                }
+        //    // Do something with the collected music files (e.g., populate a DataGridView or ListBox)
+        //    if (musicFiles.Count != 0)
+        //    {
+        //        foreach (string file in musicFiles)
+        //        {
+        //            try
+        //            {
+        //                GetFileMetaData(file);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                // Handle or log the error, skip this file, and continue processing others
+        //                //Console.WriteLine($"Error processing file {file}: {ex.Message}");
+        //                label1.Text = $"Error processing file {file}: {ex.Message}";
+        //            }
+        //        }
 
-                DgvMusicList.DataSource = null;
-                musicList = musicList.OrderBy(x => x.Title).ToList();
-                tempMusicList = new List<MyMusic>(musicList);   // Copy the music list from musicList to tempMusicList
-                DgvMusicList.DataSource = musicList;            // Set musicList as the datasource to display in data grid view           
-                ModifyDvgMusicList(DgvMusicList);               // Function call for customizing the data grid 
+        //        DgvMusicList.DataSource = null;
+        //        musicList = musicList.OrderBy(x => x.Title).ToList();
+        //        tempMusicList = new List<Music>(musicList);   // Copy the music list from musicList to tempMusicList
+        //        DgvMusicList.DataSource = musicList;            // Set musicList as the datasource to display in data grid view           
+        //        ModifyDvgMusicList(DgvMusicList);               // Function call for customizing the data grid 
 
-                var artistInfo = GetMusicInfo(a => new ArtistInfo(CapitalizeWords(a.Artist), a.MusicPictureMedium));
-                DisplayInfo(flowLayoutPanel1, true, artistInfo);
+        //        var artistInfo = GetMusicInfo(a => new ArtistInfo(CapitalizeWords(a.Artist), a.MusicPictureMedium));
+        //        DisplayInfo(flowLayoutPanel1, true, artistInfo);
 
-                var albumInfo = GetMusicInfo(a => new AlbumInfo(CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
-                DisplayInfo(flowLayoutPanel2, false, albumInfo);
-            }
-            else
-            {
-                MessageBox.Show("No music files found.");
-            }
-        }
+        //        var albumInfo = GetMusicInfo(a => new AlbumInfo(CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
+        //        DisplayInfo(flowLayoutPanel2, false, albumInfo);
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show("No music files found.");
+        //    }
+        //}
 
-        private List<string> GetMusicFiles()
-        {
-            // Define a list of music files to stored the music
-            List<string> musicFiles = new List<string>();
+        //private List<string> GetMusicFiles()
+        //{
+        //    // Define a list of music files to stored the music
+        //    List<string> musicFiles = new List<string>();
 
-            if (importMusic != null) musicFiles.AddRange(importMusic);
+        //    if (importMusic != null) musicFiles.AddRange(importMusic);
 
-            // Define a list of directories to scan for music
-            List<string> musicDirectories = new List<string>
-            {
-               Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), // Default Music folder
-                @"C:\Users\Mark Daniel\Downloads"   // Downloads folder
-                //@"D:\CustomMusicFolder"               // Any other custom folder
-            };
+        //    // Define a list of directories to scan for music
+        //    List<string> musicDirectories = new List<string>
+        //    {
+        //       Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), // Default Music folder
+        //        @"C:\Users\Mark Daniel\Downloads"   // Downloads folder
+        //        //@"D:\CustomMusicFolder"               // Any other custom folder
+        //    };
 
-            foreach (string directory in musicDirectories)
-            {
-                if (Directory.Exists(directory))
-                {
-                    // Get all music files (.mp3 and .wav) from the directory and subdirectories
-                    musicFiles.AddRange(Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories)
-                                                      .Where(file => file.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
-                                                      .OrderBy(file => Path.GetFileName(file))
-                                                      .ToArray());
-                }
-            }
+        //    foreach (string directory in musicDirectories)
+        //    {
+        //        if (Directory.Exists(directory))
+        //        {
+        //            // Get all music files (.mp3 and .wav) from the directory and subdirectories
+        //            musicFiles.AddRange(Directory.GetFiles(directory, "*.*", SearchOption.AllDirectories)
+        //                                              .Where(file => file.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
+        //                                              .OrderBy(file => Path.GetFileName(file))
+        //                                              .ToArray());
+        //        }
+        //    }
 
-            return musicFiles;
-        }
+        //    return musicFiles;
+        //}
 
-        private void GetFileMetaData(string file)
-        {
-            Image musicPictureSmall, musicPictureMedium;
+        //private void GetFileMetaData(string file)
+        //{
+        //    Image musicPictureSmall, musicPictureMedium;
 
-            var tagFile = TagLib.File.Create(file);
+        //    var tagFile = TagLib.File.Create(file);
 
-            if (tagFile.Tag.Pictures.Length > 0)
-            {
-                var bin = (byte[])(tagFile.Tag.Pictures[0].Data.Data);
+        //    if (tagFile.Tag.Pictures.Length > 0)
+        //    {
+        //        var bin = (byte[])(tagFile.Tag.Pictures[0].Data.Data);
 
-                using (var ms = new MemoryStream(bin))
-                {
-                    Image originalImage = Image.FromStream(ms);
+        //        using (var ms = new MemoryStream(bin))
+        //        {
+        //            Image originalImage = Image.FromStream(ms);
 
-                    // Resize the image to the desired dimensions
-                    musicPictureSmall = new Bitmap(30, 30);
-                    using (Graphics g = Graphics.FromImage(musicPictureSmall))
-                    {
-                        // Set the interpolation mode for better quality
-                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                        g.DrawImage(originalImage, 0, 0, 30, 30);
-                    }
+        //            // Resize the image to the desired dimensions
+        //            musicPictureSmall = new Bitmap(30, 30);
+        //            using (Graphics g = Graphics.FromImage(musicPictureSmall))
+        //            {
+        //                // Set the interpolation mode for better quality
+        //                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+        //                g.DrawImage(originalImage, 0, 0, 30, 30);
+        //            }
 
-                    musicPictureMedium = originalImage;
-                }
-            }
-            else
-            {
-                // If there is no image from the metadata set a default image
-                //string albumCoverPath = "C:/Users/Mark Daniel/Downloads/music2.png";
-                //musicPictureSmall = Image.FromFile(albumCoverPath);
-                musicPictureSmall = Properties.Resources.default_music_picture_small;
-                musicPictureMedium = Properties.Resources.default_music_picture_medium;
-                //musicPictureMedium = Image.FromFile("C:/Users/Mark Daniel/Downloads/music.png");
-            }
+        //            musicPictureMedium = originalImage;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // If there is no image from the metadata set a default image
+        //        //string albumCoverPath = "C:/Users/Mark Daniel/Downloads/music2.png";
+        //        //musicPictureSmall = Image.FromFile(albumCoverPath);
+        //        musicPictureSmall = Properties.Resources.default_music_picture_small;
+        //        musicPictureMedium = Properties.Resources.default_music_picture_medium;
+        //        //musicPictureMedium = Image.FromFile("C:/Users/Mark Daniel/Downloads/music.png");
+        //    }
 
-            // Get the following information from the file's meta data
-            string title = tagFile.Tag.Title ?? Path.GetFileNameWithoutExtension(file);     // Get the song title, or use the file name if the title is not available
-            string artist = tagFile.Tag.FirstPerformer ?? "Unknown Artist";                 // Get the artist name, or use "Unknown Artist" if not available   
-            string album = tagFile.Tag.Album ?? "Unknown Album";                            // Get the album name, or use "Unknown Album" if not available
-            TimeSpan duration = tagFile.Properties.Duration;                                // Get the song's duration
+        //    // Get the following information from the file's meta data
+        //    string title = tagFile.Tag.Title ?? Path.GetFileNameWithoutExtension(file);     // Get the song title, or use the file name if the title is not available
+        //    string artist = tagFile.Tag.FirstPerformer ?? "Unknown Artist";                 // Get the artist name, or use "Unknown Artist" if not available   
+        //    string album = tagFile.Tag.Album ?? "Unknown Album";                            // Get the album name, or use "Unknown Album" if not available
+        //    TimeSpan duration = tagFile.Properties.Duration;                                // Get the song's duration
 
-            // Create a new MyMusic object using the gathered metadata and add it to the music list
-            MyMusic myMusic = new MyMusic(musicPictureSmall, musicPictureMedium, title, artist, album, duration, file);
-            musicList.Add(myMusic); // Add the new music item to the music list
-        }
+        //    // Create a new MyMusic object using the gathered metadata and add it to the music list
+        //    Music myMusic = new Music(musicPictureSmall, musicPictureMedium, title, artist, album, duration, file);
+        //    musicList.Add(myMusic); // Add the new music item to the music list
+        //}
 
         private void BtnImportMusic_Click(object sender, EventArgs e)
         {
-            if (ofdMusic.ShowDialog() == DialogResult.OK)
-            {
-                foreach (string file in ofdMusic.FileNames)
-                {
-                    importMusic.Add(file);
-                }
+            CbFilterAlbum.SelectedIndex = 0;
+            CbFilterArtist.SelectedIndex = 0;
 
-                musicList.Clear();
-                LoadMusicFiles();
-            }
+            // Display text in the combo box
+            CbFilterArtist.Text = "Filter by Artist";
+            CbFilterAlbum.Text = "Filter by Album";
+
+            //if (ofdMusic.ShowDialog() == DialogResult.OK)
+            //{
+            //    foreach (string file in ofdMusic.FileNames)
+            //    {
+            //        importMusic.Add(file);
+            //    }
+
+            //    musicList.Clear();
+            //    //LoadMusicFiles();
+            //}
+
+            //MusicLibrary musicLibrary = new MusicLibrary();
+            musicLibrary.ImportMusicFiles(ofdMusic, DgvMusicList);
+            musicList = new List<Music>(musicLibrary.musicList);
+            tempMusicList = new List<Music>(musicList);   // Copy the music list from musicList to tempMusicList
+            musicListViewManager = new MusicListViewManager(playerControls, musicLibrary.musicList);
+            musicSearchFilterSorter = new MusicSearchFilterSorter(musicLibrary.musicList, playerControls);
+            musicSearchFilterSorter.temporaryMusicList = new List<Music>(musicLibrary.musicList);
+            musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
+            //ModifyDvgMusicList(DgvMusicList);       // Function call for customizing the music list data grid view     
         }
 
         private void CbSortMusic_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string? currentFilePath = null;
+            musicSearchFilterSorter.SortMusicList(CbSortMusic, TxtSearch, DgvMusicList);
+            musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
 
-            // Store the file path of the currently playing music if it's valid
-            if (currentMusicIndex > -1) currentFilePath = musicList[currentMusicIndex].File;
+            //string? currentFilePath = null;
 
-            // Perform sorting based on the selected index in the combo box
-            switch (CbSortMusic.SelectedIndex)
-            {
-                case 0:
-                    musicList = musicList.OrderBy(x => x.Title).ToList(); // Sort by title in ascending
-                    break;
-                case 1:
-                    musicList = musicList.OrderByDescending(x => x.Title).ToList(); // Sort by title in descending
-                    break;
-                case 2:
-                    musicList = musicList.OrderBy(x => x.Artist).ToList(); // Sort by artist in ascending
-                    break;
-                case 3:
-                    musicList = musicList.OrderByDescending(x => x.Artist).ToList(); // Sort by artist in descending
-                    break;
-                case 4:
-                    musicList = musicList.OrderBy(x => x.Duration).ToList(); // Sort by duration in ascending
-                    break;
-                case 5:
-                    musicList = musicList.OrderByDescending(x => x.Duration).ToList(); // Sort by duration in descending
-                    break;
-                default:
-                    // Handle invalid selection
-                    break;
-            }
+            //// Store the file path of the currently playing music if it's valid
+            //if (currentMusicIndex > -1) currentFilePath = musicList[currentMusicIndex].File;
 
-            // Restore the current music index if not shuffled and if the file path is valid
-            //if (!shuffleMusic && !string.IsNullOrEmpty(currentFilePath))
+            //// Perform sorting based on the selected index in the combo box
+            //switch (CbSortMusic.SelectedIndex)
             //{
-            //    currentMusicIndex = musicList.FindIndex(index => index.File == currentFilePath);
+            //    case 0:
+            //        musicList = musicList.OrderBy(x => x.Title).ToList(); // Sort by title in ascending
+            //        break;
+            //    case 1:
+            //        musicList = musicList.OrderByDescending(x => x.Title).ToList(); // Sort by title in descending
+            //        break;
+            //    case 2:
+            //        musicList = musicList.OrderBy(x => x.Artist).ToList(); // Sort by artist in ascending
+            //        break;
+            //    case 3:
+            //        musicList = musicList.OrderByDescending(x => x.Artist).ToList(); // Sort by artist in descending
+            //        break;
+            //    case 4:
+            //        musicList = musicList.OrderBy(x => x.Duration).ToList(); // Sort by duration in ascending
+            //        break;
+            //    case 5:
+            //        musicList = musicList.OrderByDescending(x => x.Duration).ToList(); // Sort by duration in descending
+            //        break;
+            //    default:
+            //        // Handle invalid selection
+            //        break;
             //}
 
-            DgvMusicList.DataSource = null;         // Clear the data in data grid view
-            DgvMusicList.DataSource = musicList;    // Display music in data grid view
-            ModifyDvgMusicList(DgvMusicList);       // Function call for customizing the music list data grid view     
+            //// Restore the current music index if not shuffled and if the file path is valid
+            ////if (!shuffleMusic && !string.IsNullOrEmpty(currentFilePath))
+            ////{
+            ////    currentMusicIndex = musicList.FindIndex(index => index.File == currentFilePath);
+            ////}
+
+            //TxtSearch.Text = string.Empty;          // Clear the search box
+            //DgvMusicList.DataSource = null;         // Clear the data in data grid view
+            //DgvMusicList.DataSource = musicList;    // Display music in data grid view
+            //ModifyDvgMusicList(DgvMusicList);       // Function call for customizing the music list data grid view     
         }
 
         private void TxtSearch_TextChanged(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(TxtSearch.Text))
-            {
-                // Filter the music list based on the title or artist matching the search text
-                // The search is case-insensitive
-                var filteredMusicList = musicList
-                                    .Where(s => s.Title.Contains(TxtSearch.Text, StringComparison.OrdinalIgnoreCase) || // Match by title
-                                           s.Artist.Contains(TxtSearch.Text, StringComparison.OrdinalIgnoreCase))       // Match by artist
-                                    .OrderBy(s => s.Title)  // Sort the results alphabetically by title
-                                    .ToList();              // Convert the result to a list
+            musicSearchFilterSorter.Search(TxtSearch, CbFilterAlbum, CbFilterArtist, DgvMusicList);
+            musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
+            //if (!string.IsNullOrWhiteSpace(TxtSearch.Text))
+            //{
+            //    // Set filters to default
+            //    CbFilterAlbum.SelectedIndex = 0;
+            //    CbFilterArtist.SelectedIndex = 0;
 
-                DgvMusicList.DataSource = filteredMusicList;    // Set the search music as the data source
-            }
-            else
-            {
-                DgvMusicList.DataSource = musicList;    // Show all music when search bar is empty
-            }
+            //    // Filter the music list based on the title or artist matching the search text
+            //    // The search is case-insensitive
+            //    var filteredMusicList = musicList
+            //                        .Where(s => s.Title.Contains(TxtSearch.Text, StringComparison.OrdinalIgnoreCase) || // Match by title
+            //                               s.Artist.Contains(TxtSearch.Text, StringComparison.OrdinalIgnoreCase))       // Match by artist
+            //                        .OrderBy(s => s.Title)  // Sort the results alphabetically by title
+            //                        .ToList();              // Convert the result to a list
 
-            ModifyDvgMusicList(DgvMusicList);   // Function call for customizing the music list data grid view     
+            //    DgvMusicList.DataSource = filteredMusicList;    // Set the search music as the data source
+            //}
+            //else
+            //{
+            //    DgvMusicList.DataSource = musicList;    // Show all music when search bar is empty
+            //}
+
+            //ModifyDvgMusicList(DgvMusicList);   // Function call for customizing the music list data grid view     
         }
 
         private void CbFilterArtist_SelectedIndexChanged(object sender, EventArgs e)
         {
-            musicList = new List<MyMusic>(tempMusicList);   // Copy the music list from the tempMusicList to musicList
+            musicSearchFilterSorter.FilterByArtistOrAlbumHandler(CbFilterArtist, CbFilterAlbum, TxtSearch, DgvMusicList, s => s.Artist);
+            //musicSearchFilterSorter.FilterByArtist(CbFilterArtist, CbFilterAlbum, TxtSearch, DgvMusicList);
+            musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
 
-            // Filter the music by artist name
-            if (CbFilterArtist.SelectedIndex != 0)
-            {
-                CbFilterAlbum.SelectedIndex = 0;    // Set the album filter combo box to default value
+            //musicList = new List<Music>(tempMusicList);   // Copy the music list from the tempMusicList to musicList
 
-                // Filter the music based on the selected artist name in the artist combo box
-                musicList = musicList
-                        .Where(s => s.Artist.Equals(CbFilterArtist.SelectedValue))  // Match by the selected artist
-                        .ToList();  // Convert the filtered results to a list
-            }
+            //// Filter the music by artist name
+            //if (CbFilterArtist.SelectedIndex != 0)
+            //{
+            //    CbFilterAlbum.SelectedIndex = 0;    // Set the album filter combo box to default value
 
-            DgvMusicList.DataSource = musicList;    // Set the filtered music as the data source 
+            //    // Filter the music based on the selected artist name in the artist combo box
+            //    musicList = musicList
+            //            .Where(s => s.Artist.Equals(CbFilterArtist.SelectedValue))  // Match by the selected artist
+            //            .ToList();  // Convert the filtered results to a list
+            //}
 
-            ModifyDvgMusicList(DgvMusicList);       // Function call for customizing the music list data grid view     
+            //TxtSearch.Text = string.Empty;          // Clear the search box
+            //DgvMusicList.DataSource = musicList;    // Set the filtered music as the data source 
+
+            //ModifyDvgMusicList(DgvMusicList);       // Function call for customizing the music list data grid view     
         }
 
         private void CbFilterAlbum_SelectedIndexChanged(object sender, EventArgs e)
         {
-            musicList = new List<MyMusic>(tempMusicList);   // Copy the music list from the tempMusicList to musicList
+            musicSearchFilterSorter.FilterByArtistOrAlbumHandler(CbFilterAlbum, CbFilterArtist, TxtSearch, DgvMusicList, s => s.Album);
+            //musicSearchFilterSorter.FilterByAlbum(CbFilterArtist, CbFilterAlbum, TxtSearch, DgvMusicList);
+            musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
 
-            // Filter the music by album name
-            if (CbFilterAlbum.SelectedIndex != 0)
-            {
-                CbFilterArtist.SelectedIndex = 0;   // Set the album filter combo box to default value
+            //musicList = new List<Music>(tempMusicList);   // Copy the music list from the tempMusicList to musicList
 
-                // Filter the music base onn the selected album name in the album combo box
-                musicList = musicList
-                        .Where(s => s.Album.Equals(CbFilterAlbum.SelectedValue))    // Match by the selected artist
-                        .ToList();  // Convert the filtered results to a list
-            }
+            //// Filter the music by album name
+            //if (CbFilterAlbum.SelectedIndex != 0)
+            //{
+            //    CbFilterArtist.SelectedIndex = 0;   // Set the album filter combo box to default value
 
-            DgvMusicList.DataSource = musicList;    // Set the filtered music as the data source
+            //    // Filter the music base onn the selected album name in the album combo box
+            //    musicList = musicList
+            //            .Where(s => s.Album.Equals(CbFilterAlbum.SelectedValue))    // Match by the selected artist
+            //            .ToList();  // Convert the filtered results to a list
+            //}
 
-            ModifyDvgMusicList(DgvMusicList);       // Function call for customizing the music list data grid view  
+            //TxtSearch.Text = string.Empty;          // Clear the search box
+            //DgvMusicList.DataSource = musicList;    // Set the filtered music as the data source
+
+            //ModifyDvgMusicList(DgvMusicList);       // Function call for customizing the music list data grid view  
         }
 
         private void BtnShuffleAndPlay_Click(object sender, EventArgs e)
         {
-            shuffleMusic = true;
+            playerControls.ShuffleAndPlayMusic(DgvPlayMusicQueue, TimerShowPnlPlayerControls, musicLibrary);
+            //shuffleMusic = true;
 
-            playMusicQueue = new List<MyMusic>(musicList);      // Copy the current music list to playMusicQueue for shuffling
+            //playMusicQueue = new List<Music>(musicList);      // Copy the current music list to playMusicQueue for shuffling
 
-            FisherYatesShuffle();                               // Shuffle the music list using the Fisher-Yates algorithm
-            DgvPlayMusicQueue.DataSource = shuffleMusicList;    // Set shuffleMusicList as the data source and display in data grid view
+            //FisherYatesShuffle();                               // Shuffle the music list using the Fisher-Yates algorithm
+            //DgvPlayMusicQueue.DataSource = shuffleMusicList;    // Set shuffleMusicList as the data source and display in data grid view
 
-            // Get the music file information from the first index in the shuffled list
-            string filePath = shuffleMusicList[0].File;
-            string Title = shuffleMusicList[0].Title;
-            string Artist = shuffleMusicList[0].Artist;
+            //// Get the music file information from the first index in the shuffled list
+            //string filePath = shuffleMusicList[0].File;
+            //string Title = shuffleMusicList[0].Title;
+            //string Artist = shuffleMusicList[0].Artist;
 
-            int index = shuffleMusicList.FindIndex(index => index.File == filePath);    // Find the index of the current music in the shuffled list based on file path
-            Image musicPicture = shuffleMusicList[index].MusicPictureMedium;            // Get the music image
+            //int index = shuffleMusicList.FindIndex(index => index.File == filePath);    // Find the index of the current music in the shuffled list based on file path
+            //Image musicPicture = shuffleMusicList[index].MusicPictureMedium;            // Get the music image
 
-            PlayMusic(musicPicture, filePath, Title, Artist);   // Function call to play the music
+            //PlayMusic(musicPicture, filePath, Title, Artist);   // Function call to play the music
 
-            TimerShowPnlPlayerControls.Start();
+            //TimerShowPnlPlayerControls.Start();
         }
 
         private void BtnClearQueue_Click(object sender, EventArgs e)
         {
-            // Clear the play queue and reset the UI
+            //musicSearchFilterSorter.ClearQueue(DgvPlayMusicQueue, PnlMusicList);
+            var audioFileReader = playerControls.audioFileReader;
+            var waveOutDevice = playerControls.waveOutDevice;
+
+            TimerMusicDuration.Stop();
+
             if (audioFileReader != null && waveOutDevice != null)
             {
-                // Stop and dispose of the audio playback
-                waveOutDevice.Stop();
-                waveOutDevice.Dispose();
-                audioFileReader.Dispose();
-                waveOutDevice = null;
-                audioFileReader = null;
+                musicSearchFilterSorter.CleanPlaybackResources();
+                musicSearchFilterSorter.ResetSeekBarAndDurationLabels(TbSeekMusic, LblMusicLength, LblMusicDurationCtr);
+                musicSearchFilterSorter.ClearCurrentMusicInformation(LblShowPlayTitle, LblShowPlayArtist, PicBoxShowPlayPicture);
 
-                // Reset the seek bar and duration labels
-                TbSeekMusic.Value = 0;
-                LblMusicLength.Text = TimeSpan.FromSeconds(0).ToString("hh\\:mm\\:ss");
-                LblMusicDurationCtr.Text = TimeSpan.FromSeconds(0).ToString("hh\\:mm\\:ss");
-
-                // Clear the playback information display
-                LblShowPlayTitle.Text = null;
-                LblShowPlayArtist.Text = null;
-                PicBoxShowPlayPicture.Image = Properties.Resources.default_music_picture_medium;
-
-                // Reset the marquee labels
-                MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
+                playerControls.ResetMarqueeLabels(LblShowPlayTitle, LblShowPlayArtist, TimerTitleMarquee, TimerArtistMarquee);
+                //playerControls.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
             }
 
-            // Clear the data grid view of the play queue
-            DgvPlayMusicQueue.DataSource = null;        // clear the data grid view of play list queue
-            playMusicQueue.Clear();                     // Clear the play queue list
-            ModifyDvgMusicList(DgvPlayMusicQueue);      // Update the DataGridView display of the play list queue
+            musicSearchFilterSorter.ClearDataGridView(DgvPlayMusicQueue);
+            musicSearchFilterSorter.ModifyDataGridView(DgvPlayMusicQueue, PnlPlayMusicQueue);
+
+            //// Clear the play queue and reset the UI
+            //if (audioFileReader != null && waveOutDevice != null)
+            //{
+            //    // Stop and dispose of the audio playback
+            //    waveOutDevice.Stop();
+            //    waveOutDevice.Dispose();
+            //    audioFileReader.Dispose();
+            //    waveOutDevice = null;
+            //    audioFileReader = null;
+
+            //    // Reset the seek bar and duration labels
+            //    TbSeekMusic.Value = 0;
+            //    LblMusicLength.Text = TimeSpan.FromSeconds(0).ToString("hh\\:mm\\:ss");
+            //    LblMusicDurationCtr.Text = TimeSpan.FromSeconds(0).ToString("hh\\:mm\\:ss");
+
+            //    // Clear the playback information display
+            //    LblShowPlayTitle.Text = null;
+            //    LblShowPlayArtist.Text = null;
+            //    PicBoxShowPlayPicture.Image = Properties.Resources.default_music_picture_medium;
+
+            //    // Reset the marquee labels
+            //    MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
+            //}
+
+            //// Clear the data grid view of the play queue
+            //DgvPlayMusicQueue.DataSource = null;        // clear the data grid view of play list queue
+            //playMusicQueue.Clear();                     // Clear the play queue list
+            //ModifyDvgMusicList(DgvPlayMusicQueue);      // Update the DataGridView display of the play list queue
         }
 
         // SIDE PANEL BUTTONS
@@ -543,151 +689,153 @@ namespace MusicPlayer
             }
         }
 
-        private void DisplayInfo<T>(FlowLayoutPanel targetFlowLayoutPanel, bool isArtist, List<T> musicInfo) where T : MusicInfo
-        {
-            foreach (var info in musicInfo)
-            {
-                // Create a new Label for each iteration
-                Panel pnlCover = new Panel
-                {
-                    //BackColor = Color.Red,
-                    //Name = "pnlArtistCover",
-                    //Size = new Size(150, 200),
-                    //Margin = new Padding(5)
+        //private void DisplayInfo<T>(FlowLayoutPanel targetFlowLayoutPanel, bool isArtist, List<T> musicInfo) where T : MusicInfo
+        //{
+        //    foreach (var info in musicInfo)
+        //    {
+        //        // Create a new Label for each iteration
+        //        Panel pnlCover = new Panel
+        //        {
+        //            //BackColor = Color.Red,
+        //            //Name = "pnlArtistCover",
+        //            //Size = new Size(150, 200),
+        //            //Margin = new Padding(5)
 
-                    BackColor = Color.FromArgb(8, 18, 38),
-                    //BorderStyle = BorderStyle.FixedSingle,
-                    BorderStyle = BorderStyle.None,
-                    //Location = new Point(18, 3),
-                    Name = "pnlCover",
-                    Size = new Size(150, 200),
-                    Margin = new Padding(5),
-                    //TabIndex = 1,
-                };
+        //            BackColor = Color.FromArgb(8, 18, 38),
+        //            //BorderStyle = BorderStyle.FixedSingle,
+        //            BorderStyle = BorderStyle.None,
+        //            //Location = new Point(18, 3),
+        //            Name = "pnlCover",
+        //            Size = new Size(150, 200),
+        //            Margin = new Padding(5),
+        //            //TabIndex = 1,
+        //        };
 
-                PictureBox picBoxImage = new PictureBox
-                {
-                    //BackColor = Color.Silver,
-                    Image = info.DisplayImage,
-                    Location = new Point(10, 10),
-                    Name = "picBoxImage",
-                    Size = new Size(130, 130),
-                    SizeMode = PictureBoxSizeMode.StretchImage,
-                    //TabIndex = 0,
-                    //TabStop = false
-                };
+        //        PictureBox picBoxImage = new PictureBox
+        //        {
+        //            //BackColor = Color.Silver,
+        //            Image = info.DisplayImage,
+        //            Location = new Point(10, 10),
+        //            Name = "picBoxImage",
+        //            Size = new Size(130, 130),
+        //            SizeMode = PictureBoxSizeMode.StretchImage,
+        //            //TabIndex = 0,
+        //            //TabStop = false
+        //        };
 
-                PictureBox picBoxPlayButton = new PictureBox
-                {
-                    Anchor = AnchorStyles.None,
-                    BackColor = Color.FromArgb(36, 176, 191),
-                    BackgroundImageLayout = ImageLayout.Stretch,
-                    Image = Properties.Resources.play,
-                    Location = new Point(99, 99),
-                    Name = "picBoxPlayButton",
-                    Padding = new Padding(3, 0, 0, 0),
-                    Size = new Size(35, 35),
-                    SizeMode = PictureBoxSizeMode.CenterImage,
-                    //TabIndex = 7,
-                    //TabStop = false
-                    //SetToolTip(pictureBox3, "Pause")
-                };
+        //        PictureBox picBoxPlayButton = new PictureBox
+        //        {
+        //            Anchor = AnchorStyles.None,
+        //            BackColor = Color.FromArgb(36, 176, 191),
+        //            BackgroundImageLayout = ImageLayout.Stretch,
+        //            Image = Properties.Resources.play,
+        //            Location = new Point(99, 99),
+        //            Name = "picBoxPlayButton",
+        //            Padding = new Padding(3, 0, 0, 0),
+        //            Size = new Size(35, 35),
+        //            SizeMode = PictureBoxSizeMode.CenterImage,
+        //            //TabIndex = 7,
+        //            //TabStop = false
+        //            //SetToolTip(pictureBox3, "Pause")
+        //        };
 
-                Label lblName = new Label
-                {
-                    AutoSize = false,
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
-                    ForeColor = Color.White,
-                    Location = new Point(10, 150),
-                    Name = "lblName",
-                    Size = new Size(130, 20),
-                    MaximumSize = new Size(130, 20),
-                    //TabIndex = 6,
-                    Text = isArtist ? info.Name : ((AlbumInfo)(object)info).AlbumName,
-                    AutoEllipsis = true,
-                };
+        //        Label lblName = new Label
+        //        {
+        //            AutoSize = false,
+        //            TextAlign = ContentAlignment.MiddleLeft,
+        //            Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
+        //            ForeColor = Color.White,
+        //            Location = new Point(10, 150),
+        //            Name = "lblName",
+        //            Size = new Size(130, 20),
+        //            MaximumSize = new Size(130, 20),
+        //            //TabIndex = 6,
+        //            Text = isArtist ? info.Name : ((AlbumInfo)(object)info).AlbumName,
+        //            AutoEllipsis = true,
+        //        };
 
 
-                Label? lblArtistName = null;
-                if (!isArtist && info is AlbumInfo albumInfo)
-                {
-                    lblArtistName = new Label
-                    {
-                        AutoSize = false,
-                        TextAlign = ContentAlignment.MiddleLeft,
-                        Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
-                        ForeColor = Color.White,
-                        Location = new Point(10, 170),
-                        Name = "LblArtistName",
-                        Size = new Size(130, 20),
-                        MaximumSize = new Size(130, 20),
-                        //TabIndex = 6,
-                        //Text = ((AlbumInfo)(object)info).ArtistName,
-                        Text = albumInfo.ArtistName,
-                        AutoEllipsis = true,
-                    };
-                }
+        //        Label? lblArtistName = null;
+        //        if (!isArtist && info is AlbumInfo albumInfo)
+        //        {
+        //            lblArtistName = new Label
+        //            {
+        //                AutoSize = false,
+        //                TextAlign = ContentAlignment.MiddleLeft,
+        //                Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
+        //                ForeColor = Color.White,
+        //                Location = new Point(10, 170),
+        //                Name = "LblArtistName",
+        //                Size = new Size(130, 20),
+        //                MaximumSize = new Size(130, 20),
+        //                //TabIndex = 6,
+        //                //Text = ((AlbumInfo)(object)info).ArtistName,
+        //                Text = albumInfo.ArtistName,
+        //                AutoEllipsis = true,
+        //            };
+        //        }
 
-                // Add the controls to te form
-                targetFlowLayoutPanel.Controls.Add(pnlCover);
-                pnlCover.Controls.Add(picBoxImage);
-                pnlCover.Controls.Add(picBoxPlayButton);
-                pnlCover.Controls.Add(lblName);
+        //        // Add the controls to te form
+        //        targetFlowLayoutPanel.Controls.Add(pnlCover);
+        //        pnlCover.Controls.Add(picBoxImage);
+        //        pnlCover.Controls.Add(picBoxPlayButton);
+        //        pnlCover.Controls.Add(lblName);
 
-                // Add the artist name label if album button was clicked
-                if (!isArtist && lblArtistName != null)
-                {
-                    pnlCover.Controls.Add(lblArtistName);
-                    ShowToolTip(lblArtistName, pnlCover, picBoxImage, picBoxPlayButton, lblName, lblArtistName);
-                }
+        //        // Add the artist name label if album button was clicked
+        //        if (!isArtist && lblArtistName != null)
+        //        {
+        //            pnlCover.Controls.Add(lblArtistName);
+        //            ShowToolTip(lblArtistName, pnlCover, picBoxImage, picBoxPlayButton, lblName, lblArtistName);
+        //        }
 
-                ShowToolTip(lblName, pnlCover, picBoxImage, picBoxPlayButton, lblName); // Display the tool tip
+        //        ShowToolTip(lblName, pnlCover, picBoxImage, picBoxPlayButton, lblName); // Display the tool tip
 
-                // Create rounded corners and circular controls
-                MyModule.MakeCircular(picBoxPlayButton);
-                MyModule.SetRoundedCorners(pnlCover, 10, 10, 10, 10);
-                MyModule.SetRoundedCorners(picBoxImage, 10, 10, 10, 10);
-                picBoxPlayButton.BringToFront();
+        //        // Create rounded corners and circular controls
+        //        MyModule.MakeCircular(picBoxPlayButton);
+        //        MyModule.SetRoundedCorners(pnlCover, 10, 10, 10, 10);
+        //        MyModule.SetRoundedCorners(picBoxImage, 10, 10, 10, 10);
+        //        picBoxPlayButton.BringToFront();
 
-                // Attach event handlers for mouse enter and leave
-                AttachMouseEvents(pnlCover, picBoxPlayButton ,lblName.Text, isArtist);
-            }
-        }
+        //        // Attach event handlers for mouse enter and leave
+        //        AttachMouseEvents(pnlCover, picBoxPlayButton, lblName.Text, isArtist);
+        //        //musicListViewManager.AttachMouseEvents(pnlCover, picBoxPlayButton ,lblName.Text, isArtist);
+        //    }
+        //}
 
-        private void ShowToolTip(Label name, params Control[] targetControls)
-        {
-            // Check if the text needs a tooltip
-            using (Graphics g = name.CreateGraphics())
-            {
-                SizeF textSize = g.MeasureString(name.Text, name.Font);
+        //private void ShowToolTip(Label name, params Control[] targetControls)
+        //{
+        //    // Check if the text needs a tooltip
+        //    using (Graphics g = name.CreateGraphics())
+        //    {
+        //        SizeF textSize = g.MeasureString(name.Text, name.Font);
 
-                // Set a tooltip if the text size exceeds the label's width
-                if (textSize.Width > name.Width)
-                {
-                    foreach (Control control in targetControls)
-                    {
-                        toolTipPlayerControl.SetToolTip(control, name.Text);
-                    }
-                }
-            }
-        }
+        //        // Set a tooltip if the text size exceeds the label's width
+        //        if (textSize.Width > name.Width)
+        //        {
+        //            foreach (Control control in targetControls)
+        //            {
+        //                toolTipPlayerControl.SetToolTip(control, name.Text);
+        //            }
+        //        }
+        //    }
+        //}
 
-        private void AttachMouseEvents(Panel pnlCover, PictureBox playButton, string nameIdentifier, bool isArtist)
-        {
-            HoverEffect(pnlCover, Color.Silver, Color.FromArgb(8, 18, 38));
+        //private void AttachMouseEvents(Panel pnlCover, PictureBox playButton, string nameIdentifier, bool isArtist)
+        //{
+        //    HoverEffect(pnlCover, Color.Silver, Color.FromArgb(8, 18, 38));
 
-            playButton.MouseClick += (sender, e) => { PlayMusicByArtists(nameIdentifier, isArtist); };
-            pnlCover.MouseClick += (sender, e) => 
-            { 
-                DisplaySelectedAlbumOrMusicInfo(nameIdentifier, isArtist); 
-                //pnlInfo.Visible = true;
+        //    //playButton.MouseClick += (sender, e) => { PlayMusicByArtists(nameIdentifier, isArtist); };
+        //    playButton.MouseClick += (sender, e) => { PlayMusicByArtists(nameIdentifier, isArtist); };
+        //    pnlCover.MouseClick += (sender, e) => 
+        //    { 
+        //        DisplaySelectedAlbumOrMusicInfo(nameIdentifier, isArtist); 
+        //        //pnlInfo.Visible = true;
 
-                Panel[] showPanels = { pnlInfo };
-                Panel[] hidePanels = { PnlHeaderControl, pnlMusicLibrary, PnlPlayMusicQueue };
-                PanelVisibilityHandler(showPanels, hidePanels);
-            };
-        }
+        //        Panel[] showPanels = { pnlInfo };
+        //        Panel[] hidePanels = { PnlHeaderControl, pnlMusicLibrary, PnlPlayMusicQueue };
+        //        PanelVisibilityHandler(showPanels, hidePanels);
+        //    };
+        //}
 
         private void HoverEffect(Panel parentControl, Color mouseEnterColor, Color mouseLeaveColor)
         {
@@ -710,104 +858,109 @@ namespace MusicPlayer
             }
         }
 
-        private void PlayMusicByArtists(string nameIdentifier, bool isArtist)
-        {
-            currentMusicIndex = -1; // Set to empty
-            currentMusicIndex++; 
+        //private void PlayMusicByArtists(string nameIdentifier, bool isArtist)
+        //{
+        //    currentMusicIndex = -1; // Set to empty
+        //    currentMusicIndex++; 
 
-            // Filter the music based on the selected artist name in the artist combo box
-            playMusicQueue = musicList
-                    .Where(s => isArtist ? s.Artist.ToLower().Equals(nameIdentifier.ToLower()) : s.Album.ToLower().Equals(nameIdentifier.ToLower()))  // Match by the selected artist
-                    .ToList();  // Convert the filtered results to a list
+        //    // Filter the music based on the selected artist name in the artist combo box
+        //    playMusicQueue = musicList
+        //            .Where(s => isArtist ? s.Artist.ToLower().Equals(nameIdentifier.ToLower()) : s.Album.ToLower().Equals(nameIdentifier.ToLower()))  // Match by the selected artist
+        //            .ToList();  // Convert the filtered results to a list
             
-            // Retrieve music information
-            string title = playMusicQueue[currentMusicIndex].Title;
-            string artist = playMusicQueue[currentMusicIndex].Artist;
-            string filePath = playMusicQueue[currentMusicIndex].File;
-            Image musicPicture = playMusicQueue[currentMusicIndex].MusicPictureMedium;  // Get the mp3 image
+        //    // Retrieve music information
+        //    string title = playMusicQueue[currentMusicIndex].Title;
+        //    string artist = playMusicQueue[currentMusicIndex].Artist;
+        //    string filePath = playMusicQueue[currentMusicIndex].File;
+        //    Image musicPicture = playMusicQueue[currentMusicIndex].MusicPictureMedium;  // Get the mp3 image
 
-            PlayMusic(musicPicture, filePath, title, artist);
+        //    PlayMusic(musicPicture, filePath, title, artist);
 
-            if (shuffleMusic)
-            {
-                FisherYatesShuffle(filePath);                       // Shuffle the music list
-                DgvPlayMusicQueue.DataSource = shuffleMusicList;    // Set the shuffleMusicList music as the data source 
-            }
-            else
-            {
-                DgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
-            }
+        //    if (shuffleMusic)
+        //    {
+        //        FisherYatesShuffle(filePath);                       // Shuffle the music list
+        //        DgvPlayMusicQueue.DataSource = shuffleMusicList;    // Set the shuffleMusicList music as the data source 
+        //    }
+        //    else
+        //    {
+        //        DgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
+        //    }
 
-            // Display the play back controls
-            TimerShowPnlPlayerControls.Start();
-        }
+        //    // Display the play back controls
+        //    TimerShowPnlPlayerControls.Start();
+        //}
 
-        private void DisplaySelectedAlbumOrMusicInfo(string nameIdentifier, bool isArtist)
-        {
-            int totalAlbums = 0;
+        //private void DisplaySelectedAlbumOrMusicInfo(string nameIdentifier, bool isArtist)
+        //{
 
-            var select = musicList
-                            .Where(s => isArtist? s.Artist.Equals(nameIdentifier, StringComparison.OrdinalIgnoreCase) : s.Album.Equals(nameIdentifier, StringComparison.OrdinalIgnoreCase))
-                            .GroupBy(s => isArtist? s.Artist : s.Album)
-                            .Select(group => new
-                            {
-                                AlbumName = isArtist? null : group.Key,
-                                ArtistName = isArtist ? group.Key : group.First().Artist,  // Assuming all songs in the album have the same artist
-                                Duration = group.Aggregate(TimeSpan.Zero, (total, song) => total + TimeSpan.Parse(song.Duration)), // Parse and sum durations
-                                SongCount = group.Count(),  // Count the total number of songs in the album
-                                Image = group.First().MusicPictureMedium,   // Assuming all songs in the album have the same image
-                            })
-                            .ToList();
+        //    //var selected = musicListViewManager.SelectedArtistOrAlbum(nameIdentifier, isArtist);
 
-            // Display the album information
-            if (select.Count > 0)
-            {
-                picBoxAlbumImage.Image = select[0].Image;
+        //    //musicListViewManager.DisplaySelectedArtistOrAlbum(selected, nameIdentifier, isArtist, picBoxAlbumImage, lblAlbumName, lblAlbumArtist, lblAlbumNumbers);
 
-                if (isArtist)
-                {
-                    lblAlbumNumbers.Visible = false;
+        //    int totalAlbums = 0;
 
-                    totalAlbums = musicList
-                                .Where(w => w.Artist.Equals(nameIdentifier, StringComparison.OrdinalIgnoreCase))
-                                .Select(s => s.Album)
-                                .Distinct()
-                                .Count();
+        //    var select = musicList
+        //                    .Where(s => isArtist ? s.Artist.Equals(nameIdentifier, StringComparison.OrdinalIgnoreCase) : s.Album.Equals(nameIdentifier, StringComparison.OrdinalIgnoreCase))
+        //                    .GroupBy(s => isArtist ? s.Artist : s.Album)
+        //                    .Select(group => new
+        //                    {
+        //                        AlbumName = isArtist ? null : group.Key,
+        //                        ArtistName = isArtist ? group.Key : group.First().Artist,  // Assuming all songs in the album have the same artist
+        //                        Duration = group.Aggregate(TimeSpan.Zero, (total, song) => total + TimeSpan.Parse(song.Duration)), // Parse and sum durations
+        //                        SongCount = group.Count(),  // Count the total number of songs in the album
+        //                        Image = group.First().MusicPictureMedium,   // Assuming all songs in the album have the same image
+        //                    })
+        //                    .ToList();
 
-                    lblAlbumName.Text = select[0].ArtistName;
-                    lblAlbumArtist.Text = $"{totalAlbums} albums  |  {select[0].SongCount} songs  |  {select[0].Duration:hh\\:mm\\:ss} run time";
-                    lblAlbumNumbers.Text = select[0].AlbumName;
-                }
-                else
-                {
-                    lblAlbumNumbers.Visible = true;
+        //    // Display the album information
+        //    if (select.Count > 0)
+        //    {
+        //        picBoxAlbumImage.Image = select[0].Image;
 
-                    lblAlbumName.Text = select[0].AlbumName;
-                    lblAlbumArtist.Text = select[0].ArtistName;
-                    lblAlbumNumbers.Text = $"{select[0].SongCount} songs  |  {select[0].Duration:hh\\:mm\\:ss} run time";
-                }
-            }
-        }
+        //        if (isArtist)
+        //        {
+        //            lblAlbumNumbers.Visible = false;
 
-        private List<T> GetMusicInfo<T>(Func<MyMusic, T> selector) where T : MusicInfo
-        {
-            var musicInfo = musicList
-                            .Select(selector)
-                            .Distinct()
-                            .ToList();
+        //            totalAlbums = musicList
+        //                        .Where(w => w.Artist.Equals(nameIdentifier, StringComparison.OrdinalIgnoreCase))
+        //                        .Select(s => s.Album)
+        //                        .Distinct()
+        //                        .Count();
 
-            label2.Text = $"{musicInfo.Count}";
-            return musicInfo;
-        }
+        //            lblAlbumName.Text = select[0].ArtistName;
+        //            lblAlbumArtist.Text = $"{totalAlbums} albums  |  {select[0].SongCount} songs  |  {select[0].Duration:hh\\:mm\\:ss} run time";
+        //            lblAlbumNumbers.Text = select[0].AlbumName;
+        //        }
+        //        else
+        //        {
+        //            lblAlbumNumbers.Visible = true;
+
+        //            lblAlbumName.Text = select[0].AlbumName;
+        //            lblAlbumArtist.Text = select[0].ArtistName;
+        //            lblAlbumNumbers.Text = $"{select[0].SongCount} songs  |  {select[0].Duration:hh\\:mm\\:ss} run time";
+        //        }
+        //    }
+        //}
+
+        //private List<T> GetMusicInfo<T>(Func<Music, T> selector) where T : MusicInfo
+        //{
+        //    var musicInfo = musicList
+        //                    .Select(selector)
+        //                    .Distinct()
+        //                    .ToList();
+
+        //    label2.Text = $"{musicInfo.Count}";
+        //    return musicInfo;
+        //}
 
         // Helper method to capitalize the first letter of each word
-        private static string CapitalizeWords(string input)
-        {
-            if (string.IsNullOrEmpty(input)) return input;
+        //private static string CapitalizeWords(string input)
+        //{
+        //    if (string.IsNullOrEmpty(input)) return input;
 
-            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
-            return textInfo.ToTitleCase(input.ToLower());
-        }
+        //    TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+        //    return textInfo.ToTitleCase(input.ToLower());
+        //}
 
         private void BtnAlbums_Click(object sender, EventArgs e)
         {
@@ -887,310 +1040,344 @@ namespace MusicPlayer
 
         private void DgvMusicList_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            musicListViewManager.MusicListView(DgvMusicList, DgvPlayMusicQueue, CbFilterArtist, CbFilterAlbum, TimerShowPnlPlayerControls);
+
+
             // Play's the selected music through cell click and populate the playlist queue
-            if (DgvMusicList.CurrentRow != null)
-            {
-                // Filter the music based on the selected artist and album from the combo boxes
-                // Selects all the music when both combo boxes are at their default values (index 0)
-                playMusicQueue = (CbFilterArtist.SelectedIndex == 0 && CbFilterAlbum.SelectedIndex == 0)
-                                    ? new List<MyMusic>(musicList)  // Create a new list with all music
-                                    : musicList
-                                        .Where(s => s.Artist.Equals(CbFilterArtist.SelectedValue) || s.Album.Equals(CbFilterAlbum.SelectedValue))   // Filter based on selected artist or album
-                                        .ToList();  // Convert the filtered results to a list
+            //if (DgvMusicList.CurrentRow != null)
+            //{
+            //    // Filter the music based on the selected artist and album from the combo boxes
+            //    // Selects all the music when both combo boxes are at their default values (index 0)
+            //    playMusicQueue = (CbFilterArtist.SelectedIndex == 0 && CbFilterAlbum.SelectedIndex == 0)
+            //                        ? new List<Music>(musicList)  // Create a new list with all music
+            //                        : musicList
+            //                            .Where(s => s.Artist.Equals(CbFilterArtist.SelectedValue) || s.Album.Equals(CbFilterAlbum.SelectedValue))   // Filter based on selected artist or album
+            //                            .ToList();  // Convert the filtered results to a list
 
-                // Retrieve every cells data from the selected row
-                string? title = DgvMusicList.CurrentRow.Cells[2].Value.ToString();
-                string? artist = DgvMusicList.CurrentRow.Cells[3].Value.ToString();
-                string? filePath = DgvMusicList.CurrentRow.Cells[6].Value.ToString();
 
-                // Find the index of the selected music using the file path
-                int index = playMusicQueue.FindIndex(index => index.File == filePath);
-                // Check if the file path was found 
-                if (index != -1)
-                {
-                    Image musicPicture = playMusicQueue[index].MusicPictureMedium;  // Get the mp3 image
+            //    playerControls.SetPlayMusicQueue(playMusicQueue);
 
-                    // Play's the mp3 when all data has value
-                    if (!string.IsNullOrEmpty(filePath) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(artist))
-                    {
-                        PlayMusic(musicPicture, filePath, title, artist);
-                    }
-                }
 
-                if (shuffleMusic)
-                {
-                    FisherYatesShuffle(filePath);                       // Shuffle the music list
-                    DgvPlayMusicQueue.DataSource = shuffleMusicList;    // Set the shuffleMusicList music as the data source 
-                }
-                else
-                {
-                    DgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
-                }
 
-                // Display the play back controls
-                TimerShowPnlPlayerControls.Start();
-            }
+            //    // Retrieve every cells data from the selected row
+            //    string? title = DgvMusicList.CurrentRow.Cells[2].Value.ToString();
+            //    string? artist = DgvMusicList.CurrentRow.Cells[3].Value.ToString();
+            //    string? filePath = DgvMusicList.CurrentRow.Cells[6].Value.ToString();
+
+            //    // Find the index of the selected music using the file path
+            //    int index = playMusicQueue.FindIndex(index => index.File == filePath);
+            //    // Check if the file path was found 
+            //    if (index != -1)
+            //    {
+            //        Image musicPicture = playMusicQueue[index].MusicPictureMedium;  // Get the mp3 image
+
+            //        // Play's the mp3 when all data has value
+            //        if (!string.IsNullOrEmpty(filePath) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(artist))
+            //        {
+            //            playerControls.PlayMusic(musicPicture, filePath, title, artist);
+            //            //playerControls.MarqueeEffectHandler();
+            //            currentMusicIndex = playerControls.CurrentMusicIndex;
+            //        }
+            //    }
+
+            //    if (shuffleMusic)
+            //    {
+            //        FisherYatesShuffle(filePath);                       // Shuffle the music list
+            //        DgvPlayMusicQueue.DataSource = shuffleMusicList;    // Set the shuffleMusicList music as the data source 
+            //    }
+            //    else
+            //    {
+            //        DgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
+            //    }
+
+            //    // Display the play back controls
+            //    TimerShowPnlPlayerControls.Start();
+            //}
         }
 
         private void DgvPlayMusicQueue_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            // Play's the selected music through cell click 
-            if (DgvPlayMusicQueue.CurrentRow != null)
-            {
-                // Get every cells data of the selected row
-                string? title = DgvPlayMusicQueue.CurrentRow.Cells[2].Value.ToString();
-                string? artist = DgvPlayMusicQueue.CurrentRow.Cells[3].Value.ToString();
-                string? filePath = DgvPlayMusicQueue.CurrentRow.Cells[6].Value.ToString();
+            musicListViewManager.MusicQueueView(DgvPlayMusicQueue);
 
-                // Find the index of the selected music using the file path
-                int index = playMusicQueue.FindIndex(index => index.File == filePath);
-                if (index != -1)
-                {
-                    Image musicPicture = playMusicQueue[index].MusicPictureMedium;  // Get the mp3 image
+            //// Play's the selected music through cell click 
+            //if (DgvPlayMusicQueue.CurrentRow != null)
+            //{
+            //    // Get every cells data of the selected row
+            //    string? title = DgvPlayMusicQueue.CurrentRow.Cells[2].Value.ToString();
+            //    string? artist = DgvPlayMusicQueue.CurrentRow.Cells[3].Value.ToString();
+            //    string? filePath = DgvPlayMusicQueue.CurrentRow.Cells[6].Value.ToString();
 
-                    // Play's the music when all necessary data is available
-                    if (!string.IsNullOrEmpty(filePath) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(artist))
-                    {
-                        PlayMusic(musicPicture, filePath, title, artist);   // Function call to play the selected music
-                    }
-                }
-            }
+            //    // Find the index of the selected music using the file path
+            //    int index = playMusicQueue.FindIndex(index => index.File == filePath);
+            //    if (index != -1)
+            //    {
+            //        Image musicPicture = playMusicQueue[index].MusicPictureMedium;  // Get the mp3 image
+
+            //        // Play's the music when all necessary data is available
+            //        if (!string.IsNullOrEmpty(filePath) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(artist))
+            //        {
+            //            playerControls.PlayMusic(musicPicture, filePath, title, artist);   // Function call to play the selected music
+            //        }
+            //    }
+            //}
         }
 
-        // PLAYBACK CONTROLS
+        // PLAYER CONTROLS
 
         private void PicBoxShuffleMusic_Click(object sender, EventArgs e)
         {
-            ShuffleMusic();
+            //ShuffleMusic();
+            //playerControls.SetIsShuffleMusic(shuffleMusic);
+            //playerControls.SetPlayMusicQueue(playMusicQueue);
+            //playerControls.SetCurrentMusicIndex(currentMusicIndex);
+            playerControls.ShuffleMusicHandler(DgvPlayMusicQueue);
+            shuffleMusicList = new List<Music>(playerControls.shuffleMusicList);
+            shuffleMusic = playerControls.ShuffleMusic;
+            currentMusicIndex = playerControls.CurrentMusicIndex;
         }
 
-        public delegate void ShuffleMusicStateChangedHandler(bool isShuffled);
-        public event ShuffleMusicStateChangedHandler? ShuffleMusicStateChanged;
+        //public delegate void ShuffleMusicStateChangedHandler(bool isShuffled);
+        //public event ShuffleMusicStateChangedHandler? ShuffleMusicStateChanged;
 
         private void PicBoxSkipBackward_Click(object sender, EventArgs e)
         {
-            SkipBackward();
+            //SkipBackward();
+            //PlayerControls.SkipBackward(waveOutDevice, audioFileReader);
+            playerControls.SkipBackward();
         }
 
         private void PicBoxPlayPreviousMusic_Click(object sender, EventArgs e)
         {
-            PlayPreviousMusic();
+            playerControls.PlayPreviousMusic();
         }
 
 
         private void PicBoxPlayAndPause_Click(object sender, EventArgs e)
         {
-            TogglePlayAndPause();
+            //TogglePlayAndPause();
+            //playerControls.SetIsPlayMusic(playMusic);
+            //playerControls.TogglePlayAndPause(waveOutDevice, audioFileReader);
+            playerControls.TogglePlayAndPause();
+            //playMusic = playerControls.IsPlayMusic;
         }
 
-        public delegate void PlayAndPauseStateChangedHandler(bool isPlaying);
-        public event PlayAndPauseStateChangedHandler? PlayAndPauseStateChanged;
+        //public delegate void PlayAndPauseStateChangedHandler(bool isPlaying);
+        //public event PlayAndPauseStateChangedHandler? PlayAndPauseStateChanged;
 
         private void PicBoxPlayNextMusic_Click(object sender, EventArgs e)
         {
-            PlayNextMusic();
+            //playerControls.SetCurrentMusicIndex(currentMusicIndex);
+            playerControls.PlayNextMusic();
+            //currentMusicIndex = playerControls.CurrentMusicIndex;
         }
 
         private void PicBoxSkipForward_Click(object sender, EventArgs e)
         {
-            SkipForward();
+            //SkipForward();
+            //PlayerControls.SkipForward(waveOutDevice, audioFileReader);
+            playerControls.SkipForward();
         }
 
         private void PicBoxRepeatMusic_Click(object sender, EventArgs e)
         {
-            RepeatMusic();
+            //RepeatMusic();
+            //playerControls.SetIsRepeatMusic(repeatMusic);
+            playerControls.RepeatMusicHandler();
+            //repeatMusic = playerControls.RepeatMusic;
         }
 
-        public delegate void RepeatMusicStateChangedHandler(bool isRepeat);
-        public event RepeatMusicStateChangedHandler? RepeatMusicStateChanged;
+        //public delegate void RepeatMusicStateChangedHandler(bool isRepeat);
+        //public event RepeatMusicStateChangedHandler? RepeatMusicStateChanged;
 
-        public void ShuffleMusic()
-        {
-            if (playMusicQueue.Count > 0)   // Ensure there are songs in the queue
-            {
-                string currentFilePath;
+        //public void ShuffleMusic()
+        //{
+        //    if (playMusicQueue.Count > 0)   // Ensure there are songs in the queue
+        //    {
+        //        string currentFilePath;
 
-                shuffleMusic = !shuffleMusic;           // Toggle shuffle mode
-                //label1.Text = shuffleMusic.ToString();  // Update label to reflect shuffle state
+        //        shuffleMusic = !shuffleMusic;           // Toggle shuffle mode
+        //        //label1.Text = shuffleMusic.ToString();  // Update label to reflect shuffle state
 
-                // Shuffle or revert to original list
-                if (shuffleMusic)
-                {
-                    currentFilePath = playMusicQueue[currentMusicIndex].File;       // Get the file path of the current playing mp3 from playMusicQueue
-                    FisherYatesShuffle(currentFilePath);                            // Shuffle the music list, preserving the current song
-                    DgvPlayMusicQueue.DataSource = shuffleMusicList;                // Display shuffled list in the 
-                }
-                else
-                {
-                    currentFilePath = shuffleMusicList[currentMusicIndex].File;     // Get the file path of the current playing mp3 from shuffleMusicList
-                    //DgvPlayMusicQueue.DataSource = musicList;                     // Revert to the original (unshuffled) music list in the DataGridView
-                    shuffleMusicList = shuffleMusicList.OrderBy(x => x.Title).ToList();
-                    DgvPlayMusicQueue.DataSource = shuffleMusicList;
-                    currentMusicIndex = playMusicQueue.FindIndex(index => index.File == currentFilePath);   // Find the index of the current song in the unshuffled playMusicQueue
+        //        // Shuffle or revert to original list
+        //        if (shuffleMusic)
+        //        {
+        //            currentFilePath = playMusicQueue[currentMusicIndex].File;       // Get the file path of the current playing mp3 from playMusicQueue
+        //            FisherYatesShuffle(currentFilePath);                            // Shuffle the music list, preserving the current song
+        //            DgvPlayMusicQueue.DataSource = shuffleMusicList;                // Display shuffled list in the 
+        //        }
+        //        else
+        //        {
+        //            currentFilePath = shuffleMusicList[currentMusicIndex].File;     // Get the file path of the current playing mp3 from shuffleMusicList
+        //            //DgvPlayMusicQueue.DataSource = musicList;                     // Revert to the original (unshuffled) music list in the DataGridView
+        //            shuffleMusicList = shuffleMusicList.OrderBy(x => x.Title).ToList();
+        //            DgvPlayMusicQueue.DataSource = shuffleMusicList;
+        //            currentMusicIndex = playMusicQueue.FindIndex(index => index.File == currentFilePath);   // Find the index of the current song in the unshuffled playMusicQueue
 
-                    // If the song is not found in the unshuffled list, select the first song
-                    if (currentMusicIndex == -1)
-                    {
-                        currentMusicIndex = 0;
-                    }
-                }
+        //            // If the song is not found in the unshuffled list, select the first song
+        //            if (currentMusicIndex == -1)
+        //            {
+        //                currentMusicIndex = 0;
+        //            }
+        //        }
 
-                ShuffleMusicStateChanged?.Invoke(shuffleMusic);
-            }
-        }
+        //        ShuffleMusicStateChanged?.Invoke(shuffleMusic);
+        //    }
+        //}
 
         private void OnShuffleMusicStateChanged(bool isShuffle)
         {
-            UpdateShuffleUI(PicBoxShuffleMusic, toolTipPlayerControl, isShuffle);
+            playerControls.UpdateShuffleUI(PicBoxShuffleMusic, toolTipPlayerControl, isShuffle);
         }
 
-        public void UpdateShuffleUI(PictureBox PicBoxShuffleMusic, System.Windows.Forms.ToolTip toolTipPlayerControl, bool isShuffle)
-        {
-            // Update the UI of MiniPlayer based on the new play/pause state
-            if (isShuffle)
-            {
-                PicBoxShuffleMusic.Image = Properties.Resources.shuffle_off;    // Change the image into shuffle off icon
-                toolTipPlayerControl.SetToolTip(PicBoxShuffleMusic, "Shuffle off");    // Change the tool tip text to shuffle off
-            }
-            else
-            {
-                PicBoxShuffleMusic.Image = Properties.Resources.shuffle_on;     // Change the image into shuffle on icon
-                toolTipPlayerControl.SetToolTip(PicBoxShuffleMusic, "Shuffle on");    // Change the tool tip text to shuffle on
-            }
-        }
+        //public void UpdateShuffleUI(PictureBox PicBoxShuffleMusic, System.Windows.Forms.ToolTip toolTipPlayerControl, bool isShuffle)
+        //{
+        //    // Update the UI of MiniPlayer based on the new play/pause state
+        //    if (isShuffle)
+        //    {
+        //        PicBoxShuffleMusic.Image = Properties.Resources.shuffle_off;    // Change the image into shuffle off icon
+        //        toolTipPlayerControl.SetToolTip(PicBoxShuffleMusic, "Shuffle off");    // Change the tool tip text to shuffle off
+        //    }
+        //    else
+        //    {
+        //        PicBoxShuffleMusic.Image = Properties.Resources.shuffle_on;     // Change the image into shuffle on icon
+        //        toolTipPlayerControl.SetToolTip(PicBoxShuffleMusic, "Shuffle on");    // Change the tool tip text to shuffle on
+        //    }
+        //}
 
-        public void SkipBackward()
-        {
-            if (audioFileReader != null && waveOutDevice != null)
-            {
-                waveOutDevice.Pause();  // Pause the music playback
+        //public void SkipBackward()
+        //{
+        //    if (audioFileReader != null && waveOutDevice != null)
+        //    {
+        //        waveOutDevice.Pause();  // Pause the music playback
 
-                TimeSpan skipValue = TimeSpan.FromSeconds(50);                  // Define the amount of time to skip backward
-                TimeSpan totalValue = audioFileReader.CurrentTime - skipValue;  // Calculate the new time after skipping
+        //        TimeSpan skipValue = TimeSpan.FromSeconds(50);                  // Define the amount of time to skip backward
+        //        TimeSpan totalValue = audioFileReader.CurrentTime - skipValue;  // Calculate the new time after skipping
 
-                // Check if the new time is greater than 0
-                if (totalValue > TimeSpan.Zero)
-                {
-                    audioFileReader.CurrentTime = totalValue;       // If greater than 0, update the current time to the new value
-                }
-                else
-                {
-                    audioFileReader.CurrentTime = TimeSpan.Zero;    // If less than or equal to 0, set the current time to the start of the track
-                }
+        //        // Check if the new time is greater than 0
+        //        if (totalValue > TimeSpan.Zero)
+        //        {
+        //            audioFileReader.CurrentTime = totalValue;       // If greater than 0, update the current time to the new value
+        //        }
+        //        else
+        //        {
+        //            audioFileReader.CurrentTime = TimeSpan.Zero;    // If less than or equal to 0, set the current time to the start of the track
+        //        }
 
-                waveOutDevice.Play();   // Resume music playback
-            }
-        }
+        //        waveOutDevice.Play();   // Resume music playback
+        //    }
+        //}
 
-        public void PlayPreviousMusic()
-        {
-            // Play previous track
-            if (currentMusicIndex > 0)
-            {
-                currentMusicIndex--;            // Move to the previous track in the queue
-                NextAndPreviousMusicHandler();  // Function call to play the next or previous music
-            }
-        }
+        //public void PlayPreviousMusic()
+        //{
+        //    // Play previous track
+        //    if (currentMusicIndex > 0)
+        //    {
+        //        currentMusicIndex--;            // Move to the previous track in the queue
+        //        NextAndPreviousMusicHandler();  // Function call to play the next or previous music
+        //    }
+        //}
 
-        public void TogglePlayAndPause()
-        {
-            if (audioFileReader != null && waveOutDevice != null)
-            {
-                // Toggle between playing and pausing the music
-                if (waveOutDevice.PlaybackState == PlaybackState.Playing)
-                {
-                    waveOutDevice.Pause();      // Pause the music
-                    playMusic = false;          // Update state to indicate music is paused
-                }
-                else
-                {
-                    waveOutDevice.Play();       // Play the music
-                    playMusic = true;           // Update state to indicate music is playing
-                }
+        //public void TogglePlayAndPause()
+        //{
+        //    if (audioFileReader != null && waveOutDevice != null)
+        //    {
+        //        // Toggle between playing and pausing the music
+        //        if (waveOutDevice.PlaybackState == PlaybackState.Playing)
+        //        {
+        //            waveOutDevice.Pause();      // Pause the music
+        //            playMusic = false;          // Update state to indicate music is paused
+        //        }
+        //        else
+        //        {
+        //            waveOutDevice.Play();       // Play the music
+        //            playMusic = true;           // Update state to indicate music is playing
+        //        }
 
-                // Trigger the event to notify that play/pause state has changed
-                PlayAndPauseStateChanged?.Invoke(playMusic);
-            }
-        }
+        //        // Trigger the event to notify that play/pause state has changed
+        //        PlayAndPauseStateChanged?.Invoke(playMusic);
+        //    }
+        //}
 
         private void OnPlayAndPauseStateChanged(bool isPlaying)
         {
-            UpdatePlayAndPauseUI(PicBoxPlayAndPause, toolTipPlayerControl, isPlaying);
+            //UpdatePlayAndPauseUI(PicBoxPlayAndPause, toolTipPlayerControl, isPlaying);
+            playerControls.UpdatePlayAndPauseUI(PicBoxPlayAndPause, toolTipPlayerControl, isPlaying);
         }
 
-        public void UpdatePlayAndPauseUI(PictureBox PicBoxPlayAndPause, System.Windows.Forms.ToolTip toolTipPlayerControl, bool isPlaying)
-        {
-            // Update the UI of MiniPlayer based on the new play/pause state
-            if (isPlaying)
-            {
-                PicBoxPlayAndPause.Image = Properties.Resources.pause;          // Change into pause icon
-                toolTipPlayerControl.SetToolTip(PicBoxPlayAndPause, "Pause");   // Change the tool tip text to Pause
-            }
-            else
-            {
-                PicBoxPlayAndPause.Image = Properties.Resources.play;           // Change the image into play icon
-                toolTipPlayerControl.SetToolTip(PicBoxPlayAndPause, "Play");    // Change the tool tip text to Play
-            }
-        }
+        //public void UpdatePlayAndPauseUI(PictureBox PicBoxPlayAndPause, System.Windows.Forms.ToolTip toolTipPlayerControl, bool isPlaying)
+        //{
+        //    // Update the UI of MiniPlayer based on the new play/pause state
+        //    if (isPlaying)
+        //    {
+        //        PicBoxPlayAndPause.Image = Properties.Resources.pause;          // Change into pause icon
+        //        toolTipPlayerControl.SetToolTip(PicBoxPlayAndPause, "Pause");   // Change the tool tip text to Pause
+        //    }
+        //    else
+        //    {
+        //        PicBoxPlayAndPause.Image = Properties.Resources.play;           // Change the image into play icon
+        //        toolTipPlayerControl.SetToolTip(PicBoxPlayAndPause, "Play");    // Change the tool tip text to Play
+        //    }
+        //}
 
-        public void PlayNextMusic()
-        {
-            // Play the next track in the queue
-            if (currentMusicIndex < playMusicQueue.Count - 1)
-            {
-                currentMusicIndex++;            // Move to the next track in the queue
-                NextAndPreviousMusicHandler();  // Function call to handle playing the next or previous track
-            }
-        }
+        //public void PlayNextMusic()
+        //{
+        //    // Play the next track in the queue
+        //    if (currentMusicIndex < playMusicQueue.Count - 1)
+        //    {
+        //        currentMusicIndex++;            // Move to the next track in the queue
+        //        NextAndPreviousMusicHandler();  // Function call to handle playing the next or previous track
+        //    }
+        //}
 
-        public void SkipForward()
-        {
-            if (audioFileReader != null && waveOutDevice != null)
-            {
-                waveOutDevice.Pause();  // Pause the music playback
+        //public void SkipForward()
+        //{
+        //    if (audioFileReader != null && waveOutDevice != null)
+        //    {
+        //        waveOutDevice.Pause();  // Pause the music playback
 
-                TimeSpan skipValue = TimeSpan.FromSeconds(50);                  // Define the amount of time to skip forward
-                TimeSpan totalValue = audioFileReader.CurrentTime + skipValue;  // Calculate the new time after skipping
+        //        TimeSpan skipValue = TimeSpan.FromSeconds(50);                  // Define the amount of time to skip forward
+        //        TimeSpan totalValue = audioFileReader.CurrentTime + skipValue;  // Calculate the new time after skipping
 
-                // Check if the new time exceeds the track's total duration
-                if (totalValue < audioFileReader.TotalTime)
-                {
-                    audioFileReader.CurrentTime = totalValue;   // If not exceeding, update the current time to the new value
-                }
-                else
-                {
-                    audioFileReader.CurrentTime = audioFileReader.TotalTime;    // If exceeding, set the current time to the track's total duration
-                }
+        //        // Check if the new time exceeds the track's total duration
+        //        if (totalValue < audioFileReader.TotalTime)
+        //        {
+        //            audioFileReader.CurrentTime = totalValue;   // If not exceeding, update the current time to the new value
+        //        }
+        //        else
+        //        {
+        //            audioFileReader.CurrentTime = audioFileReader.TotalTime;    // If exceeding, set the current time to the track's total duration
+        //        }
 
-                waveOutDevice.Play();   // Resume music playback
-            }
-        }
+        //        waveOutDevice.Play();   // Resume music playback
+        //    }
+        //}
 
-        public void RepeatMusic()
-        {
-            repeatMusic = !repeatMusic;     // Toggle repeat music
+        //public void RepeatMusic()
+        //{
+        //    repeatMusic = !repeatMusic;     // Toggle repeat music
 
-            RepeatMusicStateChanged?.Invoke(repeatMusic);
-        }
+        //    RepeatMusicStateChanged?.Invoke(repeatMusic);
+        //}
 
         private void OnRepeatMusicStateChanged(bool isRepeat)
         {
-            UpdateRepeatUI(PicBoxRepeatMusic, toolTipPlayerControl, isRepeat);
+            //UpdateRepeatUI(PicBoxRepeatMusic, toolTipPlayerControl, isRepeat);
+            playerControls.UpdateRepeatUI(PicBoxRepeatMusic, toolTipPlayerControl, isRepeat);
         }
 
-        public void UpdateRepeatUI(PictureBox PicBoxRepeatMusic, System.Windows.Forms.ToolTip toolTipPlayerControl, bool isRepeat)
-        {
-            if (isRepeat)
-            {
-                PicBoxRepeatMusic.Image = Properties.Resources.repeat_off;          // Change the image into repeat off icon
-                toolTipPlayerControl.SetToolTip(PicBoxRepeatMusic, "Repeat off");   // Change the tool tip text to Repeat off
-            }
-            else
-            {
-                PicBoxRepeatMusic.Image = Properties.Resources.repeat;              // Change the image into repeat on icon
-                toolTipPlayerControl.SetToolTip(PicBoxRepeatMusic, "Repeat on");    // Change the tool tip text to Repeat on
-            }
-        }
+        //public void UpdateRepeatUI(PictureBox PicBoxRepeatMusic, System.Windows.Forms.ToolTip toolTipPlayerControl, bool isRepeat)
+        //{
+        //    if (isRepeat)
+        //    {
+        //        PicBoxRepeatMusic.Image = Properties.Resources.repeat_off;          // Change the image into repeat off icon
+        //        toolTipPlayerControl.SetToolTip(PicBoxRepeatMusic, "Repeat off");   // Change the tool tip text to Repeat off
+        //    }
+        //    else
+        //    {
+        //        PicBoxRepeatMusic.Image = Properties.Resources.repeat;              // Change the image into repeat on icon
+        //        toolTipPlayerControl.SetToolTip(PicBoxRepeatMusic, "Repeat on");    // Change the tool tip text to Repeat on
+        //    }
+        //}
 
         private void PicBoxShowVolumeBar_Click(object sender, EventArgs e)
         {
@@ -1200,130 +1387,133 @@ namespace MusicPlayer
 
         private void PicBoxVolumePicture_Click(object sender, EventArgs e)
         {
-            VolumeMuteAndUnmuteToggle();
+            //VolumeMuteAndUnmuteToggle();
+            playerControls.VolumeMuteAndUnmuteToggle();
         }
 
-        public delegate void MuteStateChangedHandler(bool isMute);
-        public event MuteStateChangedHandler? MuteStateChanged;
+        //public delegate void MuteStateChangedHandler(bool isMute);
+        //public event MuteStateChangedHandler? MuteStateChanged;
 
-        public void VolumeMuteAndUnmuteToggle()
-        {
-            if (audioFileReader != null)
-            {
-                mute = !mute;   // Toggle mute status
+        //public void VolumeMuteAndUnmuteToggle()
+        //{
+        //    if (audioFileReader != null)
+        //    {
+        //        mute = !mute;   // Toggle mute status
 
-                MuteStateChanged?.Invoke(mute);
-            }
-        }
+        //        MuteStateChanged?.Invoke(mute);
+        //    }
+        //}
 
         private void OnMuteStateChanged(bool isMute)
         {
-            UpdateVolumeValueAndUI(TbVolume, isMute);
+            //UpdateVolumeValueAndUI(TbVolume, isMute);
+            playerControls.UpdateVolumeValueAndUI(TbVolume, isMute);
         }
 
-        public void UpdateVolumeValueAndUI(DungeonTrackBar TbVolume, bool isMute)
-        {
-            // Check and mute or unmute the volume
-            if (isMute)
-            {
-                tempVolume = TbVolume.Value;        // Temporary store the current volume value before muting
-                TbVolume.Value = 0;                 // Set the trackbar to 0
-            }
-            else
-            {
-                TbVolume.Value = tempVolume;        // Restore the previous value when unmuted
-            }
-        }
+        //public void UpdateVolumeValueAndUI(DungeonTrackBar TbVolume, bool isMute)
+        //{
+        //    // Check and mute or unmute the volume
+        //    if (isMute)
+        //    {
+        //        tempVolume = TbVolume.Value;        // Temporary store the current volume value before muting
+        //        TbVolume.Value = 0;                 // Set the trackbar to 0
+        //    }
+        //    else
+        //    {
+        //        TbVolume.Value = tempVolume;        // Restore the previous value when unmuted
+        //    }
+        //}
 
         private void PnlVolumeControl_MouseLeave(object sender, EventArgs e)
         {
-            PnlVolumeControlMousePositionHandler(PnlVolumeControl, PicBoxVolumePicture, TbVolume, LblVolumeValue);
+            //PnlVolumeControlMousePositionHandler(PnlVolumeControl, PicBoxVolumePicture, TbVolume, LblVolumeValue);
+            playerControls.PnlVolumeControlMousePositionHandler(PnlVolumeControl, PicBoxVolumePicture, TbVolume, LblVolumeValue);
         }
 
-        public void PnlVolumeControlMousePositionHandler(System.Windows.Forms.Panel PnlVolumeControl, PictureBox PicBoxVolumePicture, DungeonTrackBar TbVolume, Label LblVolumeValue)
-        {
-            Point mousePosition = Control.MousePosition;
+        //public void PnlVolumeControlMousePositionHandler(System.Windows.Forms.Panel PnlVolumeControl, PictureBox PicBoxVolumePicture, DungeonTrackBar TbVolume, Label LblVolumeValue)
+        //{
+        //    Point mousePosition = Control.MousePosition;
 
-            // Convert all controls' bounds to screen coordinates
-            Rectangle panelBounds = PnlVolumeControl.RectangleToScreen(PnlVolumeControl.ClientRectangle);
-            Rectangle pictureBounds = PicBoxVolumePicture.RectangleToScreen(PicBoxVolumePicture.ClientRectangle);
-            Rectangle trackBarBounds = TbVolume.RectangleToScreen(TbVolume.ClientRectangle);
-            Rectangle labelBounds = LblVolumeValue.RectangleToScreen(LblVolumeValue.ClientRectangle);
+        //    // Convert all controls' bounds to screen coordinates
+        //    Rectangle panelBounds = PnlVolumeControl.RectangleToScreen(PnlVolumeControl.ClientRectangle);
+        //    Rectangle pictureBounds = PicBoxVolumePicture.RectangleToScreen(PicBoxVolumePicture.ClientRectangle);
+        //    Rectangle trackBarBounds = TbVolume.RectangleToScreen(TbVolume.ClientRectangle);
+        //    Rectangle labelBounds = LblVolumeValue.RectangleToScreen(LblVolumeValue.ClientRectangle);
 
-            // Check if the mouse is outside all the controls (panel and its children)
-            if (!panelBounds.Contains(mousePosition) &&
-                !pictureBounds.Contains(mousePosition) &&
-                !trackBarBounds.Contains(mousePosition) &&
-                !labelBounds.Contains(mousePosition))
-            {
-                PnlVolumeControl.Visible = false;   // Hide the volume bar
-            }
-        }
+        //    // Check if the mouse is outside all the controls (panel and its children)
+        //    if (!panelBounds.Contains(mousePosition) &&
+        //        !pictureBounds.Contains(mousePosition) &&
+        //        !trackBarBounds.Contains(mousePosition) &&
+        //        !labelBounds.Contains(mousePosition))
+        //    {
+        //        PnlVolumeControl.Visible = false;   // Hide the volume bar
+        //    }
+        //}
 
         private void TbVolume_MouseUp(object sender, MouseEventArgs e)
         {
-            UpdateMuteState();
+            playerControls.UpdateMuteState();
         }
 
-        public delegate void UpdateMuteStateChangeHandler();
-        public event UpdateMuteStateChangeHandler? UpdateMuteStateChanged;
+        //public delegate void UpdateMuteStateChangeHandler();
+        //public event UpdateMuteStateChangeHandler? UpdateMuteStateChanged;
 
-        public void UpdateMuteState()
-        {
-            UpdateMuteStateChanged?.Invoke();
-        }
+        //public void UpdateMuteState()
+        //{
+        //    UpdateMuteStateChanged?.Invoke();
+        //}
 
         private void OnUpdateMuteStateChanged()
         {
-            UpdateMuteStateUI(TbVolume);
+            playerControls.UpdateMuteStateUI(TbVolume);
         }
 
-        public void UpdateMuteStateUI(DungeonTrackBar TbVolume)
-        {
-            if (TbVolume.Value > 0)
-            {
-                mute = false;
-                tempVolume = TbVolume.Value;    // Temporary store the current volume value
-            }
-            else
-            {
-                mute = true;
-            }
-        }
+        //public void UpdateMuteStateUI(DungeonTrackBar TbVolume)
+        //{
+        //    if (TbVolume.Value > 0)
+        //    {
+        //        mute = false;
+        //        tempVolume = TbVolume.Value;    // Temporary store the current volume value
+        //    }
+        //    else
+        //    {
+        //        mute = true;
+        //    }
+        //}
 
         private void TbVolume_ValueChanged()
         {
             // Update volume and icon based on the current trackbar value
-            UpdateVolumeValue(TbVolume.Value);
+            playerControls.UpdateVolumeValue(TbVolume.Value);
             //UpdateVolumeIcon();
-            UpdateVolumeIconUI(TbVolume, PicBoxVolumePicture, PicBoxShowVolumeBar);
+            playerControls.UpdateVolumeIconUI(TbVolume, PicBoxVolumePicture, PicBoxShowVolumeBar);
         }
 
-        public delegate void UpdateVolumeValueChangedHandler(int newVolumeValue);
-        public event UpdateVolumeValueChangedHandler? UpdateVolumeValueChanged;
+        //public delegate void UpdateVolumeValueChangedHandler(int newVolumeValue);
+        //public event UpdateVolumeValueChangedHandler? UpdateVolumeValueChanged;
         //public delegate void UpdateVolumeIconChangedHandler();
         //public event UpdateVolumeIconChangedHandler? UpdateVolumeIconChanged;
 
-        public void UpdateVolumeValue(int newVolumeValue)
-        {
-            UpdateVolumeValueChanged?.Invoke(newVolumeValue);
-        }
+        //public void UpdateVolumeValue(int newVolumeValue)
+        //{
+        //    UpdateVolumeValueChanged?.Invoke(newVolumeValue);
+        //}
 
         private void OnUpdateVolumeValueChanged(int newVolumeValue)
         {
             TbVolume.Value = newVolumeValue;
-            UpdateVolumeValueAndUI(LblVolumeValue, TbVolume);
+            playerControls.UpdateVolumeValueAndUI(LblVolumeValue, TbVolume);
         }
 
-        public void UpdateVolumeValueAndUI(Label LblVolumeValue, DungeonTrackBar TbVolume)
-        {
-            if (audioFileReader != null)
-            {
-                LblVolumeValue.Text = $"{TbVolume.Value}";  // Display the updated volume value based on the volume trackbar
-                float volumeValue = TbVolume.Value / 100f;  // Convert the volume trackbar value (0-100) into a float (0.0 - 1.0)  
-                audioFileReader.Volume = volumeValue;       // Set the audio file reader's volume to the calculated value
-            }
-        }
+        //public void UpdateVolumeValueAndUI(Label LblVolumeValue, DungeonTrackBar TbVolume)
+        //{
+        //    if (audioFileReader != null)
+        //    {
+        //        LblVolumeValue.Text = $"{TbVolume.Value}";  // Display the updated volume value based on the volume trackbar
+        //        float volumeValue = TbVolume.Value / 100f;  // Convert the volume trackbar value (0-100) into a float (0.0 - 1.0)  
+        //        audioFileReader.Volume = volumeValue;       // Set the audio file reader's volume to the calculated value
+        //    }
+        //}
 
         //public void UpdateVolumeIcon()
         //{
@@ -1335,342 +1525,344 @@ namespace MusicPlayer
         //    UpdateVolumeIconUI(TbVolume, PicBoxVolumePicture, PicBoxShowVolumeBar);
         //}
 
-        public void UpdateVolumeIconUI(DungeonTrackBar TbVolume, PictureBox PicBoxVolumePicture, PictureBox PicBoxShowVolumeBar)
-        {
-            // Change the volume icon based on the value
-            if (TbVolume.Value == 0)
-            {
-                // Change into mute icon
-                PicBoxVolumePicture.Image = Properties.Resources.volume_mute;
-                PicBoxShowVolumeBar.Image = Properties.Resources.volume_mute;
-            }
-            else if (TbVolume.Value > 0 && TbVolume.Value <= 33)
-            {
-                // Change into low volume icon
-                PicBoxVolumePicture.Image = Properties.Resources.volume_low;
-                PicBoxShowVolumeBar.Image = Properties.Resources.volume_low;
-            }
-            else if (TbVolume.Value > 33 && TbVolume.Value <= 66)
-            {
-                // Change into medium volume icon
-                PicBoxVolumePicture.Image = Properties.Resources.volume_medium;
-                PicBoxShowVolumeBar.Image = Properties.Resources.volume_medium;
-            }
-            else
-            {
-                // Change into high volume icon
-                PicBoxVolumePicture.Image = Properties.Resources.volume_high;
-                PicBoxShowVolumeBar.Image = Properties.Resources.volume_high;
-            }
-        }
+        //public void UpdateVolumeIconUI(DungeonTrackBar TbVolume, PictureBox PicBoxVolumePicture, PictureBox PicBoxShowVolumeBar)
+        //{
+        //    // Change the volume icon based on the value
+        //    if (TbVolume.Value == 0)
+        //    {
+        //        // Change into mute icon
+        //        PicBoxVolumePicture.Image = Properties.Resources.volume_mute;
+        //        PicBoxShowVolumeBar.Image = Properties.Resources.volume_mute;
+        //    }
+        //    else if (TbVolume.Value > 0 && TbVolume.Value <= 33)
+        //    {
+        //        // Change into low volume icon
+        //        PicBoxVolumePicture.Image = Properties.Resources.volume_low;
+        //        PicBoxShowVolumeBar.Image = Properties.Resources.volume_low;
+        //    }
+        //    else if (TbVolume.Value > 33 && TbVolume.Value <= 66)
+        //    {
+        //        // Change into medium volume icon
+        //        PicBoxVolumePicture.Image = Properties.Resources.volume_medium;
+        //        PicBoxShowVolumeBar.Image = Properties.Resources.volume_medium;
+        //    }
+        //    else
+        //    {
+        //        // Change into high volume icon
+        //        PicBoxVolumePicture.Image = Properties.Resources.volume_high;
+        //        PicBoxShowVolumeBar.Image = Properties.Resources.volume_high;
+        //    }
+        //}
 
-        public void FisherYatesShuffle(string? currentFilePath = null)
-        {
-            // Fisher-Yates Shuffle (aka Knuth Shuffle)
-            Random random = new Random();
+        //public void FisherYatesShuffle(string? currentFilePath = null)
+        //{
+        //    // Fisher-Yates Shuffle (aka Knuth Shuffle)
+        //    Random random = new Random();
 
-            // Copy the music list from playMusicQueue to shuffleMusicList
-            shuffleMusicList = new List<MyMusic>(playMusicQueue);
+        //    // Copy the music list from playMusicQueue to shuffleMusicList
+        //    shuffleMusicList = new List<Music>(playMusicQueue);
 
-            // Shuffle the music
-            for (int i = shuffleMusicList.Count - 1; i > 0; i--)
-            {
-                int randomIndex = random.Next(0, i + 1);                // Generate a random index between 0 and i inclusively
+        //    // Shuffle the music
+        //    for (int i = shuffleMusicList.Count - 1; i > 0; i--)
+        //    {
+        //        int randomIndex = random.Next(0, i + 1);                // Generate a random index between 0 and i inclusively
 
-                MyMusic tempMusicList = shuffleMusicList[i];            // Initialize a temporary list to temporary store the current song at index i
-                shuffleMusicList[i] = shuffleMusicList[randomIndex];    // Swap the current song with the song at the random index
-                shuffleMusicList[randomIndex] = tempMusicList;          // Place the temporarily stored song at the random index
-            }
+        //        Music tempMusicList = shuffleMusicList[i];            // Initialize a temporary list to temporary store the current song at index i
+        //        shuffleMusicList[i] = shuffleMusicList[randomIndex];    // Swap the current song with the song at the random index
+        //        shuffleMusicList[randomIndex] = tempMusicList;          // Place the temporarily stored song at the random index
+        //    }
 
-            // If currently playing a song, swap it at the first index
-            if (!string.IsNullOrEmpty(currentFilePath))
-            {
-                for (int i = 0; i < shuffleMusicList.Count; i++)
-                {
-                    // Check if the file path is in the list and identify the index position
-                    if (currentFilePath == shuffleMusicList[i].File)
-                    {
-                        MyMusic tempMusicList = shuffleMusicList[0];    // Initialize a temporary list to temporary store the current song at the first index
-                        shuffleMusicList[0] = shuffleMusicList[i];      // Place the current playing song at the first index
-                        shuffleMusicList[i] = tempMusicList;            // Place the temporary stored song at the identified index position
-                        break;
-                    }
-                }
-            }
+        //    // If currently playing a song, swap it at the first index
+        //    if (!string.IsNullOrEmpty(currentFilePath))
+        //    {
+        //        for (int i = 0; i < shuffleMusicList.Count; i++)
+        //        {
+        //            // Check if the file path is in the list and identify the index position
+        //            if (currentFilePath == shuffleMusicList[i].File)
+        //            {
+        //                Music tempMusicList = shuffleMusicList[0];    // Initialize a temporary list to temporary store the current song at the first index
+        //                shuffleMusicList[0] = shuffleMusicList[i];      // Place the current playing song at the first index
+        //                shuffleMusicList[i] = tempMusicList;            // Place the temporary stored song at the identified index position
+        //                break;
+        //            }
+        //        }
+        //    }
 
-            currentMusicIndex = 0;  // initialize back to 0 after shuffle
-        }
+        //    currentMusicIndex = 0;  // initialize back to 0 after shuffle
+        //}
 
-        public void NextAndPreviousMusicHandler()
-        {
-            if (playMusicQueue.Count > 0)   // Ensure there are songs in the queue
-            {
-                string filePath, title, artist;
-                Image musicPicture;
+        //public void NextAndPreviousMusicHandler()
+        //{
+        //    if (playMusicQueue.Count > 0)   // Ensure there are songs in the queue
+        //    {
+        //        string filePath, title, artist;
+        //        Image musicPicture;
 
-                // Play the next or previous song, considering shuffle mode
-                if (!shuffleMusic)
-                {
-                    // Retrieve the music info from the non-shuffled queue
-                    musicPicture = playMusicQueue[currentMusicIndex].MusicPictureMedium;
-                    filePath = playMusicQueue[currentMusicIndex].File;
-                    title = playMusicQueue[currentMusicIndex].Title;
-                    artist = playMusicQueue[currentMusicIndex].Artist;
+        //        // Play the next or previous song, considering shuffle mode
+        //        if (!shuffleMusic)
+        //        {
+        //            // Retrieve the music info from the non-shuffled queue
+        //            musicPicture = playMusicQueue[currentMusicIndex].MusicPictureMedium;
+        //            filePath = playMusicQueue[currentMusicIndex].File;
+        //            title = playMusicQueue[currentMusicIndex].Title;
+        //            artist = playMusicQueue[currentMusicIndex].Artist;
 
-                    TbSeekMusic.Value = 0;                              // Reset the track bar to the beginning of the song
-                    PlayMusic(musicPicture, filePath, title, artist);   // Function call to play the music
-                }
-                else
-                {
-                    // Retrieve the music info from the non-shuffled queue
-                    musicPicture = shuffleMusicList[currentMusicIndex].MusicPictureMedium;
-                    filePath = shuffleMusicList[currentMusicIndex].File;
-                    title = shuffleMusicList[currentMusicIndex].Title;
-                    artist = shuffleMusicList[currentMusicIndex].Artist;
+        //            TbSeekMusic.Value = 0;                              // Reset the track bar to the beginning of the song
+        //            PlayMusic(musicPicture, filePath, title, artist);   // Function call to play the music
+        //        }
+        //        else
+        //        {
+        //            // Retrieve the music info from the non-shuffled queue
+        //            musicPicture = shuffleMusicList[currentMusicIndex].MusicPictureMedium;
+        //            filePath = shuffleMusicList[currentMusicIndex].File;
+        //            title = shuffleMusicList[currentMusicIndex].Title;
+        //            artist = shuffleMusicList[currentMusicIndex].Artist;
 
-                    TbSeekMusic.Value = 0;                              // Reset the track bar to the beginning of the song
-                    PlayMusic(musicPicture, filePath, title, artist);   // Function call to play the music
-                }
-            }
-        }
+        //            TbSeekMusic.Value = 0;                              // Reset the track bar to the beginning of the song
+        //            PlayMusic(musicPicture, filePath, title, artist);   // Function call to play the music
+        //        }
+        //    }
+        //}
 
-        public void PlayMusic(Image musicPicture, string filePath, string title, string artist)
-        {
-            if (playMusicQueue != null)
-            {
-                // Find the index of the song in the queue (shuffled or not) based on file path
-                if (!shuffleMusic)
-                {
-                    currentMusicIndex = playMusicQueue.FindIndex(index => index.File == filePath);
-                }
-                else
-                {
-                    currentMusicIndex = shuffleMusicList.FindIndex(index => index.File == filePath);
-                }
+        //public void PlayMusic(Image musicPicture, string filePath, string title, string artist)
+        //{
+        //    if (playMusicQueue != null)
+        //    {
+        //        // Find the index of the song in the queue (shuffled or not) based on file path
+        //        if (!shuffleMusic)
+        //        {
+        //            currentMusicIndex = playMusicQueue.FindIndex(index => index.File == filePath);
+        //        }
+        //        else
+        //        {
+        //            currentMusicIndex = shuffleMusicList.FindIndex(index => index.File == filePath);
+        //        }
 
-                // Stop and dispose of any currently playing music
-                if (waveOutDevice != null)
-                {
-                    waveOutDevice.Stop();
-                    waveOutDevice.Dispose();
-                    waveOutDevice = null;
-                }
+        //        // Stop and dispose of any currently playing music
+        //        if (waveOutDevice != null)
+        //        {
+        //            waveOutDevice.Stop();
+        //            waveOutDevice.Dispose();
+        //            waveOutDevice = null;
+        //        }
 
-                if (audioFileReader != null)
-                {
-                    audioFileReader.Dispose();
-                    audioFileReader = null;
-                }
+        //        if (audioFileReader != null)
+        //        {
+        //            audioFileReader.Dispose();
+        //            audioFileReader = null;
+        //        }
 
-                waveOutDevice = new WaveOutEvent();                 // Create new playback device
-                audioFileReader = new AudioFileReader(filePath);    // Read the audio file
-                waveOutDevice.Init(audioFileReader);                // Initialize playback with audio file
-                waveOutDevice.Play();                               // Start playing the music
-                UpdateVolumeValue(TbVolume.Value);                  // Update volume
+        //        waveOutDevice = new WaveOutEvent();                 // Create new playback device
+        //        audioFileReader = new AudioFileReader(filePath);    // Read the audio file
+        //        waveOutDevice.Init(audioFileReader);                // Initialize playback with audio file
+        //        waveOutDevice.Play();                               // Start playing the music
+        //        //UpdateVolumeValue(TbVolume.Value);                  // Update volume
 
-                // Display music image or a default one if no image is available
-                if (musicPicture != null)
-                {
-                    PicBoxShowPlayPicture.Image = musicPicture;
-                    miniPlayerMusicPicture = musicPicture;
-                }
-                else
-                {
-                    PicBoxShowPlayPicture.Image = Properties.Resources.default_music_picture_medium;
-                    miniPlayerMusicPicture = Properties.Resources.default_music_picture_medium;
-                }
+        //        // Display music image or a default one if no image is available
+        //        if (musicPicture != null)
+        //        {
+        //            PicBoxShowPlayPicture.Image = musicPicture;
+        //            miniPlayerMusicPicture = musicPicture;
+        //        }
+        //        else
+        //        {
+        //            PicBoxShowPlayPicture.Image = Properties.Resources.default_music_picture_medium;
+        //            miniPlayerMusicPicture = Properties.Resources.default_music_picture_medium;
+        //        }
 
-                // Update UI with the currently playing song information
-                LblShowPlayTitle.Text = title;
-                LblShowPlayArtist.Text = artist;
-                LblMusicLength.Text = audioFileReader.TotalTime.ToString("hh\\:mm\\:ss");
+        //        // Update UI with the currently playing song information
+        //        LblShowPlayTitle.Text = title;
+        //        LblShowPlayArtist.Text = artist;
+        //        LblMusicLength.Text = audioFileReader.TotalTime.ToString("hh\\:mm\\:ss");
 
-                miniPlayerTitle = title;
-                miniPlayerArtist = artist;
-                miniPlayerMusicLen = audioFileReader.TotalTime.ToString("hh\\:mm\\:ss");
+        //        miniPlayerTitle = title;
+        //        miniPlayerArtist = artist;
+        //        miniPlayerMusicLen = audioFileReader.TotalTime.ToString("hh\\:mm\\:ss");
 
-                // Set the seek bar maximum value to the total duration of the music in seconds
-                TbSeekMusic.Maximum = (int)audioFileReader.TotalTime.TotalSeconds;
-                miniPlayerTrackBarMax = (int)audioFileReader.TotalTime.TotalSeconds;
+        //        // Set the seek bar maximum value to the total duration of the music in seconds
+        //        TbSeekMusic.Maximum = (int)audioFileReader.TotalTime.TotalSeconds;
+        //        miniPlayerTrackBarMax = (int)audioFileReader.TotalTime.TotalSeconds;
 
-                MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
+        //        MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
 
-                TimerMusicDuration.Start();     // Start tracking the music duration in seek bar
-                playMusic = true;               // Update play status
-            }
-        }
+        //        TimerMusicDuration.Start();     // Start tracking the music duration in seek bar
+        //        playMusic = true;               // Update play status
+        //    }
+        //}
 
-        public void MarqueeEffectHandler(Label LblShowPlayTitle, Label LblShowPlayArtist, System.Windows.Forms.Panel PnlMarquee, System.Windows.Forms.Timer TimerTitleMarquee, System.Windows.Forms.Timer TimerArtistMarquee)
-        {
-            // Handle the marquee effect based on label width and panel size
-            if (LblShowPlayTitle.Right > PnlMarquee.Right && LblShowPlayArtist.Right < PnlMarquee.Right)
-            {
-                TimerTitleMarquee.Start(); // Start the title marquee timer
-                TimerArtistMarquee.Stop();
-            }
-            else if (LblShowPlayTitle.Right < PnlMarquee.Right && LblShowPlayArtist.Right > PnlMarquee.Right)
-            {
-                TimerArtistMarquee.Start(); // Start the artist marquee timer
-                TimerTitleMarquee.Stop();
-            }
-            else if (LblShowPlayTitle.Right > PnlMarquee.Right && LblShowPlayArtist.Right > PnlMarquee.Right)
-            {
-                // Ensure both labels have the same width if one is wider
-                if (LblShowPlayTitle.Right < LblShowPlayArtist.Right)
-                {
-                    LblShowPlayTitle.AutoSize = false;                      // Disable auto size
-                    LblShowPlayTitle.Width = LblShowPlayArtist.Width;       // Set the width of the title label equal to the artist label
-                    LblShowPlayTitle.Invalidate();
-                }
-                else if (LblShowPlayArtist.Right < LblShowPlayTitle.Right)
-                {
-                    LblShowPlayArtist.AutoSize = false;                     // Disable auto size
-                    LblShowPlayArtist.Width = LblShowPlayTitle.Width;       // Set the width of the artist label equal to the title label
-                    LblShowPlayArtist.Invalidate();
-                }
+        //public void MarqueeEffectHandler(Label LblShowPlayTitle, Label LblShowPlayArtist, System.Windows.Forms.Panel PnlMarquee, System.Windows.Forms.Timer TimerTitleMarquee, System.Windows.Forms.Timer TimerArtistMarquee)
+        //{
+        //    // Handle the marquee effect based on label width and panel size
+        //    if (LblShowPlayTitle.Right > PnlMarquee.Right && LblShowPlayArtist.Right < PnlMarquee.Right)
+        //    {
+        //        TimerTitleMarquee.Start(); // Start the title marquee timer
+        //        TimerArtistMarquee.Stop();
+        //    }
+        //    else if (LblShowPlayTitle.Right < PnlMarquee.Right && LblShowPlayArtist.Right > PnlMarquee.Right)
+        //    {
+        //        TimerArtistMarquee.Start(); // Start the artist marquee timer
+        //        TimerTitleMarquee.Stop();
+        //    }
+        //    else if (LblShowPlayTitle.Right > PnlMarquee.Right && LblShowPlayArtist.Right > PnlMarquee.Right)
+        //    {
+        //        // Ensure both labels have the same width if one is wider
+        //        if (LblShowPlayTitle.Right < LblShowPlayArtist.Right)
+        //        {
+        //            LblShowPlayTitle.AutoSize = false;                      // Disable auto size
+        //            LblShowPlayTitle.Width = LblShowPlayArtist.Width;       // Set the width of the title label equal to the artist label
+        //            LblShowPlayTitle.Invalidate();
+        //        }
+        //        else if (LblShowPlayArtist.Right < LblShowPlayTitle.Right)
+        //        {
+        //            LblShowPlayArtist.AutoSize = false;                     // Disable auto size
+        //            LblShowPlayArtist.Width = LblShowPlayTitle.Width;       // Set the width of the artist label equal to the title label
+        //            LblShowPlayArtist.Invalidate();
+        //        }
 
-                // Start both marquees
-                TimerTitleMarquee.Start();
-                TimerArtistMarquee.Start();
-            }
-            else
-            {
-                // Reset the marquee labels
-                LblShowPlayTitle.AutoSize = true;
-                LblShowPlayArtist.AutoSize = true;
-                TimerTitleMarquee.Stop();   // Stop the title marquee timer
-                TimerArtistMarquee.Stop();  // Stop the artist marquee timer
-                LblShowPlayTitle.Left = 0;  // Reset the title label position
-                LblShowPlayArtist.Left = 0; // Reset the artist label position
-            }
-        }
+        //        // Start both marquees
+        //        TimerTitleMarquee.Start();
+        //        TimerArtistMarquee.Start();
+        //    }
+        //    else
+        //    {
+        //        // Reset the marquee labels
+        //        LblShowPlayTitle.AutoSize = true;
+        //        LblShowPlayArtist.AutoSize = true;
+        //        TimerTitleMarquee.Stop();   // Stop the title marquee timer
+        //        TimerArtistMarquee.Stop();  // Stop the artist marquee timer
+        //        LblShowPlayTitle.Left = 0;  // Reset the title label position
+        //        LblShowPlayArtist.Left = 0; // Reset the artist label position
+        //    }
+        //}
 
         private void TimerTitleMarquee_Tick(object sender, EventArgs e)
         {
-            TitleMarqueeEffectHandler(LblShowPlayTitle, PnlMarquee);
+            //playerControls.TitleMarqueeEffectHandler(LblShowPlayTitle, PnlMarquee);
+            playerControls.TitleMarqueeEffectHandler(LblShowPlayTitle, PnlMarquee);
         }
 
-        public void TitleMarqueeEffectHandler(Label LblShowPlayTitle, System.Windows.Forms.Panel PnlMarquee)
-        {
-            LblShowPlayTitle.Left -= scrollSpeed;
+        //public void TitleMarqueeEffectHandler(Label LblShowPlayTitle, System.Windows.Forms.Panel PnlMarquee)
+        //{
+        //    LblShowPlayTitle.Left -= scrollSpeed;
 
-            // Check if the label has gone off-screen and wrap it back
-            if (LblShowPlayTitle.Right < 0)
-            {
-                LblShowPlayTitle.Left = PnlMarquee.Width;
-            }
-        }
+        //    // Check if the label has gone off-screen and wrap it back
+        //    if (LblShowPlayTitle.Right < 0)
+        //    {
+        //        LblShowPlayTitle.Left = PnlMarquee.Width;
+        //    }
+        //}
 
         private void TimerArtistMarquee_Tick(object sender, EventArgs e)
         {
-            ArtistMarqueeEffectHandler(LblShowPlayArtist, PnlMarquee);
+            playerControls.ArtistMarqueeEffectHandler(LblShowPlayArtist, PnlMarquee);
         }
 
-        public void ArtistMarqueeEffectHandler(Label LblShowPlayArtist, System.Windows.Forms.Panel PnlMarquee)
-        {
-            LblShowPlayArtist.Left -= scrollSpeed;
+        //public void ArtistMarqueeEffectHandler(Label LblShowPlayArtist, System.Windows.Forms.Panel PnlMarquee)
+        //{
+        //    LblShowPlayArtist.Left -= scrollSpeed;
 
-            // Check if the label has gone off-screen and wrap it back
-            if (LblShowPlayArtist.Right < 0)
-            {
-                LblShowPlayArtist.Left = PnlMarquee.Width;
-            }
-        }
+        //    // Check if the label has gone off-screen and wrap it back
+        //    if (LblShowPlayArtist.Right < 0)
+        //    {
+        //        LblShowPlayArtist.Left = PnlMarquee.Width;
+        //    }
+        //}
 
         private void TimerMusicDuration_Tick(object sender, EventArgs e)
         {
-            MusicSeekBarHandler(TbSeekMusic, LblMusicLength, LblMusicDurationCtr, TimerMusicDuration);
+            playerControls.MusicSeekBarHandler(TbSeekMusic, LblMusicLength, LblMusicDurationCtr, TimerMusicDuration);
+            //playerControls.MusicSeekBarHandler();
         }
 
-        public void MusicSeekBarHandler(DungeonTrackBar TbSeekMusic, Label LblMusicLength, Label LblMusicDurationCtr, System.Windows.Forms.Timer TimerMusicDuration)
-        {
-            if (audioFileReader != null && waveOutDevice != null)
-            {
-                if (TbSeekMusic.Value < TbSeekMusic.Maximum)
-                {
-                    // Update seek bar and display the remaining time and current time
-                    TbSeekMusic.Value = (int)audioFileReader.CurrentTime.TotalSeconds;
-                    LblMusicLength.Text = $"{audioFileReader.TotalTime - audioFileReader.CurrentTime:hh\\:mm\\:ss}";
-                    LblMusicDurationCtr.Text = $"{audioFileReader.CurrentTime:hh\\:mm\\:ss}";
-                }
-                else
-                {
-                    // Reset seek bar and stop the timer when the track ends
-                    TbSeekMusic.Value = 0;
-                    TimerMusicDuration.Stop();
+        //public void MusicSeekBarHandler(DungeonTrackBar TbSeekMusic, Label LblMusicLength, Label LblMusicDurationCtr, System.Windows.Forms.Timer TimerMusicDuration)
+        //{
+        //    if (audioFileReader != null && waveOutDevice != null)
+        //    {
+        //        if (TbSeekMusic.Value < TbSeekMusic.Maximum)
+        //        {
+        //            // Update seek bar and display the remaining time and current time
+        //            TbSeekMusic.Value = (int)audioFileReader.CurrentTime.TotalSeconds;
+        //            LblMusicLength.Text = $"{audioFileReader.TotalTime - audioFileReader.CurrentTime:hh\\:mm\\:ss}";
+        //            LblMusicDurationCtr.Text = $"{audioFileReader.CurrentTime:hh\\:mm\\:ss}";
+        //        }
+        //        else
+        //        {
+        //            // Reset seek bar and stop the timer when the track ends
+        //            TbSeekMusic.Value = 0;
+        //            TimerMusicDuration.Stop();
 
-                    // Stop the current playback and release resources
-                    waveOutDevice.Stop();
-                    waveOutDevice.Dispose();
-                    waveOutDevice = null;
+        //            // Stop the current playback and release resources
+        //            waveOutDevice.Stop();
+        //            waveOutDevice.Dispose();
+        //            waveOutDevice = null;
 
-                    // Dispose of the audio file reader to release its resources
-                    if (audioFileReader != null)
-                    {
-                        audioFileReader.Dispose();
-                        audioFileReader = null;
-                    }
+        //            // Dispose of the audio file reader to release its resources
+        //            if (audioFileReader != null)
+        //            {
+        //                audioFileReader.Dispose();
+        //                audioFileReader = null;
+        //            }
 
-                    // Move to the next track if repeat mode is disabled
-                    if (!repeatMusic)
-                    {
-                        currentMusicIndex++;    // Go to the next track in the queue
-                    }
+        //            // Move to the next track if repeat mode is disabled
+        //            if (!repeatMusic)
+        //            {
+        //                currentMusicIndex++;    // Go to the next track in the queue
+        //            }
 
-                    NextAndPreviousMusicHandler();  // Play the next or previous track in the queue
-                }
-            }
-        }
+        //            NextAndPreviousMusicHandler();  // Play the next or previous track in the queue
+        //        }
+        //    }
+        //}
 
         private void TbSeekMusic_ValueChanged()
         {
-            UpdateMusicLengthAndDuration(TbSeekMusic, LblMusicLength, LblMusicDurationCtr);
+            playerControls.UpdateMusicLengthAndDuration(TbSeekMusic, LblMusicLength, LblMusicDurationCtr);
         }
 
-        public void UpdateMusicLengthAndDuration(DungeonTrackBar TbSeekMusic, Label LblMusicLength, Label LblMusicDurationCtr)
-        {
-            if (audioFileReader != null)
-            {
-                // Update the remaining duration based on the seek bar's current value
-                LblMusicLength.Text = $"{audioFileReader.TotalTime - TimeSpan.FromSeconds(TbSeekMusic.Value):hh\\:mm\\:ss}";
+        //public void UpdateMusicLengthAndDuration(DungeonTrackBar TbSeekMusic, Label LblMusicLength, Label LblMusicDurationCtr)
+        //{
+        //    if (audioFileReader != null)
+        //    {
+        //        // Update the remaining duration based on the seek bar's current value
+        //        LblMusicLength.Text = $"{audioFileReader.TotalTime - TimeSpan.FromSeconds(TbSeekMusic.Value):hh\\:mm\\:ss}";
 
-                // Update the current playback time based on the seek bar's position
-                LblMusicDurationCtr.Text = $"{TimeSpan.FromSeconds(TbSeekMusic.Value)}";
-            }
-        }
+        //        // Update the current playback time based on the seek bar's position
+        //        LblMusicDurationCtr.Text = $"{TimeSpan.FromSeconds(TbSeekMusic.Value)}";
+        //    }
+        //}
 
         private void TbSeekMusic_MouseUp(object sender, MouseEventArgs e)
         {
-            MusicSeekBarMouseUpHandler(TbSeekMusic);
+            playerControls.MusicSeekBarMouseUpHandler(TbSeekMusic);
         }
 
-        public void MusicSeekBarMouseUpHandler(DungeonTrackBar TbSeekMusic)
-        {
-            if (audioFileReader != null && waveOutDevice != null)
-            {
-                // Update the current playback time of the track based on the seek bar's value
-                audioFileReader.CurrentTime = TimeSpan.FromSeconds(TbSeekMusic.Value);
+        //public void MusicSeekBarMouseUpHandler(DungeonTrackBar TbSeekMusic)
+        //{
+        //    if (audioFileReader != null && waveOutDevice != null)
+        //    {
+        //        // Update the current playback time of the track based on the seek bar's value
+        //        audioFileReader.CurrentTime = TimeSpan.FromSeconds(TbSeekMusic.Value);
 
-                // Resume playback if the music is currently playing
-                if (playMusic)
-                {
-                    waveOutDevice.Play();
-                }
-            }
-        }
+        //        // Resume playback if the music is currently playing
+        //        if (playMusic)
+        //        {
+        //            waveOutDevice.Play();
+        //        }
+        //    }
+        //}
 
         private void TbSeekMusic_MouseDown(object sender, MouseEventArgs e)
         {
-            MusicSeekBarMouseDownHandler();
+            playerControls.MusicSeekBarMouseDownHandler();
         }
 
-        public void MusicSeekBarMouseDownHandler()
-        {
-            if (audioFileReader != null && waveOutDevice != null)
-            {
-                waveOutDevice.Stop();   // Stop the playback when the user presses down on the seek bar
-            }
-        }
+        //public void MusicSeekBarMouseDownHandler()
+        //{
+        //    if (audioFileReader != null && waveOutDevice != null)
+        //    {
+        //        waveOutDevice.Stop();   // Stop the playback when the user presses down on the seek bar
+        //    }
+        //}
 
         private void PicBoxFullScreenToggle_Click(object sender, EventArgs e)
         {
@@ -1690,7 +1882,7 @@ namespace MusicPlayer
 
         private void PicBoxMiniPlayerToggle_Click(object sender, EventArgs e)
         {
-            Form MiniPlayer = new MiniPlayer(this);
+            Form MiniPlayer = new MiniPlayer(this, DgvPlayMusicQueue, playerControls);
             this.Hide();
             MiniPlayer.Show();
         }
@@ -1811,6 +2003,8 @@ namespace MusicPlayer
                 this.WindowState = FormWindowState.Normal;
                 this.Size = formSize;
             }
+
+            playerControls.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
         }
 
         private void BtnCloseApplication_Click(object sender, EventArgs e)
@@ -1823,6 +2017,7 @@ namespace MusicPlayer
         {
             ApplyRoundedCorners();
             HandleResponsiveLayout();
+            playerControls.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
 
             // Update the width of the PnlPlayBackInfo with respect to form size controls
             PnlPlayBackInfo.Width = this.ClientSize.Width <= 600 ? PicBoxPlayPreviousMusic.Left - 15 : PicBoxShuffleMusic.Left - 15;
@@ -1912,6 +2107,7 @@ namespace MusicPlayer
             }
 
             previousWidth = this.ClientSize.Width;
+            playerControls.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
         }
 
         private void ShowOrHideSkipButton(bool showSkipButton, int shuffleOffset, int repeatOffset)

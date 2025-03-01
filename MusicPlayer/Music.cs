@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MusicPlayer
 {
-    public class MyMusic
+    public class Music
     {
         public Image MusicPictureSmall { get; set; }
         public Image MusicPictureMedium { get; set; }
@@ -16,7 +16,7 @@ namespace MusicPlayer
         public string Duration { get; set; }
         public string File { get; set; }
 
-        public MyMusic(Image musicPictureSmall, Image musicPictureMedium, string title, string artist, string album, TimeSpan duration, string file)
+        public Music(Image musicPictureSmall, Image musicPictureMedium, string title, string artist, string album, TimeSpan duration, string file)
         {
             MusicPictureSmall = musicPictureSmall;
             MusicPictureMedium = musicPictureMedium;

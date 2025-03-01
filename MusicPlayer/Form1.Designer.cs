@@ -30,33 +30,33 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle10 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle11 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle12 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle13 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle14 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle15 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle16 = new DataGridViewCellStyle();
             pnlMain = new Panel();
             PnlPlayerControls = new Panel();
-            PnlPlayBackInfo = new CustomControls.NielarkPanel();
+            PnlPlayBackInfo = new MusicPlayer.CustomControls.NielarkPanel();
             PicBoxShowPlayPicture = new PictureBox();
             PnlMarquee = new Panel();
             LblShowPlayTitle = new Label();
             LblShowPlayArtist = new Label();
-            PicBoxMoreOption = new CustomControls.NielarkPictureBox();
-            PicBoxMiniPlayerToggle = new CustomControls.NielarkPictureBox();
-            PicBoxFullScreenToggle = new CustomControls.NielarkPictureBox();
-            PicBoxShowVolumeBar = new CustomControls.NielarkPictureBox();
-            PicBoxRepeatMusic = new CustomControls.NielarkPictureBox();
-            PicBoxSkipForward = new CustomControls.NielarkPictureBox();
-            PicBoxPlayNextMusic = new CustomControls.NielarkPictureBox();
-            PicBoxPlayPreviousMusic = new CustomControls.NielarkPictureBox();
-            PicBoxSkipBackward = new CustomControls.NielarkPictureBox();
-            PicBoxShuffleMusic = new CustomControls.NielarkPictureBox();
+            PicBoxMoreOption = new MusicPlayer.CustomControls.NielarkPictureBox();
+            PicBoxMiniPlayerToggle = new MusicPlayer.CustomControls.NielarkPictureBox();
+            PicBoxFullScreenToggle = new MusicPlayer.CustomControls.NielarkPictureBox();
+            PicBoxShowVolumeBar = new MusicPlayer.CustomControls.NielarkPictureBox();
+            PicBoxRepeatMusic = new MusicPlayer.CustomControls.NielarkPictureBox();
+            PicBoxSkipForward = new MusicPlayer.CustomControls.NielarkPictureBox();
+            PicBoxPlayNextMusic = new MusicPlayer.CustomControls.NielarkPictureBox();
+            PicBoxPlayPreviousMusic = new MusicPlayer.CustomControls.NielarkPictureBox();
+            PicBoxSkipBackward = new MusicPlayer.CustomControls.NielarkPictureBox();
+            PicBoxShuffleMusic = new MusicPlayer.CustomControls.NielarkPictureBox();
             PnlVolumeControl = new Panel();
-            PicBoxVolumePicture = new CustomControls.NielarkPictureBox();
+            PicBoxVolumePicture = new MusicPlayer.CustomControls.NielarkPictureBox();
             LblVolumeValue = new Label();
             TbVolume = new Modernial.Controls.DungeonTrackBar();
             PicBoxPlayAndPause = new PictureBox();
@@ -64,25 +64,27 @@
             LblMusicLength = new Label();
             LblMusicDurationCtr = new Label();
             PnlHeader = new Panel();
-            picBoxHamburgerMenu = new CustomControls.NielarkPictureBox();
+            label6 = new Label();
+            picBoxHamburgerMenu = new MusicPlayer.CustomControls.NielarkPictureBox();
             lblHeaderTitle = new Label();
             btnMinimize = new Button();
             btnMaximize = new Button();
+            label1 = new Label();
             btnCloseApplication = new Button();
             PnlSideBar = new Panel();
             pnlSelectSign = new Panel();
-            btnHome = new CustomControls.NielarkButton();
-            btnMusicLibrary = new CustomControls.NielarkButton();
-            btnPlayQueue = new CustomControls.NielarkButton();
-            btnPlayLists = new CustomControls.NielarkButton();
+            btnHome = new MusicPlayer.CustomControls.NielarkButton();
+            btnMusicLibrary = new MusicPlayer.CustomControls.NielarkButton();
+            btnPlayQueue = new MusicPlayer.CustomControls.NielarkButton();
+            btnPlayLists = new MusicPlayer.CustomControls.NielarkButton();
             pnlSubSelectSign = new Panel();
-            btnSongs = new CustomControls.NielarkButton();
-            btnArtists = new CustomControls.NielarkButton();
-            btnAlbums = new CustomControls.NielarkButton();
+            btnSongs = new MusicPlayer.CustomControls.NielarkButton();
+            btnArtists = new MusicPlayer.CustomControls.NielarkButton();
+            btnAlbums = new MusicPlayer.CustomControls.NielarkButton();
             pnlContent = new Panel();
             pnlInfo = new Panel();
-            BtnAlbumPlay = new CustomControls.NielarkButton();
-            BtnAlbumShuffleAndPlay = new CustomControls.NielarkButton();
+            BtnAlbumPlay = new MusicPlayer.CustomControls.NielarkButton();
+            BtnAlbumShuffleAndPlay = new MusicPlayer.CustomControls.NielarkButton();
             lblAlbumNumbers = new Label();
             lblAlbumArtist = new Label();
             lblAlbumName = new Label();
@@ -91,17 +93,16 @@
             PnlHeaderControl = new Panel();
             PnlSortControls = new Panel();
             lblShowLibraryTitle = new Label();
-            BtnImportMusic = new CustomControls.NielarkButton();
-            BtnShuffleAndPlay = new CustomControls.NielarkButton();
+            BtnImportMusic = new MusicPlayer.CustomControls.NielarkButton();
+            BtnShuffleAndPlay = new MusicPlayer.CustomControls.NielarkButton();
             CbFilterArtist = new Modernial.Controls.PoisonComboBox();
-            label1 = new Label();
             label2 = new Label();
             CbFilterAlbum = new Modernial.Controls.PoisonComboBox();
             picBoxSearchIcon = new PictureBox();
             TxtSearch = new TextBox();
             CbSortMusic = new Modernial.Controls.PoisonComboBox();
             PnlPlayQueueControl = new Panel();
-            BtnClearQueue = new CustomControls.NielarkButton();
+            BtnClearQueue = new MusicPlayer.CustomControls.NielarkButton();
             pnlMusicLibrary = new Panel();
             pnlAlbum = new Panel();
             flowLayoutPanel2 = new FlowLayoutPanel();
@@ -257,11 +258,12 @@
             // 
             LblShowPlayTitle.Anchor = AnchorStyles.Left;
             LblShowPlayTitle.AutoSize = true;
+            LblShowPlayTitle.BorderStyle = BorderStyle.FixedSingle;
             LblShowPlayTitle.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             LblShowPlayTitle.ForeColor = Color.White;
             LblShowPlayTitle.Location = new Point(0, 9);
             LblShowPlayTitle.Name = "LblShowPlayTitle";
-            LblShowPlayTitle.Size = new Size(42, 21);
+            LblShowPlayTitle.Size = new Size(44, 23);
             LblShowPlayTitle.TabIndex = 1;
             LblShowPlayTitle.Text = "Title";
             LblShowPlayTitle.TextAlign = ContentAlignment.MiddleLeft;
@@ -271,11 +273,12 @@
             // 
             LblShowPlayArtist.Anchor = AnchorStyles.Left;
             LblShowPlayArtist.AutoSize = true;
+            LblShowPlayArtist.BorderStyle = BorderStyle.FixedSingle;
             LblShowPlayArtist.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             LblShowPlayArtist.ForeColor = Color.FromArgb(242, 242, 242);
             LblShowPlayArtist.Location = new Point(0, 32);
             LblShowPlayArtist.Name = "LblShowPlayArtist";
-            LblShowPlayArtist.Size = new Size(38, 17);
+            LblShowPlayArtist.Size = new Size(40, 19);
             LblShowPlayArtist.TabIndex = 2;
             LblShowPlayArtist.Text = "Artist";
             LblShowPlayArtist.TextAlign = ContentAlignment.MiddleLeft;
@@ -553,9 +556,9 @@
             TbVolume.Text = "dungeonTrackBar1";
             TbVolume.ThumbBackColor = Color.FromArgb(244, 244, 244);
             TbVolume.ThumbBorderColor = Color.FromArgb(180, 180, 180);
-            TbVolume.Value = 0;
+            TbVolume.Value = 100;
             TbVolume.ValueDivison = Modernial.Controls.DungeonTrackBar.ValueDivisor.By1;
-            TbVolume.ValueToSet = 0F;
+            TbVolume.ValueToSet = 100F;
             TbVolume.ValueChanged += TbVolume_ValueChanged;
             TbVolume.MouseUp += TbVolume_MouseUp;
             // 
@@ -626,10 +629,12 @@
             // PnlHeader
             // 
             PnlHeader.BackColor = Color.FromArgb(8, 18, 38);
+            PnlHeader.Controls.Add(label6);
             PnlHeader.Controls.Add(picBoxHamburgerMenu);
             PnlHeader.Controls.Add(lblHeaderTitle);
             PnlHeader.Controls.Add(btnMinimize);
             PnlHeader.Controls.Add(btnMaximize);
+            PnlHeader.Controls.Add(label1);
             PnlHeader.Controls.Add(btnCloseApplication);
             PnlHeader.Dock = DockStyle.Top;
             PnlHeader.Location = new Point(0, 0);
@@ -639,6 +644,16 @@
             PnlHeader.MouseDown += PnlHeader_MouseDown;
             PnlHeader.MouseMove += PnlHeader_MouseMove;
             PnlHeader.MouseUp += PnlHeader_MouseUp;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.BackColor = Color.White;
+            label6.Location = new Point(137, 8);
+            label6.Name = "label6";
+            label6.Size = new Size(38, 15);
+            label6.TabIndex = 18;
+            label6.Text = "label6";
             // 
             // picBoxHamburgerMenu
             // 
@@ -707,6 +722,17 @@
             btnMaximize.TabIndex = 1;
             btnMaximize.UseVisualStyleBackColor = false;
             btnMaximize.Click += BtnMaximize_Click;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.BackColor = Color.White;
+            label1.Location = new Point(458, 8);
+            label1.Name = "label1";
+            label1.Size = new Size(38, 15);
+            label1.TabIndex = 10;
+            label1.Text = "label1";
+            label1.Visible = false;
             // 
             // btnCloseApplication
             // 
@@ -1125,7 +1151,6 @@
             PnlSortControls.Controls.Add(BtnImportMusic);
             PnlSortControls.Controls.Add(BtnShuffleAndPlay);
             PnlSortControls.Controls.Add(CbFilterArtist);
-            PnlSortControls.Controls.Add(label1);
             PnlSortControls.Controls.Add(label2);
             PnlSortControls.Controls.Add(CbFilterAlbum);
             PnlSortControls.Controls.Add(picBoxSearchIcon);
@@ -1220,17 +1245,6 @@
             CbFilterArtist.UseCustomForeColor = true;
             CbFilterArtist.UseSelectable = true;
             CbFilterArtist.SelectedIndexChanged += CbFilterArtist_SelectedIndexChanged;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.BackColor = Color.White;
-            label1.Location = new Point(296, 0);
-            label1.Name = "label1";
-            label1.Size = new Size(38, 15);
-            label1.TabIndex = 10;
-            label1.Text = "label1";
-            label1.Visible = false;
             // 
             // label2
             // 
@@ -1543,25 +1557,25 @@
             DgvMusicList.BorderStyle = BorderStyle.None;
             DgvMusicList.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             DgvMusicList.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = Color.FromArgb(47, 53, 64);
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle1.ForeColor = Color.FromArgb(252, 255, 245);
-            dataGridViewCellStyle1.Padding = new Padding(10, 0, 10, 0);
-            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(47, 53, 64);
-            dataGridViewCellStyle1.SelectionForeColor = Color.FromArgb(252, 255, 245);
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            DgvMusicList.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = Color.FromArgb(47, 53, 64);
+            dataGridViewCellStyle9.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle9.ForeColor = Color.FromArgb(252, 255, 245);
+            dataGridViewCellStyle9.Padding = new Padding(10, 0, 10, 0);
+            dataGridViewCellStyle9.SelectionBackColor = Color.FromArgb(47, 53, 64);
+            dataGridViewCellStyle9.SelectionForeColor = Color.FromArgb(252, 255, 245);
+            dataGridViewCellStyle9.WrapMode = DataGridViewTriState.True;
+            DgvMusicList.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle9;
             DgvMusicList.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = Color.FromArgb(8, 18, 38);
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle2.ForeColor = Color.FromArgb(252, 255, 245);
-            dataGridViewCellStyle2.Padding = new Padding(20, 0, 20, 0);
-            dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(47, 53, 64);
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
-            DgvMusicList.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle10.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle10.BackColor = Color.FromArgb(8, 18, 38);
+            dataGridViewCellStyle10.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle10.ForeColor = Color.FromArgb(252, 255, 245);
+            dataGridViewCellStyle10.Padding = new Padding(20, 0, 20, 0);
+            dataGridViewCellStyle10.SelectionBackColor = Color.FromArgb(47, 53, 64);
+            dataGridViewCellStyle10.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = DataGridViewTriState.False;
+            DgvMusicList.DefaultCellStyle = dataGridViewCellStyle10;
             DgvMusicList.EnableHeadersVisualStyles = false;
             DgvMusicList.GridColor = Color.FromArgb(8, 18, 38);
             DgvMusicList.Location = new Point(19, 0);
@@ -1569,20 +1583,20 @@
             DgvMusicList.Name = "DgvMusicList";
             DgvMusicList.ReadOnly = true;
             DgvMusicList.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = Color.FromArgb(8, 18, 38);
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle3.ForeColor = Color.FromArgb(252, 255, 245);
-            dataGridViewCellStyle3.SelectionBackColor = Color.FromArgb(47, 53, 64);
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            DgvMusicList.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle11.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle11.BackColor = Color.FromArgb(8, 18, 38);
+            dataGridViewCellStyle11.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle11.ForeColor = Color.FromArgb(252, 255, 245);
+            dataGridViewCellStyle11.SelectionBackColor = Color.FromArgb(47, 53, 64);
+            dataGridViewCellStyle11.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle11.WrapMode = DataGridViewTriState.True;
+            DgvMusicList.RowHeadersDefaultCellStyle = dataGridViewCellStyle11;
             DgvMusicList.RowHeadersVisible = false;
             DgvMusicList.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = Color.FromArgb(8, 18, 38);
-            dataGridViewCellStyle4.SelectionBackColor = Color.FromArgb(47, 53, 64);
-            DgvMusicList.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle12.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle12.BackColor = Color.FromArgb(8, 18, 38);
+            dataGridViewCellStyle12.SelectionBackColor = Color.FromArgb(47, 53, 64);
+            DgvMusicList.RowsDefaultCellStyle = dataGridViewCellStyle12;
             DgvMusicList.RowTemplate.DefaultCellStyle.BackColor = Color.FromArgb(8, 18, 38);
             DgvMusicList.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.FromArgb(47, 53, 64);
             DgvMusicList.RowTemplate.DividerHeight = 3;
@@ -1617,45 +1631,45 @@
             DgvPlayMusicQueue.BorderStyle = BorderStyle.None;
             DgvPlayMusicQueue.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             DgvPlayMusicQueue.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = Color.FromArgb(47, 53, 64);
-            dataGridViewCellStyle5.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle5.ForeColor = Color.FromArgb(252, 255, 245);
-            dataGridViewCellStyle5.Padding = new Padding(10, 0, 10, 0);
-            dataGridViewCellStyle5.SelectionBackColor = Color.FromArgb(47, 53, 64);
-            dataGridViewCellStyle5.SelectionForeColor = Color.FromArgb(252, 255, 245);
-            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
-            DgvPlayMusicQueue.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle13.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle13.BackColor = Color.FromArgb(47, 53, 64);
+            dataGridViewCellStyle13.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle13.ForeColor = Color.FromArgb(252, 255, 245);
+            dataGridViewCellStyle13.Padding = new Padding(10, 0, 10, 0);
+            dataGridViewCellStyle13.SelectionBackColor = Color.FromArgb(47, 53, 64);
+            dataGridViewCellStyle13.SelectionForeColor = Color.FromArgb(252, 255, 245);
+            dataGridViewCellStyle13.WrapMode = DataGridViewTriState.True;
+            DgvPlayMusicQueue.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
             DgvPlayMusicQueue.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = Color.FromArgb(8, 18, 38);
-            dataGridViewCellStyle6.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle6.ForeColor = Color.FromArgb(252, 255, 245);
-            dataGridViewCellStyle6.Padding = new Padding(20, 0, 20, 0);
-            dataGridViewCellStyle6.SelectionBackColor = Color.FromArgb(47, 53, 64);
-            dataGridViewCellStyle6.SelectionForeColor = Color.FromArgb(252, 255, 245);
-            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.False;
-            DgvPlayMusicQueue.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle14.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = Color.FromArgb(8, 18, 38);
+            dataGridViewCellStyle14.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle14.ForeColor = Color.FromArgb(252, 255, 245);
+            dataGridViewCellStyle14.Padding = new Padding(20, 0, 20, 0);
+            dataGridViewCellStyle14.SelectionBackColor = Color.FromArgb(47, 53, 64);
+            dataGridViewCellStyle14.SelectionForeColor = Color.FromArgb(252, 255, 245);
+            dataGridViewCellStyle14.WrapMode = DataGridViewTriState.False;
+            DgvPlayMusicQueue.DefaultCellStyle = dataGridViewCellStyle14;
             DgvPlayMusicQueue.EnableHeadersVisualStyles = false;
             DgvPlayMusicQueue.GridColor = Color.FromArgb(8, 18, 38);
             DgvPlayMusicQueue.Location = new Point(20, 0);
             DgvPlayMusicQueue.Name = "DgvPlayMusicQueue";
             DgvPlayMusicQueue.ReadOnly = true;
             DgvPlayMusicQueue.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = Color.FromArgb(8, 18, 38);
-            dataGridViewCellStyle7.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle7.ForeColor = Color.FromArgb(252, 255, 245);
-            dataGridViewCellStyle7.SelectionBackColor = Color.FromArgb(47, 53, 64);
-            dataGridViewCellStyle7.SelectionForeColor = Color.FromArgb(252, 255, 245);
-            dataGridViewCellStyle7.WrapMode = DataGridViewTriState.True;
-            DgvPlayMusicQueue.RowHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle15.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle15.BackColor = Color.FromArgb(8, 18, 38);
+            dataGridViewCellStyle15.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle15.ForeColor = Color.FromArgb(252, 255, 245);
+            dataGridViewCellStyle15.SelectionBackColor = Color.FromArgb(47, 53, 64);
+            dataGridViewCellStyle15.SelectionForeColor = Color.FromArgb(252, 255, 245);
+            dataGridViewCellStyle15.WrapMode = DataGridViewTriState.True;
+            DgvPlayMusicQueue.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
             DgvPlayMusicQueue.RowHeadersVisible = false;
             DgvPlayMusicQueue.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
-            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = Color.FromArgb(8, 18, 38);
-            dataGridViewCellStyle8.SelectionBackColor = Color.FromArgb(47, 53, 64);
-            DgvPlayMusicQueue.RowsDefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle16.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle16.BackColor = Color.FromArgb(8, 18, 38);
+            dataGridViewCellStyle16.SelectionBackColor = Color.FromArgb(47, 53, 64);
+            DgvPlayMusicQueue.RowsDefaultCellStyle = dataGridViewCellStyle16;
             DgvPlayMusicQueue.RowTemplate.DefaultCellStyle.BackColor = Color.FromArgb(8, 18, 38);
             DgvPlayMusicQueue.RowTemplate.DefaultCellStyle.ForeColor = Color.FromArgb(252, 255, 245);
             DgvPlayMusicQueue.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.FromArgb(47, 53, 64);
@@ -1857,5 +1871,6 @@
         private Label lblAlbumArtist;
         private CustomControls.NielarkButton BtnAlbumPlay;
         private CustomControls.NielarkButton BtnAlbumShuffleAndPlay;
+        private Label label6;
     }
 }

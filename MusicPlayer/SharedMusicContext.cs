@@ -17,7 +17,7 @@ namespace MusicPlayer
         public AudioFileReader AudioFileReader { get; set; }
 
         // List to hold music data
-        public List<MyMusic> MusicList { get; set; }
+        public List<Music> MusicList { get; set; }
 
         // Current song index
         public int CurrentMusicIndex { get; set; } = -1;
@@ -33,7 +33,7 @@ namespace MusicPlayer
         // Private constructor to prevent instantiation
         private SharedMusicContext()
         {
-            MusicList = new List<MyMusic>();
+            MusicList = new List<Music>();
         }
 
         // Method to get the singleton instance
