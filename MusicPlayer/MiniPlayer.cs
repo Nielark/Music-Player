@@ -17,9 +17,8 @@ namespace MusicPlayer
     public partial class MiniPlayer : Form
     {
         private FormMain formMain; // Reference to the main form
-        private DataGridView DgvPlayMusicQueue;
+        private DataGridView dgvPlayMusicQueue;
         private PlayerControls playerControls;
-        //SharedMusicContext context = SharedMusicContext.GetInstance();
 
         [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
 
@@ -36,75 +35,52 @@ namespace MusicPlayer
         public MiniPlayer(FormMain form, DataGridView dgvPlayMusicQueue, PlayerControls playerControls)
         {
             InitializeComponent();
+
+            // Set up appearance
             Region = System.Drawing.Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, 20, 20));
             MyModule.MakeCircular(PicBoxPlayAndPause);      // Make the play or pause button circular
             TbVolume.Maximum = 100;
+
+            // Store references passed from the MainForm
             this.formMain = form; // Store the reference
-            this.DgvPlayMusicQueue = dgvPlayMusicQueue;
-
-            //formMain.PlayAndPauseStateChanged += OnPlayAndPauseStateChanged;
-            //formMain.ShuffleMusicStateChanged += OnShuffleMusicStateChanged;
-            //formMain.RepeatMusicStateChanged += OnRepeatMusicStateChanged;
-            //formMain.MuteStateChanged += OnMuteStateChanged;
-            //formMain.UpdateMuteStateChanged += OnUpdateMuteStateChanged;
-            //formMain.UpdateVolumeValueChanged += OnUpdateVolumeValueChanged;
-            //formMain.UpdateVolumeIconChanged += OnUpdateVolumeIconChanged
-
+            this.dgvPlayMusicQueue = dgvPlayMusicQueue;
             this.playerControls = playerControls;
+
+            // Wire up events from the playerControls that are UI-related
             this.playerControls.ShuffleMusicStateChanged += OnShuffleMusicStateChanged;
             this.playerControls.PlayAndPauseStateChanged += OnPlayAndPauseStateChanged;
             this.playerControls.RepeatMusicStateChanged += OnRepeatMusicStateChanged;
-            //this.playerControls.MuteStateChanged += OnMuteStateChanged;
-            //this.playerControls.UpdateMuteStateChanged += OnUpdateMuteStateChanged;
             this.playerControls.UpdateVolumeValueChanged += OnUpdateVolumeValueChanged;
-
         }
 
         private void MiniPlayer_Load(object sender, EventArgs e)
         {
-            //PicBoxShowPlayPicture.Image = formMain.musicList[formMain.currentMusicIndex].MusicPictureMedium;
-            //playerControls.UpdatePlayAndPauseUI(PicBoxPlayAndPause, toolTipPlayerControl, formMain.playMusic);
+            // Update the UI based on current playback state
             playerControls.UpdatePlayAndPauseUI(PicBoxPlayAndPause, toolTipPlayerControl, playerControls.IsPlayMusic);
-            //playerControls.UpdateShuffleUI(PicBoxShuffleMusic, toolTipPlayerControl, formMain.shuffleMusic);
             playerControls.UpdateShuffleUI(PicBoxShuffleMusic, toolTipPlayerControl, playerControls.ShuffleMusic);
-            //playerControls.UpdateRepeatUI(PicBoxRepeatMusic, toolTipPlayerControl, formMain.repeatMusic);
             playerControls.UpdateRepeatUI(PicBoxRepeatMusic, toolTipPlayerControl, playerControls.RepeatMusic);
-            //playerControls.UpdateVolumeValueAndUI(TbVolume, formMain.mute);
             playerControls.UpdateVolumeValueAndUI(TbVolume, playerControls.Mute);
             playerControls.UpdateMuteStateUI(TbVolume);
             playerControls.UpdateVolumeValueAndUI(LblVolumeValue, TbVolume);
-            //formMain.UpdateVolumeIconUI(TbVolume, PicBoxVolumePicture, PicBoxShowVolumeBar);
 
+            // Load current song information and start related timers
             DisplaySongInformation();
             TimerMusicDuration.Start();
-            //formMain.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
             playerControls.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
         }
 
         private void DisplaySongInformation()
         {
-            //PicBoxShowPlayPicture.Image = formMain.miniPlayerMusicPicture;
-            //LblShowPlayTitle.Text = formMain.miniPlayerTitle;
-            //LblShowPlayArtist.Text = formMain.miniPlayerArtist;
-            //LblMusicLength.Text = formMain.miniPlayerMusicLen;
-            //TbSeekMusic.Maximum = formMain.miniPlayerTrackBarMax;
-
             PicBoxShowPlayPicture.Image = playerControls.miniPlayerTrackInfo.MiniPlayerMusicPicture;
             LblShowPlayTitle.Text = playerControls.miniPlayerTrackInfo.MiniPlayerTitle;
             LblShowPlayArtist.Text = playerControls.miniPlayerTrackInfo.MiniPlayerArtist;
-            //LblMusicLength.Text = playerControls.miniPlayerTrackInfo.MiniPlayerMusicLen;
             TbSeekMusic.Maximum = playerControls.miniPlayerTrackInfo.MiniPlayerTrackBarMax;
         }
 
         // SHUFFLE MUSIC
         private void PicBoxShuffleMusic_Click(object sender, EventArgs e)
         {
-            //formMain.ShuffleMusic();
-            //playerControls.SetIsShuffleMusic(formMain.shuffleMusic);
-            //playerControls.SetPlayMusicQueue(formMain.playMusicQueue);
-            //playerControls.SetCurrentMusicIndex(formMain.currentMusicIndex);
-            playerControls.ShuffleMusicHandler(DgvPlayMusicQueue);
-            formMain.shuffleMusic = playerControls.ShuffleMusic;
+            playerControls.ShuffleMusicHandler(dgvPlayMusicQueue);
         }
 
         private void OnShuffleMusicStateChanged(bool isShuffle)
@@ -115,8 +91,6 @@ namespace MusicPlayer
         // SKIPBACKWARD
         private void PicBoxSkipBackward_Click(object sender, EventArgs e)
         {
-            //formMain.SkipBackward();
-            //PlayerControls.SkipBackward(formMain.waveOutDevice, formMain.audioFileReader);
             playerControls.SkipBackward();
         }
 
@@ -125,25 +99,17 @@ namespace MusicPlayer
         {
             playerControls.PlayPreviousMusic();
             DisplaySongInformation();
-            //formMain.ResetAndStopMarqueeSettings(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
-            //formMain.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
             playerControls.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
         }
 
         // PLAY AND PAUSE
         private void PicBoxPlayAndPause_Click(object sender, EventArgs e)
         {
-            //formMain.TogglePlayAndPause();
-            //playerControls.SetIsPlayMusic(formMain.playMusic);
-            //playerControls.TogglePlayAndPause(formMain.waveOutDevice, formMain.audioFileReader);
             playerControls.TogglePlayAndPause();
-            //formMain.playMusic = playerControls.IsPlayMusic;
         }
 
         private void OnPlayAndPauseStateChanged(bool isPlaying)
         {
-            // Update the UI of MiniPlayer based on the new play/pause state
-            //formMain.UpdatePlayAndPauseUI(PicBoxPlayAndPause, toolTipPlayerControl, isPlaying);
             playerControls.UpdatePlayAndPauseUI(PicBoxPlayAndPause, toolTipPlayerControl, isPlaying);
         }
 
@@ -152,31 +118,23 @@ namespace MusicPlayer
         {
             playerControls.PlayNextMusic();
             DisplaySongInformation();
-            //formMain.ResetAndStopMarqueeSettings(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
-            //formMain.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
             playerControls.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
         }
 
         // SKIP FORWARD
         private void PicBoxSkipForward_Click(object sender, EventArgs e)
         {
-            //formMain.SkipForward();
-            //PlayerControls.SkipForward(formMain.waveOutDevice, formMain.audioFileReader);
             playerControls.SkipForward();
         }
 
         // REPEAT
         private void PicBoxRepeatMusic_Click(object sender, EventArgs e)
         {
-            //formMain.RepeatMusic();
-            //playerControls.SetIsRepeatMusic(formMain.repeatMusic);
             playerControls.RepeatMusicHandler();
-            //formMain.repeatMusic = playerControls.RepeatMusic;
         }
 
         private void OnRepeatMusicStateChanged(bool isRepeat)
         {
-            //formMain.UpdateRepeatUI(PicBoxRepeatMusic, toolTipPlayerControl, isRepeat);
             playerControls.UpdateRepeatUI(PicBoxRepeatMusic, toolTipPlayerControl, isRepeat);
         }
 
@@ -189,12 +147,8 @@ namespace MusicPlayer
 
         private void TimerMusicDuration_Tick(object sender, EventArgs e)
         {
-            //formMain.MusicSeekBarHandler(TbSeekMusic, LblMusicLength, LblMusicDurationCtr, TimerMusicDuration);
             playerControls.MusicSeekBarHandler(TbSeekMusic, LblMusicLength, LblMusicDurationCtr, TimerMusicDuration);
-            //playerControls.MusicSeekBarHandler();
             DisplaySongInformation();
-            //formMain.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
-            //playerControls.MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
             TimerMusicDuration.Start();
         }
 
@@ -221,13 +175,11 @@ namespace MusicPlayer
 
         private void PicBoxVolumePicture_Click(object sender, EventArgs e)
         {
-            //formMain.VolumeMuteAndUnmuteToggle();
             playerControls.VolumeMuteAndUnmuteToggle();
         }
 
         private void OnMuteStateChanged(bool isMute)
         {
-            //formMain.UpdateVolumeValueAndUI(TbVolume, isMute);
             playerControls.UpdateVolumeValueAndUI(TbVolume, isMute);
         }
 
@@ -238,46 +190,33 @@ namespace MusicPlayer
 
         private void TbVolume_ValueChanged()
         {
-            // Update volume and icon based on the current trackbar value
-            //formMain.UpdateVolumeValue(TbVolume.Value);
             playerControls.UpdateVolumeValue(TbVolume.Value);
             playerControls.UpdateVolumeIconUI(TbVolume, PicBoxVolumePicture, PicBoxShowVolumeBar);
-            //formMain.UpdateVolumeIcon();
         }
 
         private void OnUpdateVolumeValueChanged(int newVolumeValue)
         {
             TbVolume.Value = newVolumeValue;
-            //formMain.UpdateVolumeValueAndUI(LblVolumeValue, TbVolume);
             playerControls.UpdateVolumeValueAndUI(LblVolumeValue, TbVolume);
         }
 
-        //private void OnUpdateVolumeIconChanged()
-        //{
-        //    formMain.UpdateVolumeIconUI(TbVolume, PicBoxVolumePicture, PicBoxShowVolumeBar);
-        //}
-
         private void TbVolume_MouseUp(object sender, MouseEventArgs e)
         {
-            //formMain.UpdateMuteState();
             playerControls.UpdateMuteState();
         }
 
         private void OnUpdateMuteStateChanged()
         {
-            //formMain.UpdateMuteStateUI(TbVolume);
             playerControls.UpdateMuteStateUI(TbVolume);
         }
 
         private void TimerTitleMarquee_Tick(object sender, EventArgs e)
         {
-            //formMain.TitleMarqueeEffectHandler(LblShowPlayTitle, PnlMarquee);
             playerControls.TitleMarqueeEffectHandler(LblShowPlayTitle, PnlMarquee);
         }
 
         private void TimerArtistMarquee_Tick(object sender, EventArgs e)
         {
-            //formMain.ArtistMarqueeEffectHandler(LblShowPlayArtist, PnlMarquee);
             playerControls.ArtistMarqueeEffectHandler(LblShowPlayArtist, PnlMarquee);
         }
 

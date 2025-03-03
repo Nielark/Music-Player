@@ -14,11 +14,15 @@ namespace MusicPlayer
         PlayerControls playerControls = new PlayerControls();
         public ArtistAndAlbumUIControllers ArtistAlbumUIControllers { get; private set; } = new ArtistAndAlbumUIControllers();
 
-        public MusicListViewManager(PlayerControls playerControls, List<Music> musicList)
+        public MusicListViewManager(PlayerControls playerControls)
         {
             this.playerControls = playerControls;
+            //this.musicList = musicList;
+        }
+
+        public void SetMusicList(List<Music> musicList)
+        {
             this.musicList = musicList;
-            //ShuffleMusic = this.playerControls.ShuffleMusic;
         }
 
         public void SetArtistAndAlbumUIControllers(ArtistAndAlbumUIControllers artistAndAlbumUIController)
@@ -45,6 +49,7 @@ namespace MusicPlayer
 
 
                 playerControls.SetPlayMusicQueue(playMusicQueue);
+                playerControls.TogglePlayAndPause();
 
                 // Retrieve every cells data from the selected row
                 string? title = DgvMusicList.CurrentRow.Cells[2].Value.ToString();
@@ -62,8 +67,6 @@ namespace MusicPlayer
                     if (!string.IsNullOrEmpty(filePath) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(artist))
                     {
                         playerControls.PlayMusic(musicPicture, filePath, title, artist);
-                        //playerControls.MarqueeEffectHandler();
-                        //currentMusicIndex = playerControls.CurrentMusicIndex;
                         playerControls.SetCurrentMusicIndex(index);
                     }
                 }
@@ -260,11 +263,7 @@ namespace MusicPlayer
 
         private void PlayMusicByArtistsOrAlbum(string nameIdentifier, bool isArtist, DataGridView dgvPlayMusicQueue, System.Windows.Forms.Timer timerShowPnlPlayerControls)
         {
-            //CurrentMusicIndex = -1; // Set to empty
-            //CurrentMusicIndex++;
             CurrentMusicIndex = 0;
-            //playerControls.CurrentMusicIndex = CurrentMusicIndex;
-            //playerControls.SetCurrentMusicIndex(CurrentMusicIndex);
 
             // Filter the music based on the selected artist name in the artist combo box
             playMusicQueue = musicList

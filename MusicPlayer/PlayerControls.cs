@@ -12,35 +12,13 @@ namespace MusicPlayer
 {
     public class PlayerControls : MusicPlayerBase
     {
-        //private IWavePlayer? waveOutDevice;
-        //private AudioFileReader? audioFileReader;
-
-        //private PlayerUIControllers uiControllers = new PlayerUIControllers();
-        //public MiniPlayerTrackInfo miniPlayerTrackInfo = new MiniPlayerTrackInfo();
-
         private int marqueeSpeed = 5;
         public int temporaryVolume = 100;
-
-        //public List<Music> playMusicQueue = new List<Music>();
-        //public List<Music> shuffleMusicList = new List<Music>();
-
-        //public bool ShuffleMusic { get; private set; } = false;
-        //public bool IsPlayMusic { get; private set; } = false;
-        //public bool RepeatMusic { get; private set; } = false;
-        //public bool Mute { get; set; } = false;
-        //public int CurrentMusicIndex { get; private set; }
-
-
 
         public PlayerControls()
         {
             // Constructor
         }
-
-        //public void SetUIControllers(PlayerUIControllers uIControllers)
-        //{
-        //    uiControllers = uIControllers;
-        //}
 
         public void SetPlayMusicQueue(List<Music> getPlayMusicQueue)
         {
@@ -70,9 +48,7 @@ namespace MusicPlayer
         // SHUFFLE AND PLAY MUSIC
 
         public void ShuffleAndPlayMusic(DataGridView DgvPlayMusicQueue, System.Windows.Forms.Timer TimerShowPnlPlayerControls, MusicLibrary musicLibrary)
-        { 
-            ShuffleMusic = true;
-
+        {
             playMusicQueue = new List<Music>(musicLibrary.musicList);      // Copy the current music list to playMusicQueue for shuffling
 
             FisherYatesShuffle();                               // Shuffle the music list using the Fisher-Yates algorithm
@@ -103,7 +79,6 @@ namespace MusicPlayer
                 string currentFilePath;
 
                 ShuffleMusic = !ShuffleMusic;           // Toggle shuffle mode
-                //label1.Text = shuffleMusic.ToString();  // Update label to reflect shuffle state
                 
                 // Shuffle or revert to original list
                 if (ShuffleMusic)
@@ -115,7 +90,6 @@ namespace MusicPlayer
                 else
                 {
                     currentFilePath = shuffleMusicList[CurrentMusicIndex].File;     // Get the file path of the current playing mp3 from shuffleMusicList
-                    //DgvPlayMusicQueue.DataSource = musicList;                     // Revert to the original (unshuffled) music list in the DataGridView
                     shuffleMusicList = shuffleMusicList.OrderBy(x => x.Title).ToList();
                     DgvPlayMusicQueue.DataSource = shuffleMusicList;
                     CurrentMusicIndex = playMusicQueue.FindIndex(index => index.File == currentFilePath);   // Find the index of the current song in the unshuffled playMusicQueue
@@ -131,6 +105,11 @@ namespace MusicPlayer
             }
         }
 
+        private void NotifyShuffleMusicStateChanged(bool isShuffle)
+        {
+            ShuffleMusicStateChanged?.Invoke(isShuffle);
+        }
+
         public void UpdateShuffleUI(PictureBox PicBoxShuffleMusic, System.Windows.Forms.ToolTip toolTipPlayerControl, bool isShuffle)
         {
             // Update the UI of MiniPlayer based on the new play/pause state
@@ -144,11 +123,6 @@ namespace MusicPlayer
                 PicBoxShuffleMusic.Image = Properties.Resources.shuffle_on;     // Change the image into shuffle on icon
                 toolTipPlayerControl.SetToolTip(PicBoxShuffleMusic, "Shuffle on");    // Change the tool tip text to shuffle on
             }
-        }
-
-        private void NotifyShuffleMusicStateChanged(bool isShuffle)
-        {
-            ShuffleMusicStateChanged?.Invoke(isShuffle);
         }
 
         public void FisherYatesShuffle(string? currentFilePath = null)
@@ -192,9 +166,6 @@ namespace MusicPlayer
 
         public void SkipBackward()
         {
-            //var audioFileReader = uiControllers.audioFileReader;
-            //var waveOutDevice = uiControllers.waveOutDevice;
-
             if (audioFileReader != null && waveOutDevice != null)
             {
                 waveOutDevice.Pause();  // Pause the music playback
@@ -217,7 +188,6 @@ namespace MusicPlayer
         }
 
         // PLAY PREVIOUS MUSIC
-        //public void PlayPreviousMusic(DungeonTrackBar TbSeekMusic)
         public void PlayPreviousMusic()
         {
             var TbSeekMusic = uiControllers.TbSeekMusic;
@@ -237,9 +207,6 @@ namespace MusicPlayer
 
         public void TogglePlayAndPause()
         {
-            //var audioFileReader = uiControllers.audioFileReader;
-            //var waveOutDevice = uiControllers.waveOutDevice;
-
             if (audioFileReader != null && waveOutDevice != null)
             {
                 // Toggle between playing and pausing the music
@@ -259,6 +226,11 @@ namespace MusicPlayer
             }
         }
 
+        private void NotifyPlayAndPauseStateChanged(bool playMusic)
+        {
+            PlayAndPauseStateChanged?.Invoke(playMusic);
+        }
+
         public void UpdatePlayAndPauseUI(PictureBox PicBoxPlayAndPause, System.Windows.Forms.ToolTip toolTipPlayerControl, bool isPlaying)
         {
             // Update the UI of MiniPlayer based on the new play/pause state
@@ -272,11 +244,6 @@ namespace MusicPlayer
                 PicBoxPlayAndPause.Image = Properties.Resources.play;           // Change the image into play icon
                 toolTipPlayerControl.SetToolTip(PicBoxPlayAndPause, "Play");    // Change the tool tip text to Play
             }
-        }
-
-        private void NotifyPlayAndPauseStateChanged(bool playMusic)
-        {
-            PlayAndPauseStateChanged?.Invoke(playMusic);
         }
 
         // PLAY NEXT MUSIC
@@ -295,9 +262,6 @@ namespace MusicPlayer
 
         public void SkipForward()
         {
-            //var audioFileReader = uiControllers.audioFileReader;
-            //var waveOutDevice = uiControllers.waveOutDevice;
-
             if (audioFileReader != null && waveOutDevice != null)
             {
                 waveOutDevice.Pause();  // Pause the music playback
@@ -331,6 +295,11 @@ namespace MusicPlayer
             NotifyRepeatMusicStateChanged(RepeatMusic);
         }
 
+        private void NotifyRepeatMusicStateChanged(bool repeatMusic)
+        {
+            RepeatMusicStateChanged?.Invoke(repeatMusic);
+        }
+
         public void UpdateRepeatUI(PictureBox PicBoxRepeatMusic, System.Windows.Forms.ToolTip toolTipPlayerControl, bool isRepeat)
         {
             if (isRepeat)
@@ -343,11 +312,6 @@ namespace MusicPlayer
                 PicBoxRepeatMusic.Image = Properties.Resources.repeat;              // Change the image into repeat on icon
                 toolTipPlayerControl.SetToolTip(PicBoxRepeatMusic, "Repeat on");    // Change the tool tip text to Repeat on
             }
-        }
-
-        private void NotifyRepeatMusicStateChanged(bool repeatMusic)
-        {
-            RepeatMusicStateChanged?.Invoke(repeatMusic);
         }
 
         public void NextAndPreviousMusicHandler()
@@ -387,8 +351,6 @@ namespace MusicPlayer
 
         public void PlayMusic(Image musicPicture, string filePath, string title, string artist)
         {
-            //var audioFileReader = uiControllers.audioFileReader;
-            //var waveOutDevice = uiControllers.waveOutDevice;
             var PicBoxShowPlayPicture = uiControllers.PicBoxShowPlayPicture!;
             var LblShowPlayTitle = uiControllers.LblShowPlayTitle!;
             var LblShowPlayArtist = uiControllers.LblShowPlayArtist!;
@@ -435,26 +397,17 @@ namespace MusicPlayer
                 // Display music image or a default one if no image is available
                 if (musicPicture != null)
                 {
-                    PicBoxShowPlayPicture.Image = musicPicture;
-                    //miniPlayerMusicPicture = musicPicture;   
+                    PicBoxShowPlayPicture.Image = musicPicture;  
                 }
                 else
                 {
                     PicBoxShowPlayPicture.Image = Properties.Resources.default_music_picture_medium;
-                    //miniPlayerMusicPicture = Properties.Resources.default_music_picture_medium;
                 }
-
-                //audioFileReader = uiControllers.audioFileReader;
-                //waveOutDevice = uiControllers.waveOutDevice;
 
                 // Update UI with the currently playing song information
                 LblShowPlayTitle.Text = title;
                 LblShowPlayArtist.Text = artist;
                 LblMusicLength.Text = audioFileReader.TotalTime.ToString("hh\\:mm\\:ss");
-
-                //miniPlayerTitle = title;
-                //miniPlayerArtist = artist;
-                //miniPlayerMusicLen = uiControllers.audioFileReader.TotalTime.ToString("hh\\:mm\\:ss");
 
                 miniPlayerTrackInfo = new MiniPlayerTrackInfo()
                 {
@@ -467,9 +420,7 @@ namespace MusicPlayer
 
                 // Set the seek bar maximum value to the total duration of the music in seconds
                 TbSeekMusic.Maximum = (int)audioFileReader.TotalTime.TotalSeconds;
-                //miniPlayerTrackBarMax = (int)uiControllers.audioFileReader.TotalTime.TotalSeconds;
 
-                //MarqueeEffectHandler(uiControllers.LblShowPlayTitle, uiControllers.LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
                 MarqueeEffectHandler(LblShowPlayTitle, LblShowPlayArtist, PnlMarquee, TimerTitleMarquee, TimerArtistMarquee);
 
                 TimerMusicDuration.Start();     // Start tracking the music duration in seek bar
@@ -479,12 +430,6 @@ namespace MusicPlayer
 
         public void MarqueeEffectHandler(Label LblShowPlayTitle, Label LblShowPlayArtist, System.Windows.Forms.Panel PnlMarquee, System.Windows.Forms.Timer TimerTitleMarquee, System.Windows.Forms.Timer TimerArtistMarquee)
         {
-            //var LblShowPlayTitle = uiControllers.LblShowPlayTitle!;
-            //var LblShowPlayArtist = uiControllers.LblShowPlayArtist!;
-            //var PnlMarquee = uiControllers.PnlMarquee!;
-            //var TimerTitleMarquee = uiControllers.TimerTitleMarquee!;
-            //var TimerArtistMarquee = uiControllers.TimerArtistMarquee!;
-
             if (string.IsNullOrEmpty(LblShowPlayTitle.Text) && string.IsNullOrEmpty(LblShowPlayArtist.Text))
             {
                 return;
@@ -564,9 +509,6 @@ namespace MusicPlayer
 
         public void TitleMarqueeEffectHandler(Label LblShowPlayTitle, System.Windows.Forms.Panel PnlMarquee)
         {
-            //var LblShowPlayTitle = uiControllers.LblShowPlayTitle!;
-            //var PnlMarquee = uiControllers.PnlMarquee!;
-
             LblShowPlayTitle.Left -= marqueeSpeed;
 
             // Check if the label has gone off-screen and wrap it back
@@ -578,9 +520,6 @@ namespace MusicPlayer
 
         public void ArtistMarqueeEffectHandler(Label LblShowPlayArtist, System.Windows.Forms.Panel PnlMarquee)
         {
-            //var LblShowPlayArtist = uiControllers.LblShowPlayArtist!;
-            //var PnlMarquee = uiControllers.PnlMarquee!;
-
             LblShowPlayArtist.Left -= marqueeSpeed;
 
             // Check if the label has gone off-screen and wrap it back
@@ -591,15 +530,7 @@ namespace MusicPlayer
         }
 
         public void MusicSeekBarHandler(DungeonTrackBar TbSeekMusic, Label LblMusicLength, Label LblMusicDurationCtr, System.Windows.Forms.Timer TimerMusicDuration)
-        //public void MusicSeekBarHandler()
         {
-            //var audioFileReader = uiControllers.audioFileReader;
-            //var waveOutDevice = uiControllers.waveOutDevice;
-            //var LblMusicLength = uiControllers.LblMusicLength!;
-            //var TbSeekMusic = uiControllers.TbSeekMusic!;
-            //var TimerMusicDuration = uiControllers.TimerMusicDuration!;
-            //var LblMusicDurationCtr = uiControllers.LblMusicDurationCtr!;
-
             if (audioFileReader != null && waveOutDevice != null)
             {
                 if (TbSeekMusic.Value < TbSeekMusic.Maximum)
@@ -651,10 +582,13 @@ namespace MusicPlayer
             {
                 Mute = !Mute;   // Toggle mute status
 
-                //MuteStateChanged?.Invoke(Mute);
-
                 NotifyMuteStateChanged(Mute);
             }
+        }
+
+        private void NotifyMuteStateChanged(bool isMute)
+        {
+            MuteStateChanged?.Invoke(isMute);
         }
 
         public void UpdateVolumeValueAndUI(DungeonTrackBar TbVolume, bool isMute)
@@ -691,11 +625,6 @@ namespace MusicPlayer
             }
         }
 
-        private void NotifyMuteStateChanged(bool isMute)
-        {
-            MuteStateChanged?.Invoke(isMute);
-        }
-
         // MUTE UPDATE
 
         public delegate void UpdateMuteStateChangeHandler();
@@ -704,6 +633,11 @@ namespace MusicPlayer
         public void UpdateMuteState()
         {
             NotifyUpdateMuteStateChange();
+        }
+
+        private void NotifyUpdateMuteStateChange()
+        {
+            UpdateMuteStateChanged?.Invoke();
         }
 
         public void UpdateMuteStateUI(DungeonTrackBar TbVolume)
@@ -719,11 +653,6 @@ namespace MusicPlayer
             }
         }
 
-        private void NotifyUpdateMuteStateChange()
-        {
-            UpdateMuteStateChanged?.Invoke();
-        }
-
         // UPDATE VOLUME VALUE
 
         public delegate void UpdateVolumeValueChangedHandler(int newVolumeValue);
@@ -731,26 +660,22 @@ namespace MusicPlayer
 
         public void UpdateVolumeValue(int newVolumeValue)
         {
-            //UpdateVolumeValueChanged?.Invoke(newVolumeValue);
-
             NotifyUpdateVolumeValueChanged(newVolumeValue);
+        }
+
+        private void NotifyUpdateVolumeValueChanged(int newVolumeValue)
+        {
+            UpdateVolumeValueChanged?.Invoke(newVolumeValue);
         }
 
         public void UpdateVolumeValueAndUI(Label LblVolumeValue, DungeonTrackBar TbVolume)
         {
-            //var audioFileReader = uiControllers.audioFileReader;
-
             if (audioFileReader != null)
             {
                 LblVolumeValue.Text = $"{TbVolume.Value}";  // Display the updated volume value based on the volume trackbar
                 float volumeValue = TbVolume.Value / 100f;  // Convert the volume trackbar value (0-100) into a float (0.0 - 1.0)  
                 audioFileReader.Volume = volumeValue;       // Set the audio file reader's volume to the calculated value
             }
-        }
-
-        private void NotifyUpdateVolumeValueChanged(int newVolumeValue)
-        {
-            UpdateVolumeValueChanged?.Invoke(newVolumeValue);
         }
 
         public void UpdateVolumeIconUI(DungeonTrackBar TbVolume, PictureBox PicBoxVolumePicture, PictureBox PicBoxShowVolumeBar)
@@ -786,8 +711,6 @@ namespace MusicPlayer
 
         public void UpdateMusicLengthAndDuration(DungeonTrackBar TbSeekMusic, Label LblMusicLength, Label LblMusicDurationCtr)
         {
-            //var audioFileReader = uiControllers.audioFileReader;
-
             if (audioFileReader != null)
             {
                 // Update the remaining duration based on the seek bar's current value
@@ -800,9 +723,6 @@ namespace MusicPlayer
 
         public void MusicSeekBarMouseUpHandler(DungeonTrackBar TbSeekMusic)
         {
-            //var audioFileReader = uiControllers.audioFileReader;
-            //var waveOutDevice = uiControllers.waveOutDevice;
-
             if (audioFileReader != null && waveOutDevice != null)
             {
                 // Update the current playback time of the track based on the seek bar's value
@@ -818,9 +738,6 @@ namespace MusicPlayer
 
         public void MusicSeekBarMouseDownHandler()
         {
-            //var audioFileReader = uiControllers.audioFileReader;
-            //var waveOutDevice = uiControllers.waveOutDevice;
-
             if (audioFileReader != null && waveOutDevice != null)
             {
                 waveOutDevice.Stop();   // Stop the playback when the user presses down on the seek bar

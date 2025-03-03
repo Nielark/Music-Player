@@ -11,9 +11,6 @@ namespace MusicPlayer
     public class PlayerUIControllers
     {
         // Player UI Controllers
-
-        public IWavePlayer? waveOutDevice { get; set; }
-        public AudioFileReader? audioFileReader { get; set; }
         public PictureBox? PicBoxShowPlayPicture { get; set; }
         public Label? LblShowPlayTitle { get; set; }
         public Label? LblShowPlayArtist { get; set; }

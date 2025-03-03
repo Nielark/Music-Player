@@ -42,9 +42,7 @@ namespace MusicPlayer
             else
             {
                 DgvMusicList.DataSource = musicList;    // Show all music when search bar is empty
-            }
-
-            //ModifyDvgMusicList(DgvMusicList);   // Function call for customizing the music list data grid view     
+            }   
         }
 
         // SORT COMBO BOX
@@ -82,16 +80,9 @@ namespace MusicPlayer
                     break;
             }
 
-            // Restore the current music index if not shuffled and if the file path is valid
-            //if (!shuffleMusic && !string.IsNullOrEmpty(currentFilePath))
-            //{
-            //    currentMusicIndex = musicList.FindIndex(index => index.File == currentFilePath);
-            //}
-
             TxtSearch.Text = string.Empty;          // Clear the search box
             DgvMusicList.DataSource = null;         // Clear the data in data grid view
-            DgvMusicList.DataSource = musicList;    // Display music in data grid view
-            //ModifyDvgMusicList(DgvMusicList);       // Function call for customizing the music list data grid view     
+            DgvMusicList.DataSource = musicList;    // Display music in data grid view   
         }
 
         // FILTER COMBO BOXES
@@ -114,78 +105,6 @@ namespace MusicPlayer
             TxtSearch.Text = string.Empty;          // Clear the search box
             DgvMusicList.DataSource = musicList;    // Set the filtered music as the data source 
         }
-
-        // FILTER BY ARTIST
-        public void FilterByArtist(ComboBox CbFilterArtist, ComboBox CbFilterAlbum, TextBox TxtSearch, DataGridView DgvMusicList)
-        {
-            musicList = new List<Music>(temporaryMusicList);   // Copy the music list from the tempMusicList to musicList
-
-            // Filter the music by artist name
-            if (CbFilterArtist.SelectedIndex != 0)
-            {
-                CbFilterAlbum.SelectedIndex = 0;    // Set the album filter combo box to default value
-
-                // Filter the music based on the selected artist name in the artist combo box
-                musicList = musicList
-                        .Where(s => s.Artist.Equals(CbFilterArtist.SelectedValue))  // Match by the selected artist
-                        .ToList();  // Convert the filtered results to a list
-            }
-
-            TxtSearch.Text = string.Empty;          // Clear the search box
-            DgvMusicList.DataSource = musicList;    // Set the filtered music as the data source 
-
-            //ModifyDvgMusicList(DgvMusicList);       // Function call for customizing the music list data grid view    
-        }
-
-        // FILTER BY ALBUM
-        public void FilterByAlbum(ComboBox CbFilterArtist, ComboBox CbFilterAlbum, TextBox TxtSearch, DataGridView DgvMusicList)
-        {
-            musicList = new List<Music>(temporaryMusicList);   // Copy the music list from the tempMusicList to musicList
-
-            // Filter the music by album name
-            if (CbFilterAlbum.SelectedIndex != 0)
-            {
-                CbFilterArtist.SelectedIndex = 0;   // Set the album filter combo box to default value
-
-                // Filter the music base onn the selected album name in the album combo box
-                musicList = musicList
-                        .Where(s => s.Album.Equals(CbFilterAlbum.SelectedValue))    // Match by the selected artist
-                        .ToList();  // Convert the filtered results to a list
-            }
-
-            TxtSearch.Text = string.Empty;          // Clear the search box
-            DgvMusicList.DataSource = musicList;    // Set the filtered music as the data source
-
-            //ModifyDvgMusicList(DgvMusicList);       // Function call for customizing the music list data grid view  
-        }
-
-        // THE FOLLOWING FUNCTION IS FOR CLEARING THE MUSIC QUEUE LIST
-
-        //public void ClearQueue(DataGridView dgvPlayMusicQueue, System.Windows.Forms.Panel pnlMusicList)
-        //{
-        //    var picBoxShowPlayPicture = uiControllers.PicBoxShowPlayPicture!;
-        //    var lblShowPlayTitle = uiControllers.LblShowPlayTitle!;
-        //    var lblShowPlayArtist = uiControllers.LblShowPlayArtist!;
-        //    var lblMusicLength = uiControllers.LblMusicLength!;
-        //    var lblMusicDurationCtr = uiControllers.LblMusicDurationCtr!;
-        //    var tbSeekMusic = uiControllers.TbSeekMusic!;
-        //    var pnlMarquee = uiControllers.PnlMarquee!;
-        //    var timerTitleMarquee = uiControllers.TimerTitleMarquee!;
-        //    var timerArtistMarquee = uiControllers.TimerArtistMarquee!;
-
-        //    if (audioFileReader != null && waveOutDevice != null)
-        //    {
-        //        CleanPlaybackResources();
-        //        ResetSeekBarAndDurationLabels(tbSeekMusic, lblMusicLength, lblMusicDurationCtr);
-        //        ClearCurrentMusicInformation(lblShowPlayTitle, lblShowPlayArtist, picBoxShowPlayPicture);
-
-        //        // Reset the marquee labels
-        //        playerControls.MarqueeEffectHandler(lblShowPlayTitle, lblShowPlayArtist, pnlMarquee, timerTitleMarquee, timerArtistMarquee);
-        //    }
-
-        //    ClearDataGridView(dgvPlayMusicQueue);
-        //    ModifyDvgMusicList(dgvPlayMusicQueue, pnlMusicList);
-        //}
 
         public void CleanPlaybackResources()
         {
@@ -246,14 +165,6 @@ namespace MusicPlayer
                 dgv.Columns["Artist"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 dgv.Columns["Album"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 dgv.Columns["Duration"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
-                //dataGridViewMusic.RowTemplate.Height = 40;
-                //// Dynamically adjust the height of the DataGridView based on the number of rows
-                //int rowHeight = dgv.RowTemplate.Height; // The height of one row
-                //int totalHeight = dgv.Rows.Count * rowHeight + dgv.ColumnHeadersHeight;
-
-                //// Set DataGridView height dynamically
-                //dgv.Height = totalHeight > listPanel.Height ? totalHeight : listPanel.Height;
             }
 
             // Dynamically adjust the height of the DataGridView based on the number of rows

@@ -9,10 +9,6 @@ namespace MusicPlayer
 {
     public class MusicPlayerBase
     {
-        //public MusicPlayerBase()
-        //{
-
-        //}
         public IWavePlayer? waveOutDevice;
         public AudioFileReader? audioFileReader;
 

@@ -10,7 +10,6 @@ namespace MusicPlayer
     public class MusicLibrary
     {
         public List<Music> musicList;
-        //public List<string> importMusic = new List<string>();
 
         public MusicLibrary() 
         {
@@ -59,8 +58,6 @@ namespace MusicPlayer
         {
             // Define a list of music files to stored the music
             List<string> musicFiles = new List<string>();
-
-            //if (importMusic != null) musicFiles.AddRange(importMusic);
 
             // Define a list of directories to scan for music
             List<string> musicDirectories = new List<string>
@@ -128,20 +125,6 @@ namespace MusicPlayer
             Music myMusic = new Music(musicPictureSmall, musicPictureMedium, title, artist, album, duration, file);
             musicList.Add(myMusic); // Add the new music item to the music list
         }
-
-        //public void ImportMusicFiles(OpenFileDialog ofdMusic)
-        //{
-        //    if (ofdMusic.ShowDialog() == DialogResult.OK)
-        //    {
-        //        foreach (string file in ofdMusic.FileNames)
-        //        {
-        //            importMusic.Add(file);
-        //        }
-
-        //        musicList.Clear();
-        //        //LoadMusicFiles();
-        //    }
-        //}
 
         public void ImportMusicFiles(OpenFileDialog ofdMusic, DataGridView DgvMusicList)
         {
