@@ -21,5 +21,8 @@ namespace MusicPlayer
         public Label? LblAlbumNumbers { get; set; }
 
         public ToolTip? ToolTipPlayerControl { get; set; } = new ToolTip();
+
+        public Panel? PnlAlbumTrack { get; set; }
+        public DataGridView? DgvAlbumTracks { get; set; }
     }
 }

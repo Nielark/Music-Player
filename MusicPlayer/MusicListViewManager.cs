@@ -51,38 +51,87 @@ namespace MusicPlayer
                 playerControls.SetPlayMusicQueue(playMusicQueue);
                 playerControls.TogglePlayAndPause();
 
-                // Retrieve every cells data from the selected row
-                string? title = DgvMusicList.CurrentRow.Cells[2].Value.ToString();
-                string? artist = DgvMusicList.CurrentRow.Cells[3].Value.ToString();
-                string? filePath = DgvMusicList.CurrentRow.Cells[6].Value.ToString();
+                var (title, artist, filePath) = RetrieveSelectedRowData(DgvMusicList);
+                FindAndPlayMusic(title, artist, filePath);
+                UpdateDataGridViewList(DgvPlayMusicQueue, filePath);
 
-                // Find the index of the selected music using the file path
-                int index = playMusicQueue.FindIndex(index => index.File == filePath);
-                // Check if the file path was found 
-                if (index != -1)
-                {
-                    Image musicPicture = playMusicQueue[index].MusicPictureMedium;  // Get the mp3 image
+                TimerShowPnlPlayerControls.Start();
 
-                    // Play's the mp3 when all data has value
-                    if (!string.IsNullOrEmpty(filePath) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(artist))
-                    {
-                        playerControls.PlayMusic(musicPicture, filePath, title, artist);
-                        playerControls.SetCurrentMusicIndex(index);
-                    }
-                }
+                //// Retrieve every cells data from the selected row
+                //string? title = DgvMusicList.CurrentRow.Cells[2].Value.ToString();
+                //string? artist = DgvMusicList.CurrentRow.Cells[3].Value.ToString();
+                //string? filePath = DgvMusicList.CurrentRow.Cells[6].Value.ToString();
 
-                if (ShuffleMusic)
-                {
-                    playerControls.FisherYatesShuffle(filePath);                       // Shuffle the music list
-                    DgvPlayMusicQueue.DataSource = playerControls.shuffleMusicList;    // Set the shuffleMusicList music as the data source 
-                }
-                else
-                {
-                    DgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
-                }
+                //// Find the index of the selected music using the file path
+                //int index = playMusicQueue.FindIndex(index => index.File == filePath);
+
+                //// Check if the file path was found 
+                //if (index != -1)
+                //{
+                //    Image musicPicture = playMusicQueue[index].MusicPictureMedium;  // Get the mp3 image
+
+                //    // Play's the mp3 when all data has value
+                //    if (!string.IsNullOrEmpty(filePath) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(artist))
+                //    {
+                //        playerControls.PlayMusic(musicPicture, filePath, title, artist);
+                //        playerControls.SetCurrentMusicIndex(index);
+                //    }
+                //}
+
+                //if (ShuffleMusic)
+                //{
+                //    playerControls.FisherYatesShuffle(filePath);                       // Shuffle the music list
+                //    DgvPlayMusicQueue.DataSource = playerControls.shuffleMusicList;    // Set the shuffleMusicList music as the data source 
+                //}
+                //else
+                //{
+                //    DgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
+                //}
 
                 // Display the play back controls
-                TimerShowPnlPlayerControls.Start();
+                //TimerShowPnlPlayerControls.Start();
+            }
+        }
+
+        private (string?, string?, string?) RetrieveSelectedRowData(DataGridView dgvMusicList)
+        {
+            // Retrieve every cells data from the selected row
+            string? title = dgvMusicList.CurrentRow.Cells[2].Value.ToString();
+            string? artist = dgvMusicList.CurrentRow.Cells[3].Value.ToString();
+            string? filePath = dgvMusicList.CurrentRow.Cells[6].Value.ToString();
+
+            return (title, artist, filePath);
+        }
+
+        private void FindAndPlayMusic(string? title, string? artist, string? filePath)
+        {
+            // Find the index of the selected music using the file path
+            int index = playMusicQueue.FindIndex(index => index.File == filePath);
+
+            // Check if the file path was found 
+            if (index != -1)
+            {
+                Image musicPicture = playMusicQueue[index].MusicPictureMedium;  // Get the mp3 image
+
+                // Play's the mp3 when all data has value
+                if (!string.IsNullOrEmpty(filePath) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(artist))
+                {
+                    playerControls.PlayMusic(musicPicture, filePath, title, artist);
+                    playerControls.SetCurrentMusicIndex(index);
+                }
+            }
+        }
+
+        private void UpdateDataGridViewList(DataGridView dgvPlayMusicQueue, string? filePath)
+        {
+            if (ShuffleMusic)
+            {
+                playerControls.FisherYatesShuffle(filePath);                       // Shuffle the music list
+                dgvPlayMusicQueue.DataSource = playerControls.shuffleMusicList;    // Set the shuffleMusicList music as the data source 
+            }
+            else
+            {
+                dgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
             }
         }
 
@@ -232,6 +281,10 @@ namespace MusicPlayer
                 var selected = SelectArtistOrAlbum(nameIdentifier, isArtist);
                 DisplaySelectedArtistOrAlbum(selected, nameIdentifier, isArtist);
 
+                if (!isArtist && !string.IsNullOrWhiteSpace(selected.albumName))
+                {
+                    DisplayAlbumTracks(selected.albumName);
+                }
                 //pnlInfo.Visible = true;
 
                 Panel[] showPanels = { ArtistAlbumUIControllers.PnlInfo! };
@@ -271,29 +324,45 @@ namespace MusicPlayer
                     .ToList();  // Convert the filtered results to a list
 
             playerControls.SetPlayMusicQueue(playMusicQueue);
+            playerControls.TogglePlayAndPause();
 
+            // Retrieve music information
+            //string title = playMusicQueue[CurrentMusicIndex].Title;
+            //string artist = playMusicQueue[CurrentMusicIndex].Artist;
+            //string filePath = playMusicQueue[CurrentMusicIndex].File;
+            //Image musicPicture = playMusicQueue[CurrentMusicIndex].MusicPictureMedium;  // Get the mp3 image
+
+            var (title, artist, filePath, musicPicture) = RetrieveMusicInformation();
+
+            playerControls.PlayMusic(musicPicture, filePath, title, artist);
+
+            ShuffleMusic = playerControls.ShuffleMusic;
+
+            UpdateDataGridViewList(dgvPlayMusicQueue, filePath);
+
+            //if (ShuffleMusic)
+            //{
+            //    playerControls.FisherYatesShuffle(filePath);                       // Shuffle the music list
+            //    dgvPlayMusicQueue.DataSource = playerControls.shuffleMusicList;    // Set the shuffleMusicList music as the data source 
+            //}
+            //else
+            //{
+            //    dgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
+            //}
+
+            // Display the play back controls
+            timerShowPnlPlayerControls.Start();
+        }
+
+        private (string, string, string, Image) RetrieveMusicInformation()
+        {
             // Retrieve music information
             string title = playMusicQueue[CurrentMusicIndex].Title;
             string artist = playMusicQueue[CurrentMusicIndex].Artist;
             string filePath = playMusicQueue[CurrentMusicIndex].File;
             Image musicPicture = playMusicQueue[CurrentMusicIndex].MusicPictureMedium;  // Get the mp3 image
 
-            playerControls.PlayMusic(musicPicture, filePath, title, artist);
-
-            ShuffleMusic = playerControls.ShuffleMusic;
-
-            if (ShuffleMusic)
-            {
-                playerControls.FisherYatesShuffle(filePath);                       // Shuffle the music list
-                dgvPlayMusicQueue.DataSource = playerControls.shuffleMusicList;    // Set the shuffleMusicList music as the data source 
-            }
-            else
-            {
-                dgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
-            }
-
-            // Display the play back controls
-            timerShowPnlPlayerControls.Start();
+            return (title, artist, filePath, musicPicture);
         }
 
         private (string? albumName, string? artistName, TimeSpan duration, int songCount, Image musicPictureMedium) SelectArtistOrAlbum(string nameIdentifier, bool isArtist)
@@ -344,6 +413,119 @@ namespace MusicPlayer
                     ArtistAlbumUIControllers.LblAlbumNumbers!.Text = $"{selected.songCount} songs  |  {selected.duration:hh\\:mm\\:ss} run time";
                 }
             }
+        }
+
+        private List<Music> FilterAlbumTracks(string? albumName)
+        {
+            // Filters the tracks that belongs to a specific album
+            var albumTracks = musicList
+                .Where(w => w.Album.Equals(albumName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            return albumTracks;
+        }
+
+        private void DisplayAlbumTracks(string albumName)
+        {
+            // Filters the tracks that belongs to a specific album
+            //var albumTracks = musicList
+            //    .Where(w => w.Album.Equals(albumName, StringComparison.OrdinalIgnoreCase))
+            //    .ToList();
+
+            var albumTracks = FilterAlbumTracks(albumName);
+
+            ArtistAlbumUIControllers.DgvAlbumTracks!.DataSource = albumTracks;
+            ModifyDataGridView(ArtistAlbumUIControllers.DgvAlbumTracks!, ArtistAlbumUIControllers.PnlAlbumTrack!);
+            ArtistAlbumUIControllers.PnlAlbumTrack!.Visible = true;
+        }
+
+        public void PlayAlbumTrack(DataGridView dgvAlbumTracks, DataGridView dgvPlayMusicQueue, System.Windows.Forms.Timer TimerShowPnlPlayerControls)
+        {
+            ShuffleMusic = this.playerControls.ShuffleMusic;
+
+            // Play's the selected music through cell click and populate the playlist queue
+            if (dgvAlbumTracks.CurrentRow != null)
+            {
+                string? albumName = dgvAlbumTracks.CurrentRow.Cells[4].Value.ToString();
+
+                // Filter the music based on album name
+                //playMusicQueue = musicList
+                //    .Where(w => w.Album.Equals(albumName, StringComparison.OrdinalIgnoreCase))
+                //    .ToList();
+
+                playMusicQueue = FilterAlbumTracks(albumName);
+
+                playerControls.SetPlayMusicQueue(playMusicQueue);
+                playerControls.TogglePlayAndPause();
+
+                var (title, artist, filePath) = RetrieveSelectedRowData(dgvAlbumTracks);
+                FindAndPlayMusic(title, artist, filePath);
+                UpdateDataGridViewList(dgvPlayMusicQueue, filePath);
+
+                TimerShowPnlPlayerControls.Start();
+
+                //// Retrieve every cells data from the selected row
+                //string? title = dgvAlbumTracks.CurrentRow.Cells[2].Value.ToString();
+                //string? artist = dgvAlbumTracks.CurrentRow.Cells[3].Value.ToString();
+                //string? filePath = dgvAlbumTracks.CurrentRow.Cells[6].Value.ToString();
+
+                //// Find the index of the selected music using the file path
+                //int index = playMusicQueue.FindIndex(index => index.File == filePath);
+                //// Check if the file path was found 
+                //if (index != -1)
+                //{
+                //    Image musicPicture = playMusicQueue[index].MusicPictureMedium;  // Get the mp3 image
+
+                //    // Play's the mp3 when all data has value
+                //    if (!string.IsNullOrEmpty(filePath) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(artist))
+                //    {
+                //        playerControls.PlayMusic(musicPicture, filePath, title, artist);
+                //        playerControls.SetCurrentMusicIndex(index);
+                //    }
+                //}
+
+                //if (ShuffleMusic)
+                //{
+                //    playerControls.FisherYatesShuffle(filePath);                       // Shuffle the music list
+                //    dgvPlayMusicQueue.DataSource = playerControls.shuffleMusicList;    // Set the shuffleMusicList music as the data source 
+                //}
+                //else
+                //{
+                //    dgvPlayMusicQueue.DataSource = playMusicQueue;      // Set the shuffleMusicList music as the data source (not shuffle)
+                //}
+
+                //// Display the play back controls
+                //TimerShowPnlPlayerControls.Start();
+            }
+        }
+
+        public void ModifyDataGridView(DataGridView dgv, System.Windows.Forms.Panel listPanel)
+        {
+            // Customize the data grid view when there is a data row displayed
+            if (dgv.RowCount > 0)
+            {
+                // Hide the header title of the column
+                dgv.Columns["Artist"].Visible = false;
+                dgv.Columns["Album"].Visible = false;
+                dgv.Columns["File"].Visible = false;
+                dgv.Columns["musicPictureMedium"].Visible = false;
+                dgv.Columns[0].HeaderText = "Image";  // Set the header title of the first column
+
+                // Customize the sizing of columns
+                dgv.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+                dgv.Columns[0].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                dgv.Columns["Title"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                dgv.Columns["Artist"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                dgv.Columns["Album"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                dgv.Columns["Duration"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            }
+
+            // Dynamically adjust the height of the DataGridView based on the number of rows
+            int rowHeight = dgv.RowTemplate.Height; // The height of one row
+            int totalHeight = dgv.Rows.Count * rowHeight + dgv.ColumnHeadersHeight;
+
+            // Set DataGridView height dynamically
+            dgv.Height = totalHeight > listPanel.Height ? totalHeight : listPanel.Height;
         }
 
         private void PanelVisibilityHandler(Panel[] showPanels, Panel[] hidePanels)

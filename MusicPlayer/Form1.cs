@@ -109,7 +109,9 @@ namespace MusicPlayer
                 LblAlbumArtist = this.lblAlbumArtist,
                 LblAlbumNumbers = this.lblAlbumNumbers,
 
-                ToolTipPlayerControl = this.toolTipPlayerControl
+                ToolTipPlayerControl = this.toolTipPlayerControl,
+                PnlAlbumTrack = this.pnlAlbumTrack,
+                DgvAlbumTracks = this.dgvAlbumTracks
             };
             musicListViewManager.SetArtistAndAlbumUIControllers(artistAndAlbumUIControllers);
 
@@ -223,7 +225,7 @@ namespace MusicPlayer
         private void CbFilterAlbum_SelectedIndexChanged(object sender, EventArgs e)
         {
             musicSearchFilterSorter.FilterByArtistOrAlbumHandler(CbFilterAlbum, CbFilterArtist, TxtSearch, DgvMusicList, s => s.Album);
-            musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList); 
+            musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
         }
 
         private void BtnShuffleAndPlay_Click(object sender, EventArgs e)
@@ -268,7 +270,7 @@ namespace MusicPlayer
             DisplayOrHideSubButtons();
 
             Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, PnlMusicList };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum, pnlInfo };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum, pnlInfo, pnlAlbumTrack };
             PanelVisibilityHandler(showPanels, hidePanels);
         }
 
@@ -315,7 +317,7 @@ namespace MusicPlayer
             pnlSubSelectSign.Visible = false;
 
             Panel[] showPanels = { PnlHeaderControl, PnlPlayQueueControl, PnlPlayMusicQueue };
-            Panel[] hidePanels = { PnlSortControls, pnlMusicLibrary, pnlArtists, pnlAlbum, pnlInfo };
+            Panel[] hidePanels = { PnlSortControls, pnlMusicLibrary, pnlArtists, pnlAlbum, pnlInfo, pnlAlbumTrack };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Songs";
@@ -336,7 +338,7 @@ namespace MusicPlayer
             pnlSubSelectSign.Visible = true;
 
             Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, PnlMusicList };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum ,pnlInfo };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum, pnlInfo, pnlAlbumTrack };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Songs";
@@ -349,7 +351,7 @@ namespace MusicPlayer
             pnlSubSelectSign.Visible = true;
 
             Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, pnlArtists };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlAlbum, pnlInfo };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlAlbum, pnlInfo, pnlAlbumTrack };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Artists";
@@ -398,7 +400,7 @@ namespace MusicPlayer
             pnlSubSelectSign.Visible = true;
 
             Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, pnlAlbum };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlArtists, pnlInfo };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlArtists, pnlInfo, pnlAlbumTrack };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Albums";
@@ -474,6 +476,11 @@ namespace MusicPlayer
         private void DgvPlayMusicQueue_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             musicListViewManager.MusicQueueView(DgvPlayMusicQueue);
+        }
+
+        private void DgvAlbumTracks_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            musicListViewManager.PlayAlbumTrack(dgvAlbumTracks, DgvPlayMusicQueue, TimerShowPnlPlayerControls);
         }
 
         // PLAYER CONTROLS
@@ -1018,8 +1025,9 @@ namespace MusicPlayer
             //isDragging = false; // Stop dragging
         }
 
-        
+        private void BtnAlbumPlay_Click(object sender, EventArgs e)
+        {
 
-        
+        }
     }
 }

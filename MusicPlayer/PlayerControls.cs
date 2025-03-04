@@ -314,6 +314,13 @@ namespace MusicPlayer
             }
         }
 
+        // ALBUM TRACK CONTROLS
+        // PLAY ALL
+        public void PlayAllAlbumTracks()
+        {
+
+        }
+
         public void NextAndPreviousMusicHandler()
         {
             var TbSeekMusic = uiControllers.TbSeekMusic!;

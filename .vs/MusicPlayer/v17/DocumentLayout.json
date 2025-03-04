@@ -3,28 +3,32 @@
   "WorkspaceRootPath": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\musicplayer\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|solutionrelative:musicplayer\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|c:\\users\\mark daniel\\source\\repos\\musicplayer\\musicplayer\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|solutionrelative:musicplayer\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|c:\\users\\mark daniel\\source\\repos\\musicplayer\\musicplayer\\musiclistviewmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|solutionrelative:musicplayer\\musiclistviewmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|c:\\users\\mark daniel\\source\\repos\\musicplayer\\musicplayer\\musicsearchfiltersorter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|solutionrelative:musicplayer\\musicsearchfiltersorter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|c:\\users\\mark daniel\\source\\repos\\musicplayer\\musicplayer\\playercontrols.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|solutionrelative:musicplayer\\playercontrols.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|c:\\users\\mark daniel\\source\\repos\\musicplayer\\musicplayer\\musiclistviewmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|solutionrelative:musicplayer\\musiclistviewmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\musicplayer\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|solutionrelative:musicplayer\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|c:\\users\\mark daniel\\source\\repos\\musicplayer\\musicplayer\\artistandalbumuicontrollers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|solutionrelative:musicplayer\\artistandalbumuicontrollers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|c:\\users\\mark daniel\\source\\repos\\musicplayer\\musicplayer\\musicplayerbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|solutionrelative:musicplayer\\musicplayerbase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|c:\\users\\mark daniel\\source\\repos\\musicplayer\\musicplayer\\musicsearchfiltersorter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|solutionrelative:musicplayer\\musicsearchfiltersorter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{80537C29-9823-4990-96EC-3E2FDF61ABE8}|MusicPlayer\\MusicPlayer.csproj|c:\\users\\mark daniel\\source\\repos\\musicplayer\\musicplayer\\miniplayer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -38,22 +42,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 4,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "MusicPlayerBase.cs",
-              "DocumentMoniker": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\MusicPlayerBase.cs",
-              "RelativeDocumentMoniker": "MusicPlayer\\MusicPlayerBase.cs",
-              "ToolTip": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\MusicPlayerBase.cs",
-              "RelativeToolTip": "MusicPlayer\\MusicPlayerBase.cs",
-              "ViewState": "AgIAAAIAAAAAAAAAAAAtwAoAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-19T06:02:02.18Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
@@ -68,20 +58,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "MiniPlayer.cs",
-              "DocumentMoniker": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\MiniPlayer.cs",
-              "RelativeDocumentMoniker": "MusicPlayer\\MiniPlayer.cs",
-              "ToolTip": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\MiniPlayer.cs",
-              "RelativeToolTip": "MusicPlayer\\MiniPlayer.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAAgwDIAAAA4AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-02T10:40:46.204Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "Form1.cs [Design]",
               "DocumentMoniker": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\Form1.cs",
               "RelativeDocumentMoniker": "MusicPlayer\\Form1.cs",
@@ -93,43 +70,101 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\Form1.cs",
               "RelativeDocumentMoniker": "MusicPlayer\\Form1.cs",
               "ToolTip": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\Form1.cs",
               "RelativeToolTip": "MusicPlayer\\Form1.cs",
-              "ViewState": "AgIAANgAAAAAAAAAAAA2wOYAAAAuAAAAAAAAAA==",
+              "ViewState": "AgIAAPgDAAAAAAAAAADgvwUEAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-01T06:52:35.698Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MusicPlayerBase.cs",
+              "DocumentMoniker": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\MusicPlayerBase.cs",
+              "RelativeDocumentMoniker": "MusicPlayer\\MusicPlayerBase.cs",
+              "ToolTip": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\MusicPlayerBase.cs",
+              "RelativeToolTip": "MusicPlayer\\MusicPlayerBase.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAtwAcAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-19T06:02:02.18Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 4,
+              "Title": "ArtistAndAlbumUIControllers.cs",
+              "DocumentMoniker": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\ArtistAndAlbumUIControllers.cs",
+              "RelativeDocumentMoniker": "MusicPlayer\\ArtistAndAlbumUIControllers.cs",
+              "ToolTip": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\ArtistAndAlbumUIControllers.cs",
+              "RelativeToolTip": "MusicPlayer\\ArtistAndAlbumUIControllers.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAxwBwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-03T12:43:50.717Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "MiniPlayer.cs",
+              "DocumentMoniker": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\MiniPlayer.cs",
+              "RelativeDocumentMoniker": "MusicPlayer\\MiniPlayer.cs",
+              "ToolTip": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\MiniPlayer.cs",
+              "RelativeToolTip": "MusicPlayer\\MiniPlayer.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAgwDIAAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-02T10:40:46.204Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "PlayerControls.cs",
               "DocumentMoniker": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\PlayerControls.cs",
               "RelativeDocumentMoniker": "MusicPlayer\\PlayerControls.cs",
               "ToolTip": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\PlayerControls.cs",
               "RelativeToolTip": "MusicPlayer\\PlayerControls.cs",
-              "ViewState": "AgIAACcAAAAAAAAAAADgvzQAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAC0BAAAAAAAAAAAUwDoBAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-02-17T06:20:03.065Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "MusicSearchFilterSorter.cs",
               "DocumentMoniker": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\MusicSearchFilterSorter.cs",
               "RelativeDocumentMoniker": "MusicPlayer\\MusicSearchFilterSorter.cs",
               "ToolTip": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\MusicSearchFilterSorter.cs",
               "RelativeToolTip": "MusicPlayer\\MusicSearchFilterSorter.cs",
-              "ViewState": "AgIAAA4AAAAAAAAAAAAQwKYAAABbAAAAAAAAAA==",
+              "ViewState": "AgIAAJgAAAAAAAAAAAAAwK8AAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-21T12:55:56.62Z",
-              "EditorCaption": ""
-            },
+              "WhenOpened": "2025-02-21T12:55:56.62Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "FloatingWindowState": {
+        "Id": "81b95ba9-1040-4daa-ab0b-9cfe43d62fe0",
+        "Display": 0,
+        "X": 245,
+        "Y": 162,
+        "Width": 996,
+        "Height": 623,
+        "WindowState": 2
+      },
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 2,
@@ -138,7 +173,7 @@
               "RelativeDocumentMoniker": "MusicPlayer\\MusicListViewManager.cs",
               "ToolTip": "C:\\Users\\Mark Daniel\\source\\repos\\MusicPlayer\\MusicPlayer\\MusicListViewManager.cs",
               "RelativeToolTip": "MusicPlayer\\MusicListViewManager.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADQAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAACIBAAAAAAAAAAAcwEUBAAA9AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-01T12:24:16.895Z",
               "EditorCaption": ""
