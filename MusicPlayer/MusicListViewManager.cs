@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.ApplicationServices;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -162,7 +164,7 @@ namespace MusicPlayer
                 PictureBox picBoxImage = new PictureBox
                 {
                     //BackColor = Color.Silver,
-                    Image = info.DisplayImage,
+                    Image = isArtist? Properties.Resources.artist : info.DisplayImage,
                     Location = new Point(10, 10),
                     Name = "picBoxImage",
                     Size = new Size(130, 130),
@@ -281,10 +283,25 @@ namespace MusicPlayer
                 var selected = SelectArtistOrAlbum(nameIdentifier, isArtist);
                 DisplaySelectedArtistOrAlbum(selected, nameIdentifier, isArtist);
 
-                if (!isArtist && !string.IsNullOrWhiteSpace(selected.albumName))
+                //DisplayAlbumTracks(isArtist);
+
+                if (isArtist)
                 {
-                    DisplayAlbumTracks(selected.albumName);
+                    DisplayArtistOrAlbumTracks(isArtist, ArtistAlbumUIControllers.DgvArtistTracks!, ArtistAlbumUIControllers.PnlArtistTrack!, ArtistAlbumUIControllers.PnlAlbumTrack!);
                 }
+                else
+                {
+                    DisplayArtistOrAlbumTracks(isArtist, ArtistAlbumUIControllers.DgvAlbumTracks!, ArtistAlbumUIControllers.PnlAlbumTrack!, ArtistAlbumUIControllers.PnlArtistTrack!);
+                }
+
+                //if (!isArtist && !string.IsNullOrWhiteSpace(selected.albumName))
+                //{
+                //    DisplayAlbumTracks(selected.albumName);
+                //}
+                //else if(isArtist && !string.IsNullOrWhiteSpace(selected.artistName))
+                //{
+                //    DisplayAlbumTracks(selected.artistName);
+                //}
                 //pnlInfo.Visible = true;
 
                 Panel[] showPanels = { ArtistAlbumUIControllers.PnlInfo! };
@@ -391,6 +408,7 @@ namespace MusicPlayer
             if (selected.songCount > 0)
             {
                 ArtistAlbumUIControllers.PicBoxAlbumImage!.Image = selected.musicPictureMedium;
+                ArtistAlbumUIControllers.LblAlbumName!.Tag = isArtist;
 
                 if (isArtist)
                 {
@@ -407,6 +425,7 @@ namespace MusicPlayer
                 }
                 else
                 {
+
                     ArtistAlbumUIControllers.LblAlbumNumbers!.Visible = true;
                     ArtistAlbumUIControllers.LblAlbumName!.Text = selected.albumName;
                     ArtistAlbumUIControllers.LblAlbumArtist!.Text = selected.artistName;
@@ -415,28 +434,85 @@ namespace MusicPlayer
             }
         }
 
-        private List<Music> FilterAlbumTracks(string? albumName)
+        //private List<Music> FilterAlbumTracks(string? nameIdentifier, bool isArtist)
+        private List<Music> FilterTrackHandler(bool isArtist)
         {
+            var albumName = ArtistAlbumUIControllers.LblAlbumName!.Text;
+            var artistName = ArtistAlbumUIControllers.LblAlbumName!.Text;
+
             // Filters the tracks that belongs to a specific album
             var albumTracks = musicList
-                .Where(w => w.Album.Equals(albumName, StringComparison.OrdinalIgnoreCase))
+                .Where(w => isArtist
+                    ? w.Artist.Equals(artistName, StringComparison.OrdinalIgnoreCase)
+                    : w.Album.Equals(albumName, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(o => isArtist
+                    ? o.Album
+                    : o.Artist)
                 .ToList();
 
             return albumTracks;
         }
 
-        private void DisplayAlbumTracks(string albumName)
+        //private IEnumerable<IGrouping<string, Music>> FilterTrackHandler(bool isArtist)
+        //{
+        //    var nameIdentifier = ArtistAlbumUIControllers.LblAlbumName!.Text;
+
+        //    if (isArtist)
+        //    {
+        //        // Group by Album when filtering by Artist
+        //        return musicList
+        //            .Where(w => w.Artist.Equals(nameIdentifier, StringComparison.OrdinalIgnoreCase))
+        //            .GroupBy(g => g.Album);
+        //    }
+        //    else
+        //    {
+        //        // Return only the album’s tracks without grouping
+        //        return musicList
+        //            .Where(w => w.Album.Equals(nameIdentifier, StringComparison.OrdinalIgnoreCase))
+        //            .GroupBy(g => g.Album);
+        //    }
+        //}
+
+        //private void DisplayAlbumTracks(string albumName)
+        private void DisplayArtistOrAlbumTracks(bool isArtist, DataGridView dgv, Panel showPnl, Panel hidePnl)
         {
+            dgv.DataSource = null;
             // Filters the tracks that belongs to a specific album
             //var albumTracks = musicList
             //    .Where(w => w.Album.Equals(albumName, StringComparison.OrdinalIgnoreCase))
             //    .ToList();
 
-            var albumTracks = FilterAlbumTracks(albumName);
+            //var albumTracks = FilterAlbumTracks(albumName, false);
+            //var tracks = FilterTrackHandler(isArtist)
+            //    .SelectMany(group => group) // Flatten groups into a single list
+            //    .ToList();
 
-            ArtistAlbumUIControllers.DgvAlbumTracks!.DataSource = albumTracks;
-            ModifyDataGridView(ArtistAlbumUIControllers.DgvAlbumTracks!, ArtistAlbumUIControllers.PnlAlbumTrack!);
-            ArtistAlbumUIControllers.PnlAlbumTrack!.Visible = true;
+            var tracks = FilterTrackHandler(isArtist);
+
+            dgv.DataSource = tracks;
+            ModifyDataGridView(dgv, showPnl);
+            showPnl.Visible = true;
+            hidePnl.Visible = false;
+        }
+
+        public void PlayArtistTrack(DataGridView dgvArtistTracks, DataGridView dgvPlayMusicQueue, System.Windows.Forms.Timer TimerShowPnlPlayerControls)
+        {
+            ShuffleMusic = this.playerControls.ShuffleMusic;
+
+            // Play's the selected music through cell click and populate the playlist queue
+            if (dgvArtistTracks.CurrentRow != null)
+            {
+                playMusicQueue = FilterTrackHandler(true);
+
+                playerControls.SetPlayMusicQueue(playMusicQueue);
+                playerControls.TogglePlayAndPause();
+
+                var (title, artist, filePath) = RetrieveSelectedRowData(dgvArtistTracks);
+                FindAndPlayMusic(title, artist, filePath);
+                UpdateDataGridViewList(dgvPlayMusicQueue, filePath);
+
+                TimerShowPnlPlayerControls.Start();
+            }
         }
 
         public void PlayAlbumTrack(DataGridView dgvAlbumTracks, DataGridView dgvPlayMusicQueue, System.Windows.Forms.Timer TimerShowPnlPlayerControls)
@@ -446,14 +522,15 @@ namespace MusicPlayer
             // Play's the selected music through cell click and populate the playlist queue
             if (dgvAlbumTracks.CurrentRow != null)
             {
-                string? albumName = dgvAlbumTracks.CurrentRow.Cells[4].Value.ToString();
+                //string? albumName = dgvAlbumTracks.CurrentRow.Cells[4].Value.ToString();
 
                 // Filter the music based on album name
                 //playMusicQueue = musicList
                 //    .Where(w => w.Album.Equals(albumName, StringComparison.OrdinalIgnoreCase))
                 //    .ToList();
 
-                playMusicQueue = FilterAlbumTracks(albumName);
+                //playMusicQueue = FilterAlbumTracks(albumName, false);
+                playMusicQueue = FilterTrackHandler(false);
 
                 playerControls.SetPlayMusicQueue(playMusicQueue);
                 playerControls.TogglePlayAndPause();
@@ -506,7 +583,7 @@ namespace MusicPlayer
             {
                 // Hide the header title of the column
                 dgv.Columns["Artist"].Visible = false;
-                dgv.Columns["Album"].Visible = false;
+                //dgv.Columns["Album"].Visible = false;
                 dgv.Columns["File"].Visible = false;
                 dgv.Columns["musicPictureMedium"].Visible = false;
                 dgv.Columns[0].HeaderText = "Image";  // Set the header title of the first column
@@ -526,6 +603,8 @@ namespace MusicPlayer
 
             // Set DataGridView height dynamically
             dgv.Height = totalHeight > listPanel.Height ? totalHeight : listPanel.Height;
+
+            listPanel.VerticalScroll.Value = 0;
         }
 
         private void PanelVisibilityHandler(Panel[] showPanels, Panel[] hidePanels)
@@ -568,9 +647,11 @@ namespace MusicPlayer
             if (DgvPlayMusicQueue.CurrentRow != null)
             {
                 // Get every cells data of the selected row
-                string? title = DgvPlayMusicQueue.CurrentRow.Cells[2].Value.ToString();
-                string? artist = DgvPlayMusicQueue.CurrentRow.Cells[3].Value.ToString();
-                string? filePath = DgvPlayMusicQueue.CurrentRow.Cells[6].Value.ToString();
+                //string? title = DgvPlayMusicQueue.CurrentRow.Cells[2].Value.ToString();
+                //string? artist = DgvPlayMusicQueue.CurrentRow.Cells[3].Value.ToString();
+                //string? filePath = DgvPlayMusicQueue.CurrentRow.Cells[6].Value.ToString();
+
+                var (title, artist, filePath) = RetrieveSelectedRowData(DgvPlayMusicQueue);
 
                 // Find the index of the selected music using the file path
                 int index = playMusicQueue.FindIndex(index => index.File == filePath);
@@ -584,6 +665,89 @@ namespace MusicPlayer
                         playerControls.PlayMusic(musicPicture, filePath, title, artist);   // Function call to play the selected music
                     }
                 }
+            }
+        }
+
+        // ALBUM TRACK CONTROLS
+        // PLAY ALL
+        public void PlayAllArtistOrAlbumTracks(Label albumName, DataGridView dgvPlayMusicQueue, System.Windows.Forms.Timer timerShowPnlPlayerControls)
+        {
+            if (ArtistAlbumUIControllers.LblAlbumName?.Tag != null)
+            {
+                CurrentMusicIndex = 0;
+                bool isArtist = (bool)ArtistAlbumUIControllers.LblAlbumName.Tag;
+
+                // Filters the tracks that belongs to a specific album
+                //playMusicQueue = FilterAlbumTracks(albumName.Text, isArtist);
+                playMusicQueue = FilterTrackHandler(isArtist);
+
+
+                playerControls.SetPlayMusicQueue(playMusicQueue);
+                playerControls.TogglePlayAndPause();
+
+                var (title, artist, filePath, musicPicture) = RetrieveMusicInformation();
+
+                playerControls.PlayMusic(musicPicture, filePath, title, artist);
+
+                ShuffleMusic = playerControls.ShuffleMusic;
+
+                UpdateDataGridViewList(dgvPlayMusicQueue, filePath);
+
+                // Display the play back controls
+                timerShowPnlPlayerControls.Start();
+            }
+        }
+
+        // SHUFFLE & PLAY
+        public void ShuffleAndPlayArtistsOrAlbumTracks(Label albumName, DataGridView dgvPlayMusicQueue, System.Windows.Forms.Timer timerShowPnlPlayerControls)
+        {
+            playerControls.ShuffleMusic = true;
+
+            if (ArtistAlbumUIControllers.LblAlbumName?.Tag != null)
+            {
+                bool isArtist = (bool)ArtistAlbumUIControllers.LblAlbumName.Tag;
+                // Filters the tracks that belongs to a specific album
+                //playerControls.playMusicQueue = FilterAlbumTracks(albumName.Text, false);
+                playerControls.playMusicQueue = FilterTrackHandler(isArtist);
+
+                playerControls.FisherYatesShuffle();                // Shuffle the music list using the Fisher-Yates algorithm
+                dgvPlayMusicQueue.DataSource = playerControls.shuffleMusicList;    // Set shuffleMusicList as the data source and display in data grid view
+
+                // Get the music file information from the first index in the shuffled list
+                string filePath = playerControls.shuffleMusicList[0].File;
+                string Title = playerControls.shuffleMusicList[0].Title;
+                string Artist = playerControls.shuffleMusicList[0].Artist;
+
+                int index = playerControls.shuffleMusicList.FindIndex(index => index.File == filePath);    // Find the index of the current music in the shuffled list based on file path
+                Image musicPicture = playerControls.shuffleMusicList[index].MusicPictureMedium;            // Get the music image
+
+                playerControls.PlayMusic(musicPicture, filePath, Title, Artist);   // Function call to play the music
+
+                timerShowPnlPlayerControls.Start();
+            }
+
+            playerControls.NotifyShuffleMusicStateChanged(playerControls.ShuffleMusic);
+        }
+
+        public void BackToArtistOrAlbumList()
+        {
+            if (ArtistAlbumUIControllers.LblAlbumName?.Tag != null)
+            {
+                bool isArtist = (bool)ArtistAlbumUIControllers.LblAlbumName.Tag;
+                Panel[] showPanels, hidePanels;
+
+                if (isArtist)
+                {
+                    showPanels = new Panel[] { ArtistAlbumUIControllers.PnlHeaderControl!,  ArtistAlbumUIControllers.PnlMusicLibrary!, ArtistAlbumUIControllers.PnlArtist! };
+                    hidePanels = new Panel[] { ArtistAlbumUIControllers.PnlInfo!, ArtistAlbumUIControllers.PnlArtistTrack! };
+                }
+                else
+                {
+                    showPanels = new Panel[] { ArtistAlbumUIControllers.PnlHeaderControl!, ArtistAlbumUIControllers.PnlMusicLibrary!, ArtistAlbumUIControllers.PnlAlbum! };
+                    hidePanels = new Panel[] { ArtistAlbumUIControllers.PnlInfo!, ArtistAlbumUIControllers.PnlAlbumTrack! };
+                }
+
+                PanelVisibilityHandler(showPanels, hidePanels);
             }
         }
     }

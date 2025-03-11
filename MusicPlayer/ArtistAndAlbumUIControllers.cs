@@ -22,7 +22,11 @@ namespace MusicPlayer
 
         public ToolTip? ToolTipPlayerControl { get; set; } = new ToolTip();
 
+        public Panel? PnlArtist { get; set; }
+        public Panel? PnlAlbum { get; set; }
         public Panel? PnlAlbumTrack { get; set; }
         public DataGridView? DgvAlbumTracks { get; set; }
+        public Panel? PnlArtistTrack { get; set; }
+        public DataGridView? DgvArtistTracks { get; set; }
     }
 }

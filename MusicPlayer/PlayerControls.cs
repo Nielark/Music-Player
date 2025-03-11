@@ -12,7 +12,7 @@ namespace MusicPlayer
 {
     public class PlayerControls : MusicPlayerBase
     {
-        private int marqueeSpeed = 5;
+        private const int marqueeSpeed = 5;
         public int temporaryVolume = 100;
 
         public PlayerControls()
@@ -49,6 +49,8 @@ namespace MusicPlayer
 
         public void ShuffleAndPlayMusic(DataGridView DgvPlayMusicQueue, System.Windows.Forms.Timer TimerShowPnlPlayerControls, MusicLibrary musicLibrary)
         {
+            ShuffleMusic = true;
+
             playMusicQueue = new List<Music>(musicLibrary.musicList);      // Copy the current music list to playMusicQueue for shuffling
 
             FisherYatesShuffle();                               // Shuffle the music list using the Fisher-Yates algorithm
@@ -65,6 +67,8 @@ namespace MusicPlayer
             PlayMusic(musicPicture, filePath, Title, Artist);   // Function call to play the music
 
             TimerShowPnlPlayerControls.Start();
+
+            NotifyShuffleMusicStateChanged(ShuffleMusic);
         }
 
         // SHUFFLE MUSIC
@@ -105,7 +109,7 @@ namespace MusicPlayer
             }
         }
 
-        private void NotifyShuffleMusicStateChanged(bool isShuffle)
+        public void NotifyShuffleMusicStateChanged(bool isShuffle)
         {
             ShuffleMusicStateChanged?.Invoke(isShuffle);
         }
@@ -312,13 +316,6 @@ namespace MusicPlayer
                 PicBoxRepeatMusic.Image = Properties.Resources.repeat;              // Change the image into repeat on icon
                 toolTipPlayerControl.SetToolTip(PicBoxRepeatMusic, "Repeat on");    // Change the tool tip text to Repeat on
             }
-        }
-
-        // ALBUM TRACK CONTROLS
-        // PLAY ALL
-        public void PlayAllAlbumTracks()
-        {
-
         }
 
         public void NextAndPreviousMusicHandler()
@@ -571,7 +568,8 @@ namespace MusicPlayer
                         CurrentMusicIndex++;    // Go to the next track in the queue
                     }
 
-                    NextAndPreviousMusicHandler();  // Play the next or previous track in the queue
+                    if (CurrentMusicIndex < playMusicQueue.Count)
+                        NextAndPreviousMusicHandler();  // Play the next or previous track in the queue
                 }
             }
         }
