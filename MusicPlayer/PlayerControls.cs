@@ -748,5 +748,17 @@ namespace MusicPlayer
                 waveOutDevice.Stop();   // Stop the playback when the user presses down on the seek bar
             }
         }
+
+        // More Options
+
+        public void DisplayMusicProperties()
+        {
+
+        }
+
+        public void FullScreenOption()
+        {
+
+        }
     }
 }

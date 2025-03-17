@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Timers;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -29,6 +30,8 @@ namespace MusicPlayer
     {
         private int targetTopPosition;
         public bool fullScreen = false;
+        private System.Windows.Forms.Button lastClickedButton; // Track the last clicked button
+
         MusicLibrary musicLibrary = new MusicLibrary();
         public List<Music> musicList;
         private List<Music> tempMusicList;
@@ -38,10 +41,10 @@ namespace MusicPlayer
         private MusicSearchFilterSorter musicSearchFilterSorter;
 
         private Size formSize; //Keep form size when it is minimized and restored.Since the form is resized because it takes into account the size of the title bar and borders.
-        private int borderSize = 2;
+        //private int borderSize = 2;
         private int previousWidth;
-        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
 
+        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
         private static extern IntPtr CreateRoundRectRgn
         (
             int nLeftRect,     // x-coordinate of upper-left corner
@@ -131,6 +134,15 @@ namespace MusicPlayer
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            //playerControls.playMusicQueue = LoadMusicQueue();
+            //if (playerControls.playMusicQueue.Count > 0)
+            //{
+            //    // Resume the last played song
+            //    playerControls.PlayMusic(playerControls.playMusicQueue[0].MusicPictureMedium, playerControls.playMusicQueue[0].File, playerControls.playMusicQueue[0].Title, playerControls.playMusicQueue[0].Artist);
+            //    DgvPlayMusicQueue.DataSource = playerControls.playMusicQueue;
+            //    TimerShowPnlPlayerControls.Start();
+            //}
+
             formSize = this.ClientSize;
 
             // Load music files (this populates musicLibrary.musicList)
@@ -414,8 +426,6 @@ namespace MusicPlayer
             lblShowLibraryTitle.Text = "Albums";
         }
 
-        private System.Windows.Forms.Button lastClickedButton; // Track the last clicked button
-
         private void UpdateSideBarButtonUI(System.Windows.Forms.Button targetButton, System.Windows.Forms.Panel pnl, params System.Windows.Forms.Button[] Buttons)
         {
             int paddingTop = 8;
@@ -650,16 +660,6 @@ namespace MusicPlayer
             this.Show();  // Show the main form when returning from MiniPlayer
         }
 
-        private void PicBoxMoreOption_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void DgvMusicList_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
         private void PlayBackInfoParentAndChild_MouseMove(object sender, MouseEventArgs e)
         {
             HoverEffect(PnlPlayBackInfo, Color.FromArgb(89, 89, 89), Color.Transparent);
@@ -799,6 +799,7 @@ namespace MusicPlayer
             MyModule.SetRoundedCorners(PnlPlayerControls, 0, 0, 10, 0);
             MyModule.SetRoundedCorners(PnlPlayerControls, 0, 0, 10, 0);
             MyModule.SetRoundedCorners(picBoxAlbumImage, 10, 10, 10, 10);
+            MyModule.SetRoundedCorners(pnlMoreOption, 10, 10, 10, 10);
         }
 
         private void HandleResponsiveLayout()
@@ -812,6 +813,10 @@ namespace MusicPlayer
                 ShowOrHideSideBar(0, PnlSideBar.Width, -30);
                 ShowOrHideSkipButton(true, 45, 15);
 
+                ArtistOrAlbumLabelFontResize(20.25F, 15.75F, 12);
+                ArtistAlbumBtnSizeAndPositionHandler(130);
+                ArtistAlbumBtnBackgroundHandler(false);
+
                 picBoxHamburgerMenu.Visible = false;
             }
             else if (this.ClientSize.Width > 860 && this.ClientSize.Width <= 900)
@@ -824,6 +829,10 @@ namespace MusicPlayer
                 ShowOrHideShuffleAndRepeatButton(true);
                 ShowOrHideFilterControl(true, 161, 45, 272);
                 ShowOrHideSideBar(0, PnlSideBar.Width, -30);
+
+                ArtistOrAlbumLabelFontResize(20.25F, 15.75F, 12);
+                ArtistAlbumBtnSizeAndPositionHandler(130);
+                ArtistAlbumBtnBackgroundHandler(false);
 
                 picBoxHamburgerMenu.Visible = false;
             }
@@ -839,6 +848,10 @@ namespace MusicPlayer
                 ShowOrHideFilterControl(true, 161, 45, 272);
 
                 picBoxHamburgerMenu.Visible = true;
+
+                ArtistOrAlbumLabelFontResize(20.25F, 15.75F, 12);
+                ArtistAlbumBtnSizeAndPositionHandler(130);
+                ArtistAlbumBtnBackgroundHandler(false);
             }
             else if (this.ClientSize.Width > 600 && this.ClientSize.Width <= 660 && this.ClientSize.Width != previousWidth)
             {
@@ -851,6 +864,10 @@ namespace MusicPlayer
                 ShowOrHideDataGridViewColumn(true);
                 ShowOrHideShuffleAndRepeatButton(true);
 
+                ArtistOrAlbumLabelFontResize(15.25F, 10.75F, 9);
+                ArtistAlbumBtnSizeAndPositionHandler(100);
+                ArtistAlbumBtnBackgroundHandler(true);
+
                 picBoxHamburgerMenu.Visible = true;
             }
             else if (this.ClientSize.Width <= 600 && this.ClientSize.Width != previousWidth)
@@ -861,6 +878,10 @@ namespace MusicPlayer
                 ShowOrHideFilterControl(false, 0, 0, 111);
                 ShowOrHideDataGridViewColumn(false);
                 ShowOrHideShuffleAndRepeatButton(false);
+
+                ArtistOrAlbumLabelFontResize(15.25F, 10.75F, 9);
+                ArtistAlbumBtnSizeAndPositionHandler(60);
+                ArtistAlbumBtnBackgroundHandler(true);
 
                 picBoxHamburgerMenu.Visible = true;
             }
@@ -931,6 +952,48 @@ namespace MusicPlayer
             PicBoxRepeatMusic.Visible = showButton;
         }
 
+        private void ArtistOrAlbumLabelFontResize(float albumNameFontSize, float albumArtistFontSize, float albumNumbersFontSize)
+        {
+            lblAlbumName.Font = new Font("Segoe UI", albumNameFontSize, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblAlbumArtist.Font = new Font("Segoe UI Semibold", albumArtistFontSize, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblAlbumNumbers.Font = new Font("Segoe UI", albumNumbersFontSize, FontStyle.Regular, GraphicsUnit.Point, 0);
+        }
+
+        private void ArtistAlbumBtnSizeAndPositionHandler(int btnWidth)
+        {
+            btnAlbumPlay.Size = new Size(btnWidth, 35);
+            btnAlbumShuffleAndPlay.Size = new Size(btnWidth, 35);
+            btnBack.Size = new Size(btnWidth, 35);
+
+            //btnAlbumPlay.Left -= btnWidth;
+            btnAlbumShuffleAndPlay.Left = btnAlbumPlay.Right + 10;
+            btnBack.Left = btnAlbumShuffleAndPlay.Right + 10;
+        }
+
+        private void ArtistAlbumBtnBackgroundHandler(bool isShowBackground)
+        {
+            if (isShowBackground)
+            {
+                btnAlbumPlay.Text = string.Empty;
+                btnAlbumShuffleAndPlay.Text = string.Empty;
+                btnBack.Text = string.Empty;
+
+                btnAlbumPlay.BackgroundImage = Properties.Resources.play_inactive;
+                btnAlbumShuffleAndPlay.BackgroundImage = Properties.Resources.shuffle_inactive;
+                btnBack.BackgroundImage = Properties.Resources.back_inactive;
+            }
+            else
+            {
+                btnAlbumPlay.Text = "Play All";
+                btnAlbumShuffleAndPlay.Text = "Shuffle and Play";
+                btnBack.Text = "Back";
+
+                btnAlbumPlay.BackgroundImage = null;
+                btnAlbumShuffleAndPlay.BackgroundImage = null;
+                btnBack.BackgroundImage = null;
+            }
+        }
+
         private void PicBoxHamburgerMenu_Click(object sender, EventArgs e)
         {
             // Display and hide the sidebar
@@ -943,70 +1006,6 @@ namespace MusicPlayer
             {
                 PnlSideBar.Left = -PnlSideBar.Width;
                 picBoxHamburgerMenu.Image = Properties.Resources.hamburger_menu;
-            }
-        }
-
-
-
-
-        // FORM RESIZING
-
-        //protected override void OnPaint(PaintEventArgs e) // you can safely omit this method if you want
-        //{
-        //    e.Graphics.FillRectangle(Brushes.Green, Top);
-        //    e.Graphics.FillRectangle(Brushes.Green, Left);
-        //    e.Graphics.FillRectangle(Brushes.Green, Right);
-        //    e.Graphics.FillRectangle(Brushes.Green, Bottom);
-        //}
-
-        private const int
-            HTLEFT = 10,
-            HTRIGHT = 11,
-            HTTOP = 12,
-            HTTOPLEFT = 13,
-            HTTOPRIGHT = 14,
-            HTBOTTOM = 15,
-            HTBOTTOMLEFT = 16,
-            HTBOTTOMRIGHT = 17;
-
-        const int _ = 10; // you can rename this variable if you like
-
-        // Snap threshold in pixels
-        private const int SnapThreshold = 20;
-        private const int ResizeBorderThickness = 10; // Border thickness for resizing
-
-        private bool isDragging = false;
-        private Point dragCursorPoint;
-        private Point dragFormPoint;
-
-        Rectangle Top { get { return new Rectangle(0, 0, this.ClientSize.Width, _); } }
-        Rectangle Left { get { return new Rectangle(0, 0, _, this.ClientSize.Height); } }
-        Rectangle Bottom { get { return new Rectangle(0, this.ClientSize.Height - _, this.ClientSize.Width, _); } }
-        Rectangle Right { get { return new Rectangle(this.ClientSize.Width - _, 0, _, this.ClientSize.Height); } }
-
-        Rectangle TopLeft { get { return new Rectangle(0, 0, _, _); } }
-        Rectangle TopRight { get { return new Rectangle(this.ClientSize.Width - _, 0, _, _); } }
-        Rectangle BottomLeft { get { return new Rectangle(0, this.ClientSize.Height - _, _, _); } }
-        Rectangle BottomRight { get { return new Rectangle(this.ClientSize.Width - _, this.ClientSize.Height - _, _, _); } }
-
-
-        protected override void WndProc(ref Message message)
-        {
-            base.WndProc(ref message);
-
-            if (message.Msg == 0x84) // WM_NCHITTEST
-            {
-                var cursor = this.PointToClient(Cursor.Position);
-
-                if (TopLeft.Contains(cursor)) message.Result = (IntPtr)HTTOPLEFT;
-                else if (TopRight.Contains(cursor)) message.Result = (IntPtr)HTTOPRIGHT;
-                else if (BottomLeft.Contains(cursor)) message.Result = (IntPtr)HTBOTTOMLEFT;
-                else if (BottomRight.Contains(cursor)) message.Result = (IntPtr)HTBOTTOMRIGHT;
-
-                else if (Top.Contains(cursor)) message.Result = (IntPtr)HTTOP;
-                else if (Left.Contains(cursor)) message.Result = (IntPtr)HTLEFT;
-                else if (Right.Contains(cursor)) message.Result = (IntPtr)HTRIGHT;
-                else if (Bottom.Contains(cursor)) message.Result = (IntPtr)HTBOTTOM;
             }
         }
 
@@ -1054,6 +1053,236 @@ namespace MusicPlayer
         private void BtnBack_Click(object sender, EventArgs e)
         {
             musicListViewManager.BackToArtistOrAlbumList();
+        }
+
+        private void BtnAlbumPlay_MouseHover(object sender, EventArgs e)
+        {
+            if (this.ClientSize.Width <= 660)
+            {
+                btnAlbumPlay.BackgroundImage = Properties.Resources.play_active;
+            }
+        }
+
+        private void BtnAlbumPlay_MouseLeave(object sender, EventArgs e)
+        {
+            if (this.ClientSize.Width <= 660)
+            {
+                btnAlbumPlay.BackgroundImage = Properties.Resources.play_inactive;
+            }
+        }
+
+        private void BtnAlbumShuffleAndPlay_MouseHover(object sender, EventArgs e)
+        {
+            if (this.ClientSize.Width <= 660)
+            {
+                btnAlbumShuffleAndPlay.BackgroundImage = Properties.Resources.shuffle_active;
+            }
+        }
+
+        private void BtnAlbumShuffleAndPlay_MouseLeave(object sender, EventArgs e)
+        {
+            if (this.ClientSize.Width <= 660)
+            {
+                btnAlbumShuffleAndPlay.BackgroundImage = Properties.Resources.shuffle_inactive;
+            }
+        }
+
+        private void BtnBack_MouseHover(object sender, EventArgs e)
+        {
+            if (this.ClientSize.Width <= 660)
+            {
+                btnBack.BackgroundImage = Properties.Resources.back_active;
+            }
+        }
+
+        private void BtnBack_MouseLeave(object sender, EventArgs e)
+        {
+            if (this.ClientSize.Width <= 660)
+            {
+                btnBack.BackgroundImage = Properties.Resources.back_inactive;
+            }
+        }
+
+        // MORE OPTION BUTTONS
+        private void PicBoxMoreOption_Click_1(object sender, EventArgs e)
+        {
+            pnlMoreOption.Visible = true;
+        }
+
+        private void PnlMoreOption_MouseLeave(object sender, EventArgs e)
+        {
+            Point mousePosition = Control.MousePosition;
+
+            // Convert all controls' bounds to screen coordinates
+            Rectangle panelBounds = pnlMoreOption.RectangleToScreen(pnlMoreOption.ClientRectangle);
+            Rectangle btnPropertiesBounds = btnProperties.RectangleToScreen(btnProperties.ClientRectangle);
+            Rectangle btnShuffleBounds = btnShuffle.RectangleToScreen(btnShuffle.ClientRectangle);
+            Rectangle btnSkipBackwardBounds = btnSkipBackward.RectangleToScreen(btnSkipBackward.ClientRectangle);
+            Rectangle btnSkipForwardBounds = btnSkipForward.RectangleToScreen(btnSkipForward.ClientRectangle);
+            Rectangle btnRepeatBounds = btnRepeat.RectangleToScreen(btnRepeat.ClientRectangle);
+            Rectangle btnFullScreenBounds = btnFullScreen.RectangleToScreen(btnFullScreen.ClientRectangle);
+
+            // Check if the mouse is outside all the controls (panel and its children)
+            if (!panelBounds.Contains(mousePosition) &&
+                !btnPropertiesBounds.Contains(mousePosition) &&
+                !btnShuffleBounds.Contains(mousePosition) &&
+                !btnSkipBackwardBounds.Contains(mousePosition) &&
+                !btnSkipForwardBounds.Contains(mousePosition) &&
+                !btnRepeatBounds.Contains(mousePosition) &&
+                !btnFullScreenBounds.Contains(mousePosition))
+            {
+                pnlMoreOption.Visible = false;   // Hide the More Option Panel
+            }
+        }
+
+        private void BtnShuffle_Click(object sender, EventArgs e)
+        {
+            playerControls.ShuffleMusicHandler(DgvPlayMusicQueue);
+        }
+
+        private void BtnSkipBackward_Click(object sender, EventArgs e)
+        {
+            playerControls.SkipBackward();
+        }
+
+        private void BtnSkipForward_Click(object sender, EventArgs e)
+        {
+            playerControls.SkipForward();
+        }
+
+        private void BtnRepeat_Click(object sender, EventArgs e)
+        {
+            playerControls.RepeatMusicHandler();
+        }
+
+        private void BtnFullScreen_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void FormMain_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Space)
+            {
+                playerControls.TogglePlayAndPause();
+            }
+        }
+
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //var musicQueueSerializable = playerControls.playMusicQueue.Select(m => new
+            //{
+            //    MusicPictureSmall = ImageToBase64(m.MusicPictureSmall),  // Convert Image to Base64
+            //    MusicPictureMedium = ImageToBase64(m.MusicPictureMedium),
+            //    Title = m.Title,
+            //    Artist = m.Artist,
+            //    Album = m.Album,
+            //    Duration = m.Duration.ToString(), // Convert TimeSpan to string
+            //    File = m.File
+            //}).ToList();
+
+
+
+            //string filePath = "music_queue.json";
+            //string json = JsonSerializer.Serialize(musicQueueSerializable, new JsonSerializerOptions { WriteIndented = true });
+            //System.IO.File.WriteAllText(filePath, json);
+
+            //ClearAllPictureBoxes(); // Free memory by clearing PictureBoxes
+
+        }
+
+        private void ClearAllPictureBoxes()
+        {
+            foreach (Form form in Application.OpenForms)
+            {
+                foreach (Control control in form.Controls)
+                {
+                    SetPictureBoxNull(control);
+                }
+            }
+        }
+
+        private void SetPictureBoxNull(Control parent)
+        {
+            foreach (Control control in parent.Controls)
+            {
+                if (control is PictureBox pictureBox)
+                {
+                    if (pictureBox.Image != null)
+                    {
+                        pictureBox.Image.Dispose(); // Dispose safely
+                        pictureBox.Image = null;
+                    }
+                }
+                else if (control.HasChildren)
+                {
+                    SetPictureBoxNull(control); // Recursively check child controls
+                }
+            }
+        }
+
+        private List<Music> LoadMusicQueue()
+        {
+            string filePath = "music_queue.json";
+
+            if (System.IO.File.Exists(filePath))
+            {
+                string json = System.IO.File.ReadAllText(filePath);
+
+                // Deserialize into dynamic objects with Base64 strings
+                var deserializedQueue = JsonSerializer.Deserialize<List<Music>>(json) ?? new List<Music>();
+
+                // Convert Base64 to Image before assigning to `Music`
+                return deserializedQueue.Select(m => new Music(
+                    Base64ToImage(m.MusicPictureSmall.ToString()),  // Convert Base64 back to Image
+                    Base64ToImage(m.MusicPictureMedium.ToString()),
+                    m.Title.ToString(),
+                    m.Artist.ToString(),
+                    m.Album.ToString(),
+                    TimeSpan.Parse(m.Duration.ToString()),  // Convert string to TimeSpan
+                    m.File.ToString()
+                )).ToList();
+            }
+
+            return new List<Music>(); // Return empty list if file doesn't exist
+        }
+
+        private string ImageToBase64(Image image)
+        {
+            if (image == null) return string.Empty;
+
+            try
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (Bitmap bmp = new Bitmap(image)) // Clone the image to avoid GDI+ errors
+                    {
+                        bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                    }
+                    return Convert.ToBase64String(ms.ToArray());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error converting image to Base64: {ex.Message}");
+                return string.Empty;
+            }
+        }
+
+
+
+        private Image Base64ToImage(string base64String)
+        {
+            if (string.IsNullOrEmpty(base64String)) return null;
+
+            byte[] imageBytes = Convert.FromBase64String(base64String);
+            using (MemoryStream ms = new MemoryStream(imageBytes))
+            {
+                using (Image img = Image.FromStream(ms))
+                {
+                    return new Bitmap(img); // Clone to avoid memory lock issues
+                }
+            }
         }
     }
 }

@@ -33,14 +33,14 @@
             PnlMain = new Panel();
             pnlHeader = new Panel();
             label3 = new Label();
-            pnlRightBar = new Panel();
-            PnlHideRightBar = new MusicPlayer.CustomControls.NielarkPictureBox();
-            PicBoxMiniPlayerToggle = new MusicPlayer.CustomControls.NielarkPictureBox();
-            PicBoxShowVolumeBar = new MusicPlayer.CustomControls.NielarkPictureBox();
             PnlVolumeControl = new Panel();
             PicBoxVolumePicture = new MusicPlayer.CustomControls.NielarkPictureBox();
             LblVolumeValue = new Label();
             TbVolume = new Modernial.Controls.DungeonTrackBar();
+            pnlRightBar = new Panel();
+            PnlHideRightBar = new MusicPlayer.CustomControls.NielarkPictureBox();
+            PicBoxMiniPlayerToggle = new MusicPlayer.CustomControls.NielarkPictureBox();
+            PicBoxShowVolumeBar = new MusicPlayer.CustomControls.NielarkPictureBox();
             PicBoxDisplayRightBar = new PictureBox();
             PicBoxRepeatMusic = new MusicPlayer.CustomControls.NielarkPictureBox();
             PicBoxShuffleMusic = new MusicPlayer.CustomControls.NielarkPictureBox();
@@ -66,12 +66,12 @@
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
             PnlMain.SuspendLayout();
             pnlHeader.SuspendLayout();
+            PnlVolumeControl.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)PicBoxVolumePicture).BeginInit();
             pnlRightBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)PnlHideRightBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PicBoxMiniPlayerToggle).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PicBoxShowVolumeBar).BeginInit();
-            PnlVolumeControl.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)PicBoxVolumePicture).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PicBoxDisplayRightBar).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PicBoxRepeatMusic).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PicBoxShuffleMusic).BeginInit();
@@ -139,6 +139,73 @@
             label3.Size = new Size(101, 21);
             label3.TabIndex = 4;
             label3.Text = "Music Player";
+            // 
+            // PnlVolumeControl
+            // 
+            PnlVolumeControl.BackColor = Color.FromArgb(12, 23, 45);
+            PnlVolumeControl.Controls.Add(PicBoxVolumePicture);
+            PnlVolumeControl.Controls.Add(LblVolumeValue);
+            PnlVolumeControl.Controls.Add(TbVolume);
+            PnlVolumeControl.Location = new Point(237, 100);
+            PnlVolumeControl.Name = "PnlVolumeControl";
+            PnlVolumeControl.Size = new Size(150, 40);
+            PnlVolumeControl.TabIndex = 42;
+            PnlVolumeControl.Visible = false;
+            PnlVolumeControl.MouseLeave += PnlVolumeControl_MouseLeave;
+            // 
+            // PicBoxVolumePicture
+            // 
+            PicBoxVolumePicture.BackColor = Color.Transparent;
+            PicBoxVolumePicture.BorderColor = Color.Empty;
+            PicBoxVolumePicture.BorderRadius = 6;
+            PicBoxVolumePicture.BorderSize = 0;
+            PicBoxVolumePicture.HoverBackgroundColor = Color.LightSlateGray;
+            PicBoxVolumePicture.HoverBorderColor = Color.Empty;
+            PicBoxVolumePicture.Image = Properties.Resources.volume_high;
+            PicBoxVolumePicture.ImagePadding = new Padding(6);
+            PicBoxVolumePicture.Location = new Point(3, 5);
+            PicBoxVolumePicture.Name = "PicBoxVolumePicture";
+            PicBoxVolumePicture.Padding = new Padding(6);
+            PicBoxVolumePicture.Size = new Size(30, 30);
+            PicBoxVolumePicture.SizeMode = PictureBoxSizeMode.StretchImage;
+            PicBoxVolumePicture.TabIndex = 32;
+            PicBoxVolumePicture.TabStop = false;
+            PicBoxVolumePicture.Click += PicBoxVolumePicture_Click;
+            // 
+            // LblVolumeValue
+            // 
+            LblVolumeValue.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            LblVolumeValue.AutoSize = true;
+            LblVolumeValue.ForeColor = Color.White;
+            LblVolumeValue.Location = new Point(122, 13);
+            LblVolumeValue.Name = "LblVolumeValue";
+            LblVolumeValue.Size = new Size(25, 15);
+            LblVolumeValue.TabIndex = 19;
+            LblVolumeValue.Text = "100";
+            // 
+            // TbVolume
+            // 
+            TbVolume.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            TbVolume.BorderColor = Color.FromArgb(200, 200, 200);
+            TbVolume.DrawValueString = false;
+            TbVolume.EmptyBackColor = Color.FromArgb(221, 221, 221);
+            TbVolume.FillBackColor = Color.FromArgb(217, 99, 50);
+            TbVolume.JumpToMouse = true;
+            TbVolume.Location = new Point(39, 9);
+            TbVolume.Maximum = 100;
+            TbVolume.Minimum = 0;
+            TbVolume.MinimumSize = new Size(47, 22);
+            TbVolume.Name = "TbVolume";
+            TbVolume.Size = new Size(81, 22);
+            TbVolume.TabIndex = 18;
+            TbVolume.Text = "dungeonTrackBar1";
+            TbVolume.ThumbBackColor = Color.FromArgb(244, 244, 244);
+            TbVolume.ThumbBorderColor = Color.FromArgb(180, 180, 180);
+            TbVolume.Value = 100;
+            TbVolume.ValueDivison = Modernial.Controls.DungeonTrackBar.ValueDivisor.By1;
+            TbVolume.ValueToSet = 100F;
+            TbVolume.ValueChanged += TbVolume_ValueChanged;
+            TbVolume.MouseUp += TbVolume_MouseUp;
             // 
             // pnlRightBar
             // 
@@ -210,73 +277,6 @@
             PicBoxShowVolumeBar.TabStop = false;
             toolTipPlayerControl.SetToolTip(PicBoxShowVolumeBar, "Volume bar");
             PicBoxShowVolumeBar.Click += PicBoxShowVolumeBar_Click;
-            // 
-            // PnlVolumeControl
-            // 
-            PnlVolumeControl.BackColor = Color.FromArgb(12, 23, 45);
-            PnlVolumeControl.Controls.Add(PicBoxVolumePicture);
-            PnlVolumeControl.Controls.Add(LblVolumeValue);
-            PnlVolumeControl.Controls.Add(TbVolume);
-            PnlVolumeControl.Location = new Point(237, 100);
-            PnlVolumeControl.Name = "PnlVolumeControl";
-            PnlVolumeControl.Size = new Size(150, 40);
-            PnlVolumeControl.TabIndex = 42;
-            PnlVolumeControl.Visible = false;
-            PnlVolumeControl.MouseLeave += PnlVolumeControl_MouseLeave;
-            // 
-            // PicBoxVolumePicture
-            // 
-            PicBoxVolumePicture.BackColor = Color.Transparent;
-            PicBoxVolumePicture.BorderColor = Color.Empty;
-            PicBoxVolumePicture.BorderRadius = 6;
-            PicBoxVolumePicture.BorderSize = 0;
-            PicBoxVolumePicture.HoverBackgroundColor = Color.LightSlateGray;
-            PicBoxVolumePicture.HoverBorderColor = Color.Empty;
-            PicBoxVolumePicture.Image = Properties.Resources.volume_high;
-            PicBoxVolumePicture.ImagePadding = new Padding(6);
-            PicBoxVolumePicture.Location = new Point(3, 5);
-            PicBoxVolumePicture.Name = "PicBoxVolumePicture";
-            PicBoxVolumePicture.Padding = new Padding(6);
-            PicBoxVolumePicture.Size = new Size(30, 30);
-            PicBoxVolumePicture.SizeMode = PictureBoxSizeMode.StretchImage;
-            PicBoxVolumePicture.TabIndex = 32;
-            PicBoxVolumePicture.TabStop = false;
-            PicBoxVolumePicture.Click += PicBoxVolumePicture_Click;
-            // 
-            // LblVolumeValue
-            // 
-            LblVolumeValue.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            LblVolumeValue.AutoSize = true;
-            LblVolumeValue.ForeColor = Color.White;
-            LblVolumeValue.Location = new Point(122, 13);
-            LblVolumeValue.Name = "LblVolumeValue";
-            LblVolumeValue.Size = new Size(25, 15);
-            LblVolumeValue.TabIndex = 19;
-            LblVolumeValue.Text = "100";
-            // 
-            // TbVolume
-            // 
-            TbVolume.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            TbVolume.BorderColor = Color.FromArgb(200, 200, 200);
-            TbVolume.DrawValueString = false;
-            TbVolume.EmptyBackColor = Color.FromArgb(221, 221, 221);
-            TbVolume.FillBackColor = Color.FromArgb(217, 99, 50);
-            TbVolume.JumpToMouse = true;
-            TbVolume.Location = new Point(39, 9);
-            TbVolume.Maximum = 100;
-            TbVolume.Minimum = 0;
-            TbVolume.MinimumSize = new Size(47, 22);
-            TbVolume.Name = "TbVolume";
-            TbVolume.Size = new Size(81, 22);
-            TbVolume.TabIndex = 18;
-            TbVolume.Text = "dungeonTrackBar1";
-            TbVolume.ThumbBackColor = Color.FromArgb(244, 244, 244);
-            TbVolume.ThumbBorderColor = Color.FromArgb(180, 180, 180);
-            TbVolume.Value = 100;
-            TbVolume.ValueDivison = Modernial.Controls.DungeonTrackBar.ValueDivisor.By1;
-            TbVolume.ValueToSet = 100F;
-            TbVolume.ValueChanged += TbVolume_ValueChanged;
-            TbVolume.MouseUp += TbVolume_MouseUp;
             // 
             // PicBoxDisplayRightBar
             // 
@@ -570,13 +570,13 @@
             PnlMain.ResumeLayout(false);
             pnlHeader.ResumeLayout(false);
             pnlHeader.PerformLayout();
+            PnlVolumeControl.ResumeLayout(false);
+            PnlVolumeControl.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)PicBoxVolumePicture).EndInit();
             pnlRightBar.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)PnlHideRightBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)PicBoxMiniPlayerToggle).EndInit();
             ((System.ComponentModel.ISupportInitialize)PicBoxShowVolumeBar).EndInit();
-            PnlVolumeControl.ResumeLayout(false);
-            PnlVolumeControl.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)PicBoxVolumePicture).EndInit();
             ((System.ComponentModel.ISupportInitialize)PicBoxDisplayRightBar).EndInit();
             ((System.ComponentModel.ISupportInitialize)PicBoxRepeatMusic).EndInit();
             ((System.ComponentModel.ISupportInitialize)PicBoxShuffleMusic).EndInit();
