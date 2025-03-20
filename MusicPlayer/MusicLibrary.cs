@@ -33,9 +33,7 @@ namespace MusicPlayer
                     catch (Exception ex)
                     {
                         // Handle or log the error, skip this file, and continue processing others
-                        //Console.WriteLine($"Error processing file {file}: {ex.Message}");
-                        //label1.Text = $"Error processing file {file}: {ex.Message}";
-                        MessageBox.Show($"Error processing file {file}: {ex.Message}");
+                        MessageBox.Show($"Error processing file {file}: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
 

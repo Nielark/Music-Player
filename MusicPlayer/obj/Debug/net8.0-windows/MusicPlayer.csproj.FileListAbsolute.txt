@@ -30,3 +30,4 @@ C:\Users\Mark Daniel\source\repos\MusicPlayer\MusicPlayer\obj\Debug\net8.0-windo
 C:\Users\Mark Daniel\source\repos\MusicPlayer\MusicPlayer\obj\Debug\net8.0-windows\MusicPlayer.pdb
 C:\Users\Mark Daniel\source\repos\MusicPlayer\MusicPlayer\obj\Debug\net8.0-windows\MusicPlayer.genruntimeconfig.cache
 C:\Users\Mark Daniel\source\repos\MusicPlayer\MusicPlayer\obj\Debug\net8.0-windows\ref\MusicPlayer.dll
+C:\Users\Mark Daniel\source\repos\MusicPlayer\MusicPlayer\obj\Debug\net8.0-windows\MusicPlayer.MusicProperties.resources
