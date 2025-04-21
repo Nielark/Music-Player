@@ -16,6 +16,7 @@ namespace MusicPlayer
     {
         private readonly PlayerControls playerControls;
         private readonly Form formMain;
+        private readonly DataGridView? dgv;
 
         [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
         private static extern IntPtr CreateRoundRectRgn
@@ -28,7 +29,7 @@ namespace MusicPlayer
             int nHeightEllipse // width of ellipse
         );
 
-        public MusicProperties(Form formMain, PlayerControls playerControls)
+        public MusicProperties(Form formMain, PlayerControls playerControls, DataGridView? dgv = null)
         {
             InitializeComponent();
             Region = System.Drawing.Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, 20, 20));   // Set the rounded corners
@@ -37,12 +38,22 @@ namespace MusicPlayer
             // Set the form and player controls
             this.formMain = formMain;
             this.playerControls = playerControls;
+            this.dgv = dgv;
         }
 
         private void MusicProperties_Load(object sender, EventArgs e)
         {
             CenterPropertyForm();       // Center the property form
-            DisplayMusicProperties();   // Display the music properties
+
+            if (dgv != null)
+            {
+                DisplaySelectedRowProperties();
+                
+            }
+            else
+            {
+                DisplayMusicProperties();   // Display the music properties
+            }
         }
 
         private void BtnBack_Click(object sender, EventArgs e)
@@ -55,18 +66,39 @@ namespace MusicPlayer
             // Open the file location of the current music
             try
             {
-                // Get the file path of the current music
-                string filePath = playerControls.playMusicQueue[playerControls.CurrentMusicIndex].File;
+                string filePath = string.Empty;
+
+                // Check if the DataGridView is not null
+                if (dgv != null)
+                {   
+                    var cellValue = dgv.Rows[playerControls.selectedRowIndex].Cells[6].Value; // Get the file path of the selected music
+                    
+                    // Check if the cell value is not null
+                    if (cellValue != null)
+                    {
+                        filePath = cellValue.ToString()!;    // Convert the cell value to string
+                    }
+                    else
+                    {
+                        MessageBox.Show("File path is null! Please check if the file exists.",
+                                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }     
+                }
+                else
+                {   
+                    filePath = playerControls.playMusicQueue[playerControls.CurrentMusicIndex].File;    // Get the file path of the current music
+                }
 
                 // Check if the file exists
                 if (!File.Exists(filePath))
                 {
                     MessageBox.Show("File not found! Please check if it was moved or deleted.",
                                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    return; // Exit the method if the file doesn't exist
                 }
 
-                Process.Start("explorer.exe", $"/select, \"{filePath}\"");
+                Process.Start("explorer.exe", $"/select, \"{filePath}\"");  // Open the file location
             }
             catch (Exception ex)
             {
@@ -99,6 +131,17 @@ namespace MusicPlayer
             //lblBitRateValue.Text = playMusicQueue[currentMusicIndex].Bitrate;
             //lblItemTypeValue.Text = playMusicQueue[currentMusicIndex].Type;
             lblFileLocationValue.Text = playMusicQueue[currentMusicIndex].File;
+        }
+
+        private void DisplaySelectedRowProperties()
+        {
+            var selectedRowIndex = playerControls.selectedRowIndex;
+
+            lblTitleValue.Text = dgv!.Rows[selectedRowIndex].Cells[2].Value.ToString();         // Get the title of the selected music
+            lblArtistValue.Text = dgv.Rows[selectedRowIndex].Cells[3].Value.ToString();         // Get the artist of the selected music
+            lblAlbumTitleValue.Text = dgv.Rows[selectedRowIndex].Cells[4].Value.ToString();     // Get the album title of the selected music
+            lblLengthValue.Text = dgv.Rows[selectedRowIndex].Cells[5].Value.ToString();         // Get the length of the selected music
+            lblFileLocationValue.Text = dgv.Rows[selectedRowIndex].Cells[6].Value.ToString();   // Get the file location of the selected music
         }
     }
 }

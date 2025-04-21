@@ -10,6 +10,7 @@ using System.Drawing.Printing;
 using System.Formats.Tar;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -157,7 +158,7 @@ namespace MusicPlayer
             // Initialize view managers with the loaded music list
             MusicPlayerBase musicPlayerBase = new MusicPlayerBase();
             musicListViewManager.SetMusicList(musicLibrary.musicList);
-            musicSearchFilterSorter = new MusicSearchFilterSorter(musicLibrary.musicList, playerControls);
+            musicSearchFilterSorter = new MusicSearchFilterSorter(musicLibrary.musicList, playerControls, musicListViewManager);
             musicSearchFilterSorter.temporaryMusicList = new List<Music>(musicLibrary.musicList);
 
             // Display artist and album information
@@ -166,6 +167,14 @@ namespace MusicPlayer
 
             var albumInfo = musicListViewManager.GetMusicInfo(a => new AlbumInfo(MusicListViewManager.CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
             musicListViewManager.DisplayInfo(flowLayoutPanel2, false, albumInfo);
+
+            // for artist
+            //CbSortMusic.Items.Clear();
+            //CbSortMusic.Items.AddRange(new string[] { "A - Z", "Z - A" });
+
+            // for album
+            //CbSortMusic.Items.Clear();
+            //CbSortMusic.Items.AddRange(new string[] { "A - Z", "Z - A", "Artist (A - Z)", "Artist (Z - A)" });
 
             // Set the ComboBox data source for filtering by artist
             CbFilterArtist.DataSource = musicList
@@ -218,33 +227,87 @@ namespace MusicPlayer
             musicListViewManager = new MusicListViewManager(playerControls);
             musicListViewManager.SetMusicList(musicLibrary.musicList);
 
-            musicSearchFilterSorter = new MusicSearchFilterSorter(musicLibrary.musicList, playerControls);
+            musicSearchFilterSorter = new MusicSearchFilterSorter(musicLibrary.musicList, playerControls, musicListViewManager);
             musicSearchFilterSorter.temporaryMusicList = new List<Music>(musicLibrary.musicList);
             musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
         }
 
         private void CbSortMusic_SelectedIndexChanged(object sender, EventArgs e)
         {
-            musicSearchFilterSorter.SortMusicList(CbSortMusic, TxtSearch, DgvMusicList);
-            musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
+            if (!musicSearchFilterSorter.IsAllMusicList)
+            {
+                if (musicSearchFilterSorter.IsArtistList)
+                {
+                    var artistInfo = musicSearchFilterSorter.SortArtistList(CbSortMusic);
+                    flowLayoutPanel1.Controls.Clear();
+                    musicListViewManager.DisplayInfo(flowLayoutPanel1, true, artistInfo);
+                }
+                else
+                {
+                    var albumInfo = musicSearchFilterSorter.SortAlbumList(CbSortMusic);
+                    flowLayoutPanel2.Controls.Clear();
+                    musicListViewManager.DisplayInfo(flowLayoutPanel2, false, albumInfo);
+                }
+            }
+            else
+            {
+                musicSearchFilterSorter.SortMusicList(CbSortMusic, TxtSearch, DgvMusicList);
+                musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
+            }
+
+            TxtSearch.Text = string.Empty;          // Clear the search box
         }
 
         private void TxtSearch_TextChanged(object sender, EventArgs e)
         {
-            musicSearchFilterSorter.Search(TxtSearch, CbFilterAlbum, CbFilterArtist, DgvMusicList);
-            musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
+            if (!musicSearchFilterSorter.IsAllMusicList)
+            {
+                if (musicSearchFilterSorter.IsArtistList)
+                {
+                    var artistInfo = musicSearchFilterSorter.SearchArtistList(TxtSearch);
+                    flowLayoutPanel1.Controls.Clear();
+                    musicListViewManager.DisplayInfo(flowLayoutPanel1, true, artistInfo);
+                }
+                else
+                {
+                    var albumInfo = musicSearchFilterSorter.SearchAlbumList(TxtSearch);
+                    flowLayoutPanel2.Controls.Clear();
+                    musicListViewManager.DisplayInfo(flowLayoutPanel2, false, albumInfo);
+                }
+            }
+            else
+            {
+                musicSearchFilterSorter.Search(TxtSearch, CbFilterAlbum, CbFilterArtist, DgvMusicList);
+                musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
+            }
         }
 
         private void CbFilterArtist_SelectedIndexChanged(object sender, EventArgs e)
         {
-            musicSearchFilterSorter.FilterByArtistOrAlbumHandler(CbFilterArtist, CbFilterAlbum, TxtSearch, DgvMusicList, s => s.Artist);
-            musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
+            if (!musicSearchFilterSorter.IsAllMusicList && !musicSearchFilterSorter.IsArtistList)
+            {
+                var albumInfo = musicSearchFilterSorter.FilterAlbum(CbFilterArtist);
+                flowLayoutPanel2.Controls.Clear();
+                musicListViewManager.DisplayInfo(flowLayoutPanel2, false, albumInfo);
+            }
+            else
+            {
+                musicSearchFilterSorter.FilterByArtistOrAlbumHandler(CbFilterArtist, CbFilterAlbum, TxtSearch, DgvMusicList, s => s.Artist);
+                musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
+            }
+
+            TxtSearch.Text = string.Empty;
         }
 
         private void CbFilterAlbum_SelectedIndexChanged(object sender, EventArgs e)
         {
-            musicSearchFilterSorter.FilterByArtistOrAlbumHandler(CbFilterAlbum, CbFilterArtist, TxtSearch, DgvMusicList, s => s.Album);
-            musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
+            if (musicSearchFilterSorter.IsAllMusicList)
+            {
+                musicSearchFilterSorter.FilterByArtistOrAlbumHandler(CbFilterAlbum, CbFilterArtist, TxtSearch, DgvMusicList, s => s.Album);
+                musicSearchFilterSorter.ModifyDataGridView(DgvMusicList, PnlMusicList);
+            }
+
+            TxtSearch.Text = string.Empty;
         }
 
         private void BtnShuffleAndPlay_Click(object sender, EventArgs e)
@@ -286,6 +349,25 @@ namespace MusicPlayer
 
         private void BtnMusicLibrary_Click(object sender, EventArgs e)
         {
+            // Set up AutoComplete for the search textbox
+            AutoCompleteStringCollection autoCompleteCollection = new AutoCompleteStringCollection();   // Assuming `musicList` is a List<MyMusic> with Title and Artist 
+            autoCompleteCollection.AddRange(musicList.Select(x => x.Title).ToArray());  // Add Titles  to the AutoCompleteStringCollection
+            autoCompleteCollection.AddRange(musicList.Select(x => x.Artist).ToArray()); // Add Artists to the AutoCompleteStringCollection
+
+            // Configure the TextBox for auto-completion
+            TxtSearch.AutoCompleteCustomSource = autoCompleteCollection;
+            TxtSearch.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
+            musicSearchFilterSorter.IsAllMusicList = true;
+            musicSearchFilterSorter.IsArtistList = false;
+
+            CbSortMusic.Text = "Sort by";
+            CbSortMusic.Items.Clear();
+            CbSortMusic.Items.AddRange(new string[] { "A - Z", "Z - A", "Artist (Asc)", "Artist (Desc)", "Duration (Asc)", "Duration (Desc)" });
+            CbFilterArtist.Left = CbFilterAlbum.Left - CbFilterArtist.Width - 21;
+            CbFilterArtist.Visible = true;
+            CbFilterAlbum.Visible = true;
+
             ModifyDvgMusicList(DgvMusicList);   // Update the DataGridView display of the music list
             UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists, btnSongs, btnArtists, btnAlbums);
             UpdateSideBarButtonUI(btnSongs, pnlSubSelectSign, btnArtists, btnAlbums);
@@ -355,6 +437,25 @@ namespace MusicPlayer
 
         private void BtnSongs_Click(object sender, EventArgs e)
         {
+            // Set up AutoComplete for the search textbox
+            AutoCompleteStringCollection autoCompleteCollection = new AutoCompleteStringCollection();   // Assuming `musicList` is a List<MyMusic> with Title and Artist 
+            autoCompleteCollection.AddRange(musicList.Select(x => x.Title).ToArray());  // Add Titles  to the AutoCompleteStringCollection
+            autoCompleteCollection.AddRange(musicList.Select(x => x.Artist).ToArray()); // Add Artists to the AutoCompleteStringCollection
+
+            // Configure the TextBox for auto-completion
+            TxtSearch.AutoCompleteCustomSource = autoCompleteCollection;
+            TxtSearch.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
+            musicSearchFilterSorter.IsAllMusicList = true;
+            musicSearchFilterSorter.IsArtistList = false;
+
+            CbSortMusic.Text = "Sort by";
+            CbSortMusic.Items.Clear();
+            CbSortMusic.Items.AddRange(new string[] { "A - Z", "Z - A", "Artist (Asc)", "Artist (Desc)", "Duration (Asc)", "Duration (Desc)" });
+            CbFilterArtist.Left = CbFilterAlbum.Left - CbFilterArtist.Width - 21;
+            CbFilterArtist.Visible = true;
+            CbFilterAlbum.Visible = true;
+
             UpdateSideBarButtonUI(btnSongs, pnlSubSelectSign, btnArtists, btnAlbums);
             UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
@@ -368,6 +469,23 @@ namespace MusicPlayer
 
         private void BtnArtists_Click(object sender, EventArgs e)
         {
+            var artistInfo = musicListViewManager.GetMusicInfo(a => new ArtistInfo(MusicListViewManager.CapitalizeWords(a.Artist), a.MusicPictureMedium));
+            var albumInfo = musicListViewManager.GetMusicInfo(a => new AlbumInfo(MusicListViewManager.CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
+
+            // Set up AutoComplete for the search textbox
+            AutoCompleteStringCollection autoCompleteCollection = new AutoCompleteStringCollection();   // Assuming `musicList` is a List<MyMusic> with Title and Artist 
+            autoCompleteCollection.AddRange(artistInfo.Select(s => s.Name).ToArray());  // Add Titles  to the AutoCompleteStringCollection
+
+            musicSearchFilterSorter.IsAllMusicList = false;
+            musicSearchFilterSorter.IsArtistList = true;
+
+            CbSortMusic.Text = "Sort by";
+            CbSortMusic.Items.Clear();
+            CbSortMusic.Items.AddRange(new string[] { "A - Z", "Z - A" });
+            CbFilterArtist.Left = CbFilterArtist.Width + 21;
+            CbFilterArtist.Visible = false;
+            CbFilterAlbum.Visible = false;
+
             UpdateSideBarButtonUI(btnArtists, pnlSubSelectSign, btnSongs, btnAlbums);
             UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
@@ -417,6 +535,28 @@ namespace MusicPlayer
 
         private void BtnAlbums_Click(object sender, EventArgs e)
         {
+            var artistInfo = musicListViewManager.GetMusicInfo(a => new ArtistInfo(MusicListViewManager.CapitalizeWords(a.Artist), a.MusicPictureMedium));
+            var albumInfo = musicListViewManager.GetMusicInfo(a => new AlbumInfo(MusicListViewManager.CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
+
+            // Set up AutoComplete for the search textbox
+            AutoCompleteStringCollection autoCompleteCollection = new AutoCompleteStringCollection();   // Assuming `musicList` is a List<MyMusic> with Title and Artist 
+            autoCompleteCollection.AddRange(artistInfo.Select(s => s.Name).ToArray());  // Add Titles  to the AutoCompleteStringCollection
+            autoCompleteCollection.AddRange(albumInfo.Select(s => s.AlbumName).ToArray()); // Add Artists to the AutoCompleteStringCollection
+
+            // Configure the TextBox for auto-completion
+            TxtSearch.AutoCompleteCustomSource = autoCompleteCollection;
+            TxtSearch.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
+            musicSearchFilterSorter.IsAllMusicList = false;
+            musicSearchFilterSorter.IsArtistList = false;
+
+            CbSortMusic.Text = "Sort by";
+            CbSortMusic.Items.Clear();
+            CbSortMusic.Items.AddRange(new string[] { "A - Z", "Z - A", "Artist (A - Z)", "Artist (Z - A)" });
+            CbFilterArtist.Left = CbFilterAlbum.Left;
+            CbFilterArtist.Visible = true;
+            CbFilterAlbum.Visible = false;
+
             UpdateSideBarButtonUI(btnAlbums, pnlSubSelectSign, btnSongs, btnArtists);
             UpdateSideBarButtonUI(btnMusicLibrary, pnlSelectSign, btnHome, btnPlayQueue, btnPlayLists);
             pnlSubSelectSign.Visible = true;
@@ -490,7 +630,110 @@ namespace MusicPlayer
 
         private void DgvMusicList_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            musicListViewManager.MusicListView(DgvMusicList, DgvPlayMusicQueue, CbFilterArtist, CbFilterAlbum, TimerShowPnlPlayerControls);
+            if (e.Button == MouseButtons.Left)
+            {
+                musicListViewManager.MusicListView(DgvMusicList, DgvPlayMusicQueue, CbFilterArtist, CbFilterAlbum, TimerShowPnlPlayerControls);
+            }
+        }
+
+        private void DgvMusicList_RowContextMenuStripNeeded(object sender, DataGridViewRowContextMenuStripNeededEventArgs e)
+        {
+            DgvMusicList.ClearSelection();  // Clear current selection
+            DgvMusicList.Rows[e.RowIndex].Selected = true;  // Select the row that was right-clicked
+            e.ContextMenuStrip = contextMenuStrip1;
+            playerControls.selectedRowIndex = e.RowIndex;
+        }
+
+        private void PlayToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var selectedRowIndex = playerControls.selectedRowIndex;
+
+            string? title = DgvMusicList.Rows[selectedRowIndex].Cells[2].Value.ToString();
+            string? artist = DgvMusicList.Rows[selectedRowIndex].Cells[3].Value.ToString();
+            string? getFilePath = DgvMusicList.Rows[selectedRowIndex].Cells[6].Value.ToString();
+
+            musicListViewManager.playMusicQueue = musicList
+                                .Where(s => s.File.Equals(getFilePath))
+                                .ToList();
+
+            playerControls.SetPlayMusicQueue(musicListViewManager.playMusicQueue);
+            playerControls.TogglePlayAndPause();
+
+            musicListViewManager.FindAndPlayMusic(title, artist, getFilePath);
+            musicListViewManager.UpdateDataGridViewList(DgvPlayMusicQueue, getFilePath);
+
+            TimerShowPnlPlayerControls.Start();
+        }
+
+        private void ShowArtistToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var nameIdentifier = DgvMusicList.Rows[playerControls.selectedRowIndex].Cells[3].Value.ToString();  // Get the artist name from the selected row
+
+            // Check if the artist name is null or empty
+            if (nameIdentifier == null)
+            {
+                MessageBox.Show("Artist not found! Please check if the artist exists.",
+                                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var selected = musicListViewManager.SelectArtistOrAlbum(nameIdentifier, true);      // Select the artist name from the music list
+            musicListViewManager.DisplaySelectedArtistOrAlbum(selected, nameIdentifier, true);  // Display the selected artist name
+
+            musicListViewManager.DisplayArtistOrAlbumTracks(true, dgvArtistTracks, pnlArtistTrack, pnlAlbumTrack);  // Display the selected artist tracks
+
+            // Hide and show the panels
+            Panel[] showPanels = { pnlInfo };
+            Panel[] hidePanels = { PnlHeaderControl, pnlMusicLibrary, PnlPlayMusicQueue };
+            PanelVisibilityHandler(showPanels, hidePanels);
+        }
+
+        private void ShowAlbumToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var nameIdentifier = DgvMusicList.Rows[playerControls.selectedRowIndex].Cells[4].Value.ToString();  // Get the artist name from the selected row
+
+            // Check if the artist name is null or empty
+            if (nameIdentifier == null)
+            {
+                MessageBox.Show("Artist not found! Please check if the artist exists.",
+                                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var selected = musicListViewManager.SelectArtistOrAlbum(nameIdentifier, false);      // Select the artist name from the music list
+            musicListViewManager.DisplaySelectedArtistOrAlbum(selected, nameIdentifier, false);  // Display the selected artist name
+
+            musicListViewManager.DisplayArtistOrAlbumTracks(false, dgvAlbumTracks, pnlAlbumTrack, pnlArtistTrack); // Display the selected album tracks
+
+            // Hide and show the panels
+            Panel[] showPanels = { pnlInfo };
+            Panel[] hidePanels = { PnlHeaderControl, pnlMusicLibrary, PnlPlayMusicQueue };
+            PanelVisibilityHandler(showPanels, hidePanels);
+        }
+
+        private void PropertiesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Open the Music Properties form
+            Form MusicProperties = new MusicProperties(this, playerControls, DgvMusicList);
+            MusicProperties.ShowDialog();
+        }
+
+        private void PlayQueueToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var selectedRowIndex = playerControls.selectedRowIndex;
+
+            string? title = DgvMusicList.Rows[selectedRowIndex].Cells[2].Value.ToString();
+            string? artist = DgvMusicList.Rows[selectedRowIndex].Cells[3].Value.ToString();
+            string? getFilePath = DgvMusicList.Rows[selectedRowIndex].Cells[6].Value.ToString();
+
+            var playMusicQueue = musicList
+                                .Where(s => s.File.Equals(getFilePath))
+                                .ToList();
+
+            musicListViewManager.playMusicQueue.AddRange(playMusicQueue);
+            playerControls.SetPlayMusicQueue(musicListViewManager.playMusicQueue);
+            musicListViewManager.playMusicQueue = playerControls.playMusicQueue;
+            musicListViewManager.UpdateDataGridViewList(DgvPlayMusicQueue, getFilePath);
         }
 
         private void DgvPlayMusicQueue_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -1349,5 +1592,7 @@ namespace MusicPlayer
                 else if (Bottom.Contains(cursor)) message.Result = (IntPtr)HTBOTTOM;
             }
         }
+
+        
     }
 }

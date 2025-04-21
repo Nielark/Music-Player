@@ -14,6 +14,7 @@ namespace MusicPlayer
     {
         private const int marqueeSpeed = 5;
         public int temporaryVolume = 100;
+        public int selectedRowIndex = -1;
 
         public PlayerControls()
         {

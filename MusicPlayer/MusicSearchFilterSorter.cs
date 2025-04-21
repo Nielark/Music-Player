@@ -5,17 +5,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace MusicPlayer
 {
     public class MusicSearchFilterSorter : MusicPlayerBase
     {
-        PlayerControls playerControls;
+        public bool IsAllMusicList { get; set; }
+        public bool IsArtistList { get; set; }
 
-        public MusicSearchFilterSorter(List<Music> musicList, PlayerControls playerControls)
+        PlayerControls playerControls;
+        MusicListViewManager musicListViewManager;
+
+        public MusicSearchFilterSorter(List<Music> musicList, PlayerControls playerControls, MusicListViewManager musicListViewManager)
         {
             this.musicList = musicList;
             this.playerControls = playerControls;
+            this.musicListViewManager = musicListViewManager;
         }
 
 
@@ -44,6 +50,40 @@ namespace MusicPlayer
                 DgvMusicList.DataSource = musicList;    // Show all music when search bar is empty
             }   
         }
+
+        public List<ArtistInfo> SearchArtistList(TextBox txtSearch)
+        {
+            if (!string.IsNullOrWhiteSpace(txtSearch.Text))
+            {
+                var artistInfo = musicListViewManager.GetMusicInfo(a => new ArtistInfo(MusicListViewManager.CapitalizeWords(a.Artist), a.MusicPictureMedium));
+
+                // Filter the artist list based on the artist name matching the search text
+                // The search is case-insensitive
+                return artistInfo
+                            .Where(s => s.Name.Contains(txtSearch.Text, StringComparison.OrdinalIgnoreCase)) // Match by artist name
+                            .OrderBy(s => s.Name)  // Sort the results alphabetically by artist name
+                            .ToList();              // Convert the result to a list
+            }
+            
+            return musicListViewManager.GetMusicInfo(a => new ArtistInfo(MusicListViewManager.CapitalizeWords(a.Artist), a.MusicPictureMedium)); ;
+        }
+
+        public List<AlbumInfo> SearchAlbumList(TextBox txtSearch)
+        {
+            if (!string.IsNullOrWhiteSpace(txtSearch.Text))
+            {
+                var albumInfo = musicListViewManager.GetMusicInfo(a => new AlbumInfo(MusicListViewManager.CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
+
+                return albumInfo
+                            .Where(s => s.AlbumName.Contains(txtSearch.Text, StringComparison.OrdinalIgnoreCase) || // Match by title
+                                        s.ArtistName.Contains(txtSearch.Text, StringComparison.OrdinalIgnoreCase)) // Match by artist name
+                            .OrderBy(s => s.Name)  // Sort the results alphabetically by artist name
+                            .ToList();              // Convert the result to a list
+            }
+
+            return musicListViewManager.GetMusicInfo(a => new AlbumInfo(MusicListViewManager.CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
+        }
+
 
         // SORT COMBO BOX
 
@@ -85,6 +125,60 @@ namespace MusicPlayer
             DgvMusicList.DataSource = musicList;    // Display music in data grid view   
         }
 
+        public List<ArtistInfo> SortArtistList(ComboBox CbSortMusic)
+        {
+            // Display artist information
+            var artistInfo = musicListViewManager.GetMusicInfo(a => new ArtistInfo(MusicListViewManager.CapitalizeWords(a.Artist), a.MusicPictureMedium));
+
+            // Perform sorting based on the selected index in the combo box
+            switch (CbSortMusic.SelectedIndex)
+            {
+                case 0:
+                    artistInfo = artistInfo.OrderBy(x => x.Name).ToList(); // Sort by title in ascending
+                    break;
+                case 1:
+                    artistInfo = artistInfo.OrderByDescending(x => x.Name).ToList(); // Sort by title in descending
+                    break;
+                default:
+                    // Handle invalid selection
+                    break;
+            }
+
+            return artistInfo;
+
+            //TxtSearch.Text = string.Empty;          // Clear the search box
+            //musicListViewManager.DisplayInfo(flowLayoutPanel1, true, artistInfo);
+        }
+
+        public List<AlbumInfo> SortAlbumList(ComboBox CbSortMusic)
+        {
+            var albumInfo = musicListViewManager.GetMusicInfo(a => new AlbumInfo(MusicListViewManager.CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
+            
+            switch (CbSortMusic.SelectedIndex)
+            {
+                case 0:
+                    albumInfo = albumInfo.OrderBy(x => x.AlbumName).ToList(); // Sort by title in ascending
+                    break;
+                case 1:
+                    albumInfo = albumInfo.OrderByDescending(x => x.AlbumName).ToList(); // Sort by title in descending
+                    break;
+                case 2:
+                    albumInfo = albumInfo.OrderBy(x => x.ArtistName).ToList(); // Sort by artist in ascending
+                    break;
+                case 3:
+                    albumInfo = albumInfo.OrderByDescending(x => x.ArtistName).ToList(); // Sort by artist in descending
+                    break;
+                default:
+                    // Handle invalid selection
+                    break;
+            }
+
+            return albumInfo;
+
+            //TxtSearch.Text = string.Empty;          // Clear the search box
+            //musicListViewManager.DisplayInfo(flowLayoutPanel2, false, albumInfo);
+        }
+
         // FILTER COMBO BOXES
 
         public void FilterByArtistOrAlbumHandler(ComboBox activeFilterComboBox, ComboBox inactiveFilterComboBox, TextBox TxtSearch, DataGridView DgvMusicList, Func<Music, string> filterSelector)
@@ -102,8 +196,36 @@ namespace MusicPlayer
                         .ToList();  // Convert the filtered results to a list
             }
 
-            TxtSearch.Text = string.Empty;          // Clear the search box
+            //TxtSearch.Text = string.Empty;          // Clear the search box
             DgvMusicList.DataSource = musicList;    // Set the filtered music as the data source 
+        }
+
+        //public List<ArtistInfo> FilterArtist(ComboBox cbFilterAlbum)
+        //{
+        //    var artistInfo = musicListViewManager.GetMusicInfo(a => new ArtistInfo(MusicListViewManager.CapitalizeWords(a.Artist), a.MusicPictureMedium));
+
+        //    if (cbFilterAlbum.SelectedIndex == 0)
+        //    {
+        //        return musicListViewManager.GetMusicInfo(a => new ArtistInfo(MusicListViewManager.CapitalizeWords(a.Artist), a.MusicPictureMedium));
+        //    }
+
+        //    return artistInfo
+        //                .Where(s => s.Name.Equals(cbFilterAlbum.SelectedValue?.ToString(), StringComparison.OrdinalIgnoreCase))  // Match by the selected artist
+        //                .ToList();  // Convert the filtered results to a list
+        //}
+
+        public List<AlbumInfo> FilterAlbum(ComboBox cbFilterArtist)
+        {
+            var albumInfo = musicListViewManager.GetMusicInfo(a => new AlbumInfo(MusicListViewManager.CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
+
+            if (cbFilterArtist.SelectedIndex == 0)
+            {
+                return musicListViewManager.GetMusicInfo(a => new AlbumInfo(MusicListViewManager.CapitalizeWords(a.Album), a.Artist, a.MusicPictureMedium, a.Duration));
+            }
+
+            return albumInfo
+                        .Where(s => s.ArtistName.Equals(cbFilterArtist.SelectedValue?.ToString(), StringComparison.OrdinalIgnoreCase))  // Match by the selected artist
+                        .ToList();  // Convert the filtered results to a list
         }
 
         public void CleanPlaybackResources()

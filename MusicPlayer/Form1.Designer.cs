@@ -107,6 +107,14 @@
             picBoxAlbumImage = new PictureBox();
             pnlArtistTrack = new Panel();
             dgvArtistTracks = new DataGridView();
+            contextMenuStrip1 = new ContextMenuStrip(components);
+            playToolStripMenuItem = new ToolStripMenuItem();
+            addToPlaylistToolStripMenuItem = new ToolStripMenuItem();
+            playQueueToolStripMenuItem = new ToolStripMenuItem();
+            newPlaylistToolStripMenuItem = new ToolStripMenuItem();
+            showArtistToolStripMenuItem = new ToolStripMenuItem();
+            showAlbumToolStripMenuItem = new ToolStripMenuItem();
+            propertiesToolStripMenuItem = new ToolStripMenuItem();
             pnlAlbumTrack = new Panel();
             dgvAlbumTracks = new DataGridView();
             PnlHeaderControl = new Panel();
@@ -173,6 +181,7 @@
             ((System.ComponentModel.ISupportInitialize)picBoxAlbumImage).BeginInit();
             pnlArtistTrack.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvArtistTracks).BeginInit();
+            contextMenuStrip1.SuspendLayout();
             pnlAlbumTrack.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvAlbumTracks).BeginInit();
             PnlHeaderControl.SuspendLayout();
@@ -1412,6 +1421,7 @@
             dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
             dgvArtistTracks.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvArtistTracks.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvArtistTracks.ContextMenuStrip = contextMenuStrip1;
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = Color.FromArgb(8, 18, 38);
             dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
@@ -1451,6 +1461,60 @@
             dgvArtistTracks.Size = new Size(775, 340);
             dgvArtistTracks.TabIndex = 4;
             dgvArtistTracks.CellMouseClick += DgvArtistsTracks_CellMouseClick;
+            // 
+            // contextMenuStrip1
+            // 
+            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { playToolStripMenuItem, addToPlaylistToolStripMenuItem, showArtistToolStripMenuItem, showAlbumToolStripMenuItem, propertiesToolStripMenuItem });
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new Size(181, 136);
+            // 
+            // playToolStripMenuItem
+            // 
+            playToolStripMenuItem.Name = "playToolStripMenuItem";
+            playToolStripMenuItem.Size = new Size(180, 22);
+            playToolStripMenuItem.Text = "Play";
+            playToolStripMenuItem.Click += PlayToolStripMenuItem_Click;
+            // 
+            // addToPlaylistToolStripMenuItem
+            // 
+            addToPlaylistToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { playQueueToolStripMenuItem, newPlaylistToolStripMenuItem });
+            addToPlaylistToolStripMenuItem.Name = "addToPlaylistToolStripMenuItem";
+            addToPlaylistToolStripMenuItem.Size = new Size(180, 22);
+            addToPlaylistToolStripMenuItem.Text = "Add to";
+            // 
+            // playQueueToolStripMenuItem
+            // 
+            playQueueToolStripMenuItem.Name = "playQueueToolStripMenuItem";
+            playQueueToolStripMenuItem.Size = new Size(138, 22);
+            playQueueToolStripMenuItem.Text = "Play queue";
+            playQueueToolStripMenuItem.Click += PlayQueueToolStripMenuItem_Click;
+            // 
+            // newPlaylistToolStripMenuItem
+            // 
+            newPlaylistToolStripMenuItem.Name = "newPlaylistToolStripMenuItem";
+            newPlaylistToolStripMenuItem.Size = new Size(138, 22);
+            newPlaylistToolStripMenuItem.Text = "New playlist";
+            // 
+            // showArtistToolStripMenuItem
+            // 
+            showArtistToolStripMenuItem.Name = "showArtistToolStripMenuItem";
+            showArtistToolStripMenuItem.Size = new Size(180, 22);
+            showArtistToolStripMenuItem.Text = "Show artist";
+            showArtistToolStripMenuItem.Click += ShowArtistToolStripMenuItem_Click;
+            // 
+            // showAlbumToolStripMenuItem
+            // 
+            showAlbumToolStripMenuItem.Name = "showAlbumToolStripMenuItem";
+            showAlbumToolStripMenuItem.Size = new Size(180, 22);
+            showAlbumToolStripMenuItem.Text = "Show album";
+            showAlbumToolStripMenuItem.Click += ShowAlbumToolStripMenuItem_Click;
+            // 
+            // propertiesToolStripMenuItem
+            // 
+            propertiesToolStripMenuItem.Name = "propertiesToolStripMenuItem";
+            propertiesToolStripMenuItem.Size = new Size(180, 22);
+            propertiesToolStripMenuItem.Text = "Properties";
+            propertiesToolStripMenuItem.Click += PropertiesToolStripMenuItem_Click;
             // 
             // pnlAlbumTrack
             // 
@@ -1633,6 +1697,7 @@
             CbFilterArtist.Size = new Size(140, 29);
             CbFilterArtist.TabIndex = 14;
             CbFilterArtist.Theme = Modernial.Enum.Poison.ThemeStyle.Dark;
+            toolTipPlayerControl.SetToolTip(CbFilterArtist, "Filter by artist");
             CbFilterArtist.UseCustomBackColor = true;
             CbFilterArtist.UseCustomForeColor = true;
             CbFilterArtist.UseSelectable = true;
@@ -1665,6 +1730,7 @@
             CbFilterAlbum.Size = new Size(140, 29);
             CbFilterAlbum.TabIndex = 13;
             CbFilterAlbum.Theme = Modernial.Enum.Poison.ThemeStyle.Dark;
+            toolTipPlayerControl.SetToolTip(CbFilterAlbum, "Filter by album");
             CbFilterAlbum.UseCustomBackColor = true;
             CbFilterAlbum.UseCustomForeColor = true;
             CbFilterAlbum.UseSelectable = true;
@@ -1716,6 +1782,7 @@
             CbSortMusic.Size = new Size(140, 29);
             CbSortMusic.TabIndex = 11;
             CbSortMusic.Theme = Modernial.Enum.Poison.ThemeStyle.Dark;
+            toolTipPlayerControl.SetToolTip(CbSortMusic, "Sort by");
             CbSortMusic.UseCustomBackColor = true;
             CbSortMusic.UseCustomForeColor = true;
             CbSortMusic.UseSelectable = true;
@@ -1998,6 +2065,7 @@
             DgvMusicList.Size = new Size(756, 390);
             DgvMusicList.TabIndex = 3;
             DgvMusicList.CellMouseClick += DgvMusicList_CellMouseClick;
+            DgvMusicList.RowContextMenuStripNeeded += DgvMusicList_RowContextMenuStripNeeded;
             // 
             // PnlPlayMusicQueue
             // 
@@ -2153,6 +2221,7 @@
             ((System.ComponentModel.ISupportInitialize)picBoxAlbumImage).EndInit();
             pnlArtistTrack.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvArtistTracks).EndInit();
+            contextMenuStrip1.ResumeLayout(false);
             pnlAlbumTrack.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvAlbumTracks).EndInit();
             PnlHeaderControl.ResumeLayout(false);
@@ -2283,5 +2352,13 @@
         private CustomControls.NielarkButton btnSkipBackward;
         private CustomControls.NielarkButton btnShuffle;
         private CustomControls.NielarkButton btnProperties;
+        private ContextMenuStrip contextMenuStrip1;
+        private ToolStripMenuItem playToolStripMenuItem;
+        private ToolStripMenuItem addToPlaylistToolStripMenuItem;
+        private ToolStripMenuItem playQueueToolStripMenuItem;
+        private ToolStripMenuItem newPlaylistToolStripMenuItem;
+        private ToolStripMenuItem showArtistToolStripMenuItem;
+        private ToolStripMenuItem showAlbumToolStripMenuItem;
+        private ToolStripMenuItem propertiesToolStripMenuItem;
     }
 }
