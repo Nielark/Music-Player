@@ -9,6 +9,50 @@ namespace MusicPlayer
 {
     internal class MyModule
     {
+        public static bool dragHeader = false;
+        public static Point startPoint = new Point(0, 0);
+
+        public static void StartDrag(MouseEventArgs e)
+        {
+            // Start dragging
+            dragHeader = true;
+            startPoint = new Point(e.X, e.Y);
+        }
+
+        public static void MovedDrag(Form form,MouseEventArgs e)
+        {
+            // Move the form
+            if (dragHeader)
+            {
+                // Calculate the new position of the form
+                int newLeft = form.Left + e.X - startPoint.X;
+                int newTop = form.Top + e.Y - startPoint.Y;
+
+                // Apply constraint to prevent the form from moving above the top edge
+                form.Left = newLeft;  // No constraints on left
+                form.Top = Math.Max(0, newTop);  // Constraint on top (can't move above the screen)
+
+                // UNCOMMENT THE CODE BELOW TO ALLOW CONSTRAINTS IN EVERY EDGE OF THE SCREEN
+
+                // Ensure the form stays within screen bounds
+                // Rectangle screenBounds = Screen.FromControl(this).Bounds;
+                //int maxX = screenBounds.Right - this.Width;
+                //int maxY = screenBounds.Bottom - this.Height;
+
+                //this.Left = Math.Max(screenBounds.Left, Math.Min(newLeft, maxX));
+                //this.Top = Math.Max(screenBounds.Top, Math.Min(newTop, maxY));
+
+                //int maxLeft = Screen.PrimaryScreen.WorkingArea.Width - this.Width;
+                //int maxTop = Screen.PrimaryScreen.WorkingArea.Height - this.Height;
+            }
+        }
+
+        public static void EndDrag()
+        {
+            // Stop dragging
+            dragHeader = false;
+        }
+
         public static void SetRoundedCorners(Control ctrl, int topLeftRadius, int topRightRadius, int bottomRightRadius, int bottomLeftRadius)
         {
             GraphicsPath gp = new GraphicsPath();
