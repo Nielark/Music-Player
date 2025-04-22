@@ -97,6 +97,7 @@
             btnArtists = new MusicPlayer.CustomControls.NielarkButton();
             btnAlbums = new MusicPlayer.CustomControls.NielarkButton();
             pnlContent = new Panel();
+            pnlPlaylist = new Panel();
             pnlInfo = new Panel();
             btnBack = new MusicPlayer.CustomControls.NielarkButton();
             btnAlbumPlay = new MusicPlayer.CustomControls.NielarkButton();
@@ -1223,6 +1224,7 @@
             // pnlContent
             // 
             pnlContent.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlContent.Controls.Add(pnlPlaylist);
             pnlContent.Controls.Add(pnlInfo);
             pnlContent.Controls.Add(pnlArtistTrack);
             pnlContent.Controls.Add(pnlAlbumTrack);
@@ -1233,6 +1235,17 @@
             pnlContent.Name = "pnlContent";
             pnlContent.Size = new Size(795, 565);
             pnlContent.TabIndex = 2;
+            // 
+            // pnlPlaylist
+            // 
+            pnlPlaylist.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlPlaylist.AutoScroll = true;
+            pnlPlaylist.BackColor = Color.FromArgb(8, 18, 38);
+            pnlPlaylist.Location = new Point(0, 80);
+            pnlPlaylist.Name = "pnlPlaylist";
+            pnlPlaylist.Size = new Size(795, 485);
+            pnlPlaylist.TabIndex = 19;
+            pnlPlaylist.Visible = false;
             // 
             // pnlInfo
             // 
@@ -1461,58 +1474,68 @@
             dgvArtistTracks.Size = new Size(775, 340);
             dgvArtistTracks.TabIndex = 4;
             dgvArtistTracks.CellMouseClick += DgvArtistsTracks_CellMouseClick;
+            dgvArtistTracks.RowContextMenuStripNeeded += DgvArtistTracks_RowContextMenuStripNeeded;
             // 
             // contextMenuStrip1
             // 
+            contextMenuStrip1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { playToolStripMenuItem, addToPlaylistToolStripMenuItem, showArtistToolStripMenuItem, showAlbumToolStripMenuItem, propertiesToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(181, 136);
+            contextMenuStrip1.RenderMode = ToolStripRenderMode.System;
+            contextMenuStrip1.Size = new Size(181, 156);
             // 
             // playToolStripMenuItem
             // 
+            playToolStripMenuItem.Image = Properties.Resources.play;
             playToolStripMenuItem.Name = "playToolStripMenuItem";
-            playToolStripMenuItem.Size = new Size(180, 22);
+            playToolStripMenuItem.Size = new Size(180, 26);
             playToolStripMenuItem.Text = "Play";
             playToolStripMenuItem.Click += PlayToolStripMenuItem_Click;
             // 
             // addToPlaylistToolStripMenuItem
             // 
             addToPlaylistToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { playQueueToolStripMenuItem, newPlaylistToolStripMenuItem });
+            addToPlaylistToolStripMenuItem.Image = (Image)resources.GetObject("addToPlaylistToolStripMenuItem.Image");
             addToPlaylistToolStripMenuItem.Name = "addToPlaylistToolStripMenuItem";
-            addToPlaylistToolStripMenuItem.Size = new Size(180, 22);
+            addToPlaylistToolStripMenuItem.Size = new Size(180, 26);
             addToPlaylistToolStripMenuItem.Text = "Add to";
             // 
             // playQueueToolStripMenuItem
             // 
+            playQueueToolStripMenuItem.Image = (Image)resources.GetObject("playQueueToolStripMenuItem.Image");
             playQueueToolStripMenuItem.Name = "playQueueToolStripMenuItem";
-            playQueueToolStripMenuItem.Size = new Size(138, 22);
+            playQueueToolStripMenuItem.Size = new Size(165, 26);
             playQueueToolStripMenuItem.Text = "Play queue";
             playQueueToolStripMenuItem.Click += PlayQueueToolStripMenuItem_Click;
             // 
             // newPlaylistToolStripMenuItem
             // 
+            newPlaylistToolStripMenuItem.Image = (Image)resources.GetObject("newPlaylistToolStripMenuItem.Image");
             newPlaylistToolStripMenuItem.Name = "newPlaylistToolStripMenuItem";
-            newPlaylistToolStripMenuItem.Size = new Size(138, 22);
+            newPlaylistToolStripMenuItem.Size = new Size(165, 26);
             newPlaylistToolStripMenuItem.Text = "New playlist";
             // 
             // showArtistToolStripMenuItem
             // 
+            showArtistToolStripMenuItem.Image = (Image)resources.GetObject("showArtistToolStripMenuItem.Image");
             showArtistToolStripMenuItem.Name = "showArtistToolStripMenuItem";
-            showArtistToolStripMenuItem.Size = new Size(180, 22);
+            showArtistToolStripMenuItem.Size = new Size(180, 26);
             showArtistToolStripMenuItem.Text = "Show artist";
             showArtistToolStripMenuItem.Click += ShowArtistToolStripMenuItem_Click;
             // 
             // showAlbumToolStripMenuItem
             // 
+            showAlbumToolStripMenuItem.Image = (Image)resources.GetObject("showAlbumToolStripMenuItem.Image");
             showAlbumToolStripMenuItem.Name = "showAlbumToolStripMenuItem";
-            showAlbumToolStripMenuItem.Size = new Size(180, 22);
+            showAlbumToolStripMenuItem.Size = new Size(180, 26);
             showAlbumToolStripMenuItem.Text = "Show album";
             showAlbumToolStripMenuItem.Click += ShowAlbumToolStripMenuItem_Click;
             // 
             // propertiesToolStripMenuItem
             // 
+            propertiesToolStripMenuItem.Image = (Image)resources.GetObject("propertiesToolStripMenuItem.Image");
             propertiesToolStripMenuItem.Name = "propertiesToolStripMenuItem";
-            propertiesToolStripMenuItem.Size = new Size(180, 22);
+            propertiesToolStripMenuItem.Size = new Size(180, 26);
             propertiesToolStripMenuItem.Text = "Properties";
             propertiesToolStripMenuItem.Click += PropertiesToolStripMenuItem_Click;
             // 
@@ -1549,6 +1572,7 @@
             dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
             dgvAlbumTracks.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             dgvAlbumTracks.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvAlbumTracks.ContextMenuStrip = contextMenuStrip1;
             dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle6.BackColor = Color.FromArgb(8, 18, 38);
             dataGridViewCellStyle6.Font = new Font("Segoe UI", 9F);
@@ -1588,6 +1612,7 @@
             dgvAlbumTracks.Size = new Size(775, 345);
             dgvAlbumTracks.TabIndex = 4;
             dgvAlbumTracks.CellMouseClick += DgvAlbumTracks_CellMouseClick;
+            dgvAlbumTracks.RowContextMenuStripNeeded += DgvAlbumTracks_RowContextMenuStripNeeded;
             // 
             // PnlHeaderControl
             // 
@@ -2360,5 +2385,6 @@
         private ToolStripMenuItem showArtistToolStripMenuItem;
         private ToolStripMenuItem showAlbumToolStripMenuItem;
         private ToolStripMenuItem propertiesToolStripMenuItem;
+        private Panel pnlPlaylist;
     }
 }

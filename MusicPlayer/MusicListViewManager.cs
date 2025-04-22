@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static System.ComponentModel.Design.ObjectSelectorEditor;
 
 namespace MusicPlayer
@@ -610,6 +611,14 @@ namespace MusicPlayer
 
                 PanelVisibilityHandler(showPanels, hidePanels);
             }
+        }
+
+        public void GetSelectedRowIndex(DataGridView dgv, ContextMenuStrip cms, DataGridViewRowContextMenuStripNeededEventArgs e)
+        {
+            dgv.ClearSelection();  // Clear current selection
+            dgv.Rows[e.RowIndex].Selected = true;  // Select the row that was right-clicked
+            e.ContextMenuStrip = cms;
+            playerControls.selectedRowIndex = e.RowIndex;
         }
     }
 }

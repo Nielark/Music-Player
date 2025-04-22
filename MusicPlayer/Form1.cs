@@ -374,7 +374,7 @@ namespace MusicPlayer
             DisplayOrHideSubButtons();
 
             Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, PnlMusicList };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum, pnlInfo, pnlArtistTrack, pnlAlbumTrack };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum, pnlInfo, pnlArtistTrack, pnlAlbumTrack, pnlPlaylist };
             PanelVisibilityHandler(showPanels, hidePanels);
         }
 
@@ -421,7 +421,7 @@ namespace MusicPlayer
             pnlSubSelectSign.Visible = false;
 
             Panel[] showPanels = { PnlHeaderControl, PnlPlayQueueControl, PnlPlayMusicQueue };
-            Panel[] hidePanels = { PnlSortControls, pnlMusicLibrary, pnlArtists, pnlAlbum, pnlInfo, pnlArtistTrack, pnlAlbumTrack };
+            Panel[] hidePanels = { PnlSortControls, pnlMusicLibrary, pnlArtists, pnlAlbum, pnlInfo, pnlArtistTrack, pnlAlbumTrack, pnlPlaylist };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Songs";
@@ -431,6 +431,13 @@ namespace MusicPlayer
         {
             UpdateSideBarButtonUI(btnPlayLists, pnlSelectSign, btnHome, btnMusicLibrary, btnPlayQueue, btnSongs, btnArtists, btnAlbums);
             pnlSubSelectSign.Visible = false;
+
+            CbFilterArtist.Visible = false;
+            CbFilterAlbum.Visible = false;
+
+            Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlPlaylist };
+            Panel[] hidePanels = { pnlMusicLibrary, PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum, pnlInfo, pnlArtistTrack, pnlAlbumTrack };
+            PanelVisibilityHandler(showPanels, hidePanels);
         }
 
         // MUSIC LIBRARY SUB BUTTONS
@@ -461,7 +468,7 @@ namespace MusicPlayer
             pnlSubSelectSign.Visible = true;
 
             Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, PnlMusicList };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum, pnlInfo, pnlArtistTrack, pnlAlbumTrack };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, pnlArtists, pnlAlbum, pnlInfo, pnlArtistTrack, pnlAlbumTrack, pnlPlaylist };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Songs";
@@ -491,7 +498,7 @@ namespace MusicPlayer
             pnlSubSelectSign.Visible = true;
 
             Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, pnlArtists };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlAlbum, pnlInfo, pnlArtistTrack, pnlAlbumTrack };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlAlbum, pnlInfo, pnlArtistTrack, pnlAlbumTrack, pnlPlaylist };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Artists";
@@ -562,7 +569,7 @@ namespace MusicPlayer
             pnlSubSelectSign.Visible = true;
 
             Panel[] showPanels = { PnlHeaderControl, PnlSortControls, pnlMusicLibrary, pnlAlbum };
-            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlArtists, pnlInfo, pnlArtistTrack, pnlAlbumTrack };
+            Panel[] hidePanels = { PnlPlayQueueControl, PnlPlayMusicQueue, PnlMusicList, pnlArtists, pnlInfo, pnlArtistTrack, pnlAlbumTrack, pnlPlaylist };
             PanelVisibilityHandler(showPanels, hidePanels);
 
             lblShowLibraryTitle.Text = "Albums";
@@ -638,19 +645,55 @@ namespace MusicPlayer
 
         private void DgvMusicList_RowContextMenuStripNeeded(object sender, DataGridViewRowContextMenuStripNeededEventArgs e)
         {
-            DgvMusicList.ClearSelection();  // Clear current selection
-            DgvMusicList.Rows[e.RowIndex].Selected = true;  // Select the row that was right-clicked
-            e.ContextMenuStrip = contextMenuStrip1;
-            playerControls.selectedRowIndex = e.RowIndex;
+            //DgvMusicList.ClearSelection();  // Clear current selection
+            //DgvMusicList.Rows[e.RowIndex].Selected = true;  // Select the row that was right-clicked
+            //e.ContextMenuStrip = contextMenuStrip1;
+            //playerControls.selectedRowIndex = e.RowIndex;
+
+            musicListViewManager.GetSelectedRowIndex(DgvMusicList, contextMenuStrip1, e);
+            contextMenuStrip1.Tag = DgvMusicList;
+
+            // Hide and show the context menu items based on the selected DataGridView
+            showArtistToolStripMenuItem.Visible = true;
+            showAlbumToolStripMenuItem.Visible = true;
+        }
+
+        private void DgvArtistTracks_RowContextMenuStripNeeded(object sender, DataGridViewRowContextMenuStripNeededEventArgs e)
+        {
+            musicListViewManager.GetSelectedRowIndex(dgvArtistTracks, contextMenuStrip1, e);
+            contextMenuStrip1.Tag = dgvArtistTracks;
+
+            // Hide and show the context menu items based on the selected DataGridView
+            showArtistToolStripMenuItem.Visible = false;
+            showAlbumToolStripMenuItem.Visible = true;
+        }
+
+        private void DgvAlbumTracks_RowContextMenuStripNeeded(object sender, DataGridViewRowContextMenuStripNeededEventArgs e)
+        {
+            musicListViewManager.GetSelectedRowIndex(dgvAlbumTracks, contextMenuStrip1, e);
+            contextMenuStrip1.Tag = dgvAlbumTracks;
+
+            // Hide and show the context menu items based on the selected DataGridView
+            showArtistToolStripMenuItem.Visible = true;
+            showAlbumToolStripMenuItem.Visible = false;
         }
 
         private void PlayToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Check if the context menu strip has a tag (i.e., if a DataGridView is associated with it)
+            if (contextMenuStrip1.Tag == null)
+            {
+                MessageBox.Show("No music selected!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            DataGridView dgv = (DataGridView)contextMenuStrip1.Tag;  // Get the DataGridView from the context menu strip
+            
             var selectedRowIndex = playerControls.selectedRowIndex;
 
-            string? title = DgvMusicList.Rows[selectedRowIndex].Cells[2].Value.ToString();
-            string? artist = DgvMusicList.Rows[selectedRowIndex].Cells[3].Value.ToString();
-            string? getFilePath = DgvMusicList.Rows[selectedRowIndex].Cells[6].Value.ToString();
+            string? title = dgv.Rows[selectedRowIndex].Cells[2].Value.ToString();
+            string? artist = dgv.Rows[selectedRowIndex].Cells[3].Value.ToString();
+            string? getFilePath = dgv.Rows[selectedRowIndex].Cells[6].Value.ToString();
 
             musicListViewManager.playMusicQueue = musicList
                                 .Where(s => s.File.Equals(getFilePath))
@@ -667,7 +710,16 @@ namespace MusicPlayer
 
         private void ShowArtistToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var nameIdentifier = DgvMusicList.Rows[playerControls.selectedRowIndex].Cells[3].Value.ToString();  // Get the artist name from the selected row
+            // Check if the context menu strip has a tag (i.e., if a DataGridView is associated with it)
+            if (contextMenuStrip1.Tag == null)
+            {
+                MessageBox.Show("No music selected!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            DataGridView dgv = (DataGridView)contextMenuStrip1.Tag;  // Get the DataGridView from the context menu strip
+
+            var nameIdentifier = dgv.Rows[playerControls.selectedRowIndex].Cells[3].Value.ToString();  // Get the artist name from the selected row
 
             // Check if the artist name is null or empty
             if (nameIdentifier == null)
@@ -690,12 +742,21 @@ namespace MusicPlayer
 
         private void ShowAlbumToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var nameIdentifier = DgvMusicList.Rows[playerControls.selectedRowIndex].Cells[4].Value.ToString();  // Get the artist name from the selected row
+            // Check if the context menu strip has a tag (i.e., if a DataGridView is associated with it)
+            if (contextMenuStrip1.Tag == null)
+            {
+                MessageBox.Show("No music selected!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            DataGridView dgv = (DataGridView)contextMenuStrip1.Tag;  // Get the DataGridView from the context menu strip
+
+            var nameIdentifier = dgv.Rows[playerControls.selectedRowIndex].Cells[4].Value.ToString();  // Get the artist name from the selected row
 
             // Check if the artist name is null or empty
             if (nameIdentifier == null)
             {
-                MessageBox.Show("Artist not found! Please check if the artist exists.",
+                MessageBox.Show("Album not found! Please check if the album exists.",
                                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -713,18 +774,36 @@ namespace MusicPlayer
 
         private void PropertiesToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Check if the context menu strip has a tag (i.e., if a DataGridView is associated with it)
+            if (contextMenuStrip1.Tag == null)
+            {
+                MessageBox.Show("No music selected!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            DataGridView dgv = (DataGridView)contextMenuStrip1.Tag;  // Get the DataGridView from the context menu strip
+
             // Open the Music Properties form
-            Form MusicProperties = new MusicProperties(this, playerControls, DgvMusicList);
+            Form MusicProperties = new MusicProperties(this, playerControls, dgv);
             MusicProperties.ShowDialog();
         }
 
         private void PlayQueueToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Check if the context menu strip has a tag (i.e., if a DataGridView is associated with it)
+            if (contextMenuStrip1.Tag == null)
+            {
+                MessageBox.Show("No music selected!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            DataGridView dgv = (DataGridView)contextMenuStrip1.Tag;  // Get the DataGridView from the context menu strip
+
             var selectedRowIndex = playerControls.selectedRowIndex;
 
-            string? title = DgvMusicList.Rows[selectedRowIndex].Cells[2].Value.ToString();
-            string? artist = DgvMusicList.Rows[selectedRowIndex].Cells[3].Value.ToString();
-            string? getFilePath = DgvMusicList.Rows[selectedRowIndex].Cells[6].Value.ToString();
+            string? title = dgv.Rows[selectedRowIndex].Cells[2].Value.ToString();
+            string? artist = dgv.Rows[selectedRowIndex].Cells[3].Value.ToString();
+            string? getFilePath = dgv.Rows[selectedRowIndex].Cells[6].Value.ToString();
 
             var playMusicQueue = musicList
                                 .Where(s => s.File.Equals(getFilePath))
